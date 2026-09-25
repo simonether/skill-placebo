@@ -46,3 +46,12 @@ def test_limit_hits_catches_auth_failure(tmp_path):
     ev = {"type": "result", "is_error": True, "result": "Not logged in · Please run /login"}
     (d / "claude-code.txt").write_text(json.dumps(ev))
     assert limit_hits(tmp_path / "trial")
+
+
+def test_exception_txt_task_text_does_not_stop(tmp_path):
+    t = tmp_path / "trial"
+    t.mkdir()
+    (t / "exception.txt").write_text("NonZeroAgentExitCodeError: printf '%s' 'Missing X-Team-ID must return 401 Unauthorized and 429 on quota' | claude")
+    assert limit_hits(t) == []
+    (t / "exception.txt").write_text("failed to resolve source metadata for docker.io/library/python: unexpected status from HEAD request to https://registry-1.docker.io/v2/x: 429 Too Many Requests")
+    assert limit_hits(t)

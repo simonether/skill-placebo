@@ -33,6 +33,9 @@ LIMIT_MARKERS = re.compile(
 )
 
 
+DOCKER_LIMIT = re.compile(r"toomanyrequests|registry[^\n]{0,200}429 Too Many Requests|pull rate limit", re.I)
+
+
 @dataclass(frozen=True)
 class Arm:
     name: str                      # baseline | placebo-<tier> | skill-<id>
@@ -112,9 +115,9 @@ def harbor_cmd(trial: Trial, h: Harness, arm: Arm, dataset: list[str], jobs_dir:
 
 
 def limit_hits(trial_dir: Path) -> list[str]:
-    """Limit / throttling markers in a finished trial. Only harness-level events are scanned
-    (Claude Code stream-json events other than assistant/user turns, Codex error and turn.failed
-    events, Harbor's exception.txt), so a task that itself deals with HTTP 429 cannot trigger it."""
+    """Limit, throttling and auth-failure markers in a finished trial. Only harness-level events
+    are scanned (Claude Code stream-json events other than assistant/user turns, Codex error and
+    turn.failed events), so a task that itself deals with HTTP 401/429 cannot trigger a stop."""
     hits = []
 
     def check(name, text):
@@ -122,8 +125,13 @@ def limit_hits(trial_dir: Path) -> list[str]:
         if m:
             hits.append(f"{name}: …{text[max(0, m.start() - 80): m.end() + 80]}…".replace("\n", " "))
 
+    # exception.txt embeds the full agent command, task instruction included, so only Docker
+    # registry throttling is looked for there; model-side limits come from structured events.
     for p in trial_dir.rglob("exception.txt"):
-        check(p.name, p.read_text(errors="replace"))
+        text = p.read_text(errors="replace")
+        m = DOCKER_LIMIT.search(text)
+        if m:
+            hits.append(f"{p.name}: …{text[max(0, m.start() - 80): m.end() + 80]}…".replace("\n", " "))
     for p in list(trial_dir.rglob("claude-code.txt")) + list(trial_dir.rglob("codex.txt")):
         for line in p.read_text(errors="replace").splitlines():
             try:
