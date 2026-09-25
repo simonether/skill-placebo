@@ -1,0 +1,30 @@
+import json
+
+from skill_placebo.collect import cost_from_tokens, rows
+
+
+def test_cost_from_tokens_sonnet():
+    # 1M uncached-equivalent split: 100k uncached, 800k cache read, 100k cache write; 10k output
+    c = cost_from_tokens("anthropic/claude-sonnet-5", 1_000_000, 800_000, 100_000, 10_000)
+    assert abs(c - (100_000 * 2 + 800_000 * 0.2 + 100_000 * 2.5 + 10_000 * 10) / 1e6) < 1e-9
+    assert cost_from_tokens("unknown-model", 1, 0, 0, 1) is None
+
+
+def test_rows_parse_job_name_and_trial(tmp_path):
+    job = tmp_path / "b00-0003__claude-code__placebo-t1__swebench-verified_django__django-10973"
+    t = job / "django__django-10973__abc1234"
+    (t / "agent").mkdir(parents=True)
+    (t / "result.json").write_text(json.dumps({
+        "task_name": "django__django-10973", "trial_name": "django__django-10973__abc1234",
+        "agent_info": {"model_info": {"name": "claude-sonnet-5"}},
+        "agent_result": {"n_input_tokens": 1000, "n_cache_tokens": 600, "n_output_tokens": 50, "cost_usd": 0.01},
+        "verifier_result": {"rewards": {"reward": 1.0}},
+    }))
+    (t / "agent" / "trajectory.json").write_text(json.dumps({
+        "final_metrics": {"extra": {"total_cache_creation_input_tokens": 100}},
+        "steps": [{"tool_calls": [{"function_name": "Skill", "arguments": {"skill": "x"}}]}],
+    }))
+    (r,) = list(rows(tmp_path))
+    assert r["harness"] == "claude-code" and r["arm"] == "placebo-t1"
+    assert r["task"] == "swebench-verified_django__django-10973"
+    assert r["passed"] == 1 and r["skill_fired"] == 1 and r["n_cache_write"] == 100
