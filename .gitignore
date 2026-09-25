@@ -25,3 +25,4 @@ jobs/
 runs/raw/
 tmp/
 *.log
+.pytest_cache/

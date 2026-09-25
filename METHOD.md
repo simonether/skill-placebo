@@ -138,8 +138,10 @@ All comparisons are within one harness and paired by task.
 
 - **Cost ratio** R = mean cost (skill) / mean cost (placebo). **Pass difference** D = pass rate
   (skill) - pass rate (placebo), in percentage points.
-- 95% confidence intervals by cluster bootstrap: resample tasks with replacement, then trials within
-  each task, 10,000 resamples, fixed seed. p-values from the same bootstrap (two-sided).
+- 95% confidence intervals by cluster bootstrap over tasks: resample tasks with replacement (the
+  same tasks for both arms), keep all trials of each resampled task, 10,000 resamples, seed
+  20260925. Two-sided p-values from the same bootstrap distribution. Implementation:
+  `src/skill_placebo/analysis.py`, committed before any data.
 - Multiple comparisons: Holm correction across the 10 skills, separately per harness and per
   outcome. Tables show unadjusted 95% CIs; verdicts use Holm-adjusted p < 0.05.
 - The same statistics are reported for skill vs baseline and placebo vs baseline.
