@@ -38,3 +38,11 @@ def test_limit_hits_ignores_task_content_but_catches_events(tmp_path):
     lines.append({"type": "rate_limit_event", "rate_limit_info": {"status": "allowed_warning"}})
     (d / "claude-code.txt").write_text("\n".join(json.dumps(x) for x in lines))
     assert limit_hits(tmp_path / "trial")
+
+
+def test_limit_hits_catches_auth_failure(tmp_path):
+    d = tmp_path / "trial" / "agent"
+    d.mkdir(parents=True)
+    ev = {"type": "result", "is_error": True, "result": "Not logged in · Please run /login"}
+    (d / "claude-code.txt").write_text(json.dumps(ev))
+    assert limit_hits(tmp_path / "trial")

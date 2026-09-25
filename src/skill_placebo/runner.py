@@ -26,7 +26,9 @@ HARBOR_VERSION = "0.23.0"  # pinned in pyproject.toml; custom agents in skill_pl
 # Markers of a usage limit or throttling in agent logs. Any hit stops the batch (METHOD.md 12).
 LIMIT_MARKERS = re.compile(
     r"rate[_ ]limit(?:ed|_error|_event)|usage limit|limit reached|allowed_warning|"
-    r"\b429\b|too many requests|quota|weekly limit|resets at",
+    r"\b429\b|too many requests|quota|weekly limit|resets at|"
+    # Authentication failures also stop the batch: every later trial would fail the same way.
+    r"authentication_failed|not logged in|invalid[_ ]api[_ ]key|oauth token has expired|\b401\b",
     re.I,
 )
 
