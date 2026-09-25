@@ -1,0 +1,27 @@
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# Claude Code local + secrets (API keys live only in .secrets/api.env)
+.claude/settings.local.json
+CLAUDE.local.md
+.secrets/
+.env
+*.env
+
+# Python / node
+.venv/
+__pycache__/
+*.pyc
+dist/
+build/
+*.egg-info/
+node_modules/
+
+# Raw run output: Harbor jobs, container logs. Published only after scrubbing (scripts/scrub.py)
+jobs/
+runs/raw/
+tmp/
+*.log
