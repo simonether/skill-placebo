@@ -1,0 +1,256 @@
+{
+ "sources": {
+  "swebench-verified": {
+   "git": "https://github.com/laude-institute/harbor-datasets.git",
+   "commit": "86723674f04e4209ac479d0fb75d9d9f44b4377e"
+  },
+  "terminal-bench-2-1": {
+   "git": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+   "commit": "7131e4375048a0e408a8fb404b5f499d726b695b"
+  },
+  "openthoughts-tblite": {
+   "git": "https://github.com/open-thoughts/OpenThoughts-TBLite.git",
+   "commit": "f075e463472c7790b85793b392dff1fff20cc0e3"
+  }
+ },
+ "tasks": [
+  {
+   "source": "swebench-verified",
+   "name": "django__django-10973",
+   "path": "tasks/pool/swebench-verified/django__django-10973",
+   "patches": [
+    "FROM -> ghcr.io/epoch-research/swe-bench.eval.arm64.django__django-10973@sha256:d745b55cd7ba4c77dc67a3b2eb5007e2d1e4ddb609e3e861bac2621e84c335b2",
+    "agent timeout 3000 -> 1200"
+   ]
+  },
+  {
+   "source": "swebench-verified",
+   "name": "django__django-13401",
+   "path": "tasks/pool/swebench-verified/django__django-13401",
+   "patches": [
+    "FROM -> ghcr.io/epoch-research/swe-bench.eval.arm64.django__django-13401@sha256:26307abc1ba36b062ecfd8ba0357e3bbfcfb0e1264b9f7ef776bd10c75650608",
+    "agent timeout 3000 -> 1200"
+   ]
+  },
+  {
+   "source": "swebench-verified",
+   "name": "django__django-13925",
+   "path": "tasks/pool/swebench-verified/django__django-13925",
+   "patches": [
+    "FROM -> ghcr.io/epoch-research/swe-bench.eval.arm64.django__django-13925@sha256:8d223353a1542e377f4bf5695c42fcd2a2fe7bb7e78c8c88eab191bc297a9598",
+    "agent timeout 3000 -> 1200"
+   ]
+  },
+  {
+   "source": "swebench-verified",
+   "name": "django__django-14376",
+   "path": "tasks/pool/swebench-verified/django__django-14376",
+   "patches": [
+    "FROM -> ghcr.io/epoch-research/swe-bench.eval.arm64.django__django-14376@sha256:a4d53c909207df34e06b1a8a5916a49bd25fe1605c7d32393517f12e90f5e6a7",
+    "agent timeout 3000 -> 1200"
+   ]
+  },
+  {
+   "source": "swebench-verified",
+   "name": "django__django-14404",
+   "path": "tasks/pool/swebench-verified/django__django-14404",
+   "patches": [
+    "FROM -> ghcr.io/epoch-research/swe-bench.eval.arm64.django__django-14404@sha256:a710bbf5156359b8ce72f505362ffbc03b7d89bc82b2d1a0acb1987bef6cc8ee",
+    "agent timeout 3000 -> 1200"
+   ]
+  },
+  {
+   "source": "swebench-verified",
+   "name": "django__django-14534",
+   "path": "tasks/pool/swebench-verified/django__django-14534",
+   "patches": [
+    "FROM -> ghcr.io/epoch-research/swe-bench.eval.arm64.django__django-14534@sha256:0a9abe8bd0663ff2eafbc612421baaa0d02d9d6ece0f895d20e1e444b00ef3eb",
+    "agent timeout 3000 -> 1200"
+   ]
+  },
+  {
+   "source": "swebench-verified",
+   "name": "django__django-14725",
+   "path": "tasks/pool/swebench-verified/django__django-14725",
+   "patches": [
+    "FROM -> ghcr.io/epoch-research/swe-bench.eval.arm64.django__django-14725@sha256:90cb826e1a7072f3b3b5b5d48c979564f8a9fb3622888ce2268350aa3239386d",
+    "agent timeout 3000 -> 1200"
+   ]
+  },
+  {
+   "source": "swebench-verified",
+   "name": "django__django-16454",
+   "path": "tasks/pool/swebench-verified/django__django-16454",
+   "patches": [
+    "FROM -> ghcr.io/epoch-research/swe-bench.eval.arm64.django__django-16454@sha256:f229e82282009f10dee564650c016e8b05a8033a3a6c16553e6d047b0fdfcb1e",
+    "agent timeout 3000 -> 1200"
+   ]
+  },
+  {
+   "source": "swebench-verified",
+   "name": "django__django-16950",
+   "path": "tasks/pool/swebench-verified/django__django-16950",
+   "patches": [
+    "FROM -> ghcr.io/epoch-research/swe-bench.eval.arm64.django__django-16950@sha256:dec9c44aa5ef52a811531732a62001ea28fe794f09bfd9f81c74e3bd77beb1cf",
+    "agent timeout 3000 -> 1200"
+   ]
+  },
+  {
+   "source": "swebench-verified",
+   "name": "sympy__sympy-13031",
+   "path": "tasks/pool/swebench-verified/sympy__sympy-13031",
+   "patches": [
+    "FROM -> ghcr.io/epoch-research/swe-bench.eval.arm64.sympy__sympy-13031@sha256:62b9003c0297529ee26425638af9ae8c406514d1c409f415cb9d51f71d680edb",
+    "agent timeout 3000 -> 1200"
+   ]
+  },
+  {
+   "source": "swebench-verified",
+   "name": "sympy__sympy-14976",
+   "path": "tasks/pool/swebench-verified/sympy__sympy-14976",
+   "patches": [
+    "FROM -> ghcr.io/epoch-research/swe-bench.eval.arm64.sympy__sympy-14976@sha256:077064ba433b9b9d1eaa0f95b10bf37170d3e065eb6e2be82edaf604b141d62f",
+    "agent timeout 3000 -> 1200"
+   ]
+  },
+  {
+   "source": "swebench-verified",
+   "name": "sympy__sympy-18211",
+   "path": "tasks/pool/swebench-verified/sympy__sympy-18211",
+   "patches": [
+    "FROM -> ghcr.io/epoch-research/swe-bench.eval.arm64.sympy__sympy-18211@sha256:459e5daffe0a9b8c7513f272afc42ce58e8dc87e253e8b363cbcfcc00d92ea75",
+    "agent timeout 3000 -> 1200"
+   ]
+  },
+  {
+   "source": "swebench-verified",
+   "name": "pytest-dev__pytest-7490",
+   "path": "tasks/pool/swebench-verified/pytest-dev__pytest-7490",
+   "patches": [
+    "FROM -> ghcr.io/epoch-research/swe-bench.eval.arm64.pytest-dev__pytest-7490@sha256:f049336c9c8201e8c61280685655078ee5fdd2c8e087c9830816af9e54e92fe9",
+    "agent timeout 3000 -> 1200"
+   ]
+  },
+  {
+   "source": "swebench-verified",
+   "name": "mwaskom__seaborn-3069",
+   "path": "tasks/pool/swebench-verified/mwaskom__seaborn-3069",
+   "patches": [
+    "FROM -> ghcr.io/epoch-research/swe-bench.eval.arm64.mwaskom__seaborn-3069@sha256:d69b41f4a45e52de029b569c7fd7be022b1e9727cb810ca84907908b65c86510",
+    "agent timeout 3000 -> 1200"
+   ]
+  },
+  {
+   "source": "terminal-bench-2-1",
+   "name": "cancel-async-tasks",
+   "path": "tasks/pool/terminal-bench-2-1/cancel-async-tasks",
+   "patches": [
+    "prebuilt docker_image dropped, built from Dockerfile"
+   ]
+  },
+  {
+   "source": "terminal-bench-2-1",
+   "name": "extract-elf",
+   "path": "tasks/pool/terminal-bench-2-1/extract-elf",
+   "patches": [
+    "prebuilt docker_image dropped, built from Dockerfile"
+   ]
+  },
+  {
+   "source": "terminal-bench-2-1",
+   "name": "openssl-selfsigned-cert",
+   "path": "tasks/pool/terminal-bench-2-1/openssl-selfsigned-cert",
+   "patches": [
+    "prebuilt docker_image dropped, built from Dockerfile"
+   ]
+  },
+  {
+   "source": "terminal-bench-2-1",
+   "name": "sanitize-git-repo",
+   "path": "tasks/pool/terminal-bench-2-1/sanitize-git-repo",
+   "patches": [
+    "prebuilt docker_image dropped, built from Dockerfile"
+   ]
+  },
+  {
+   "source": "terminal-bench-2-1",
+   "name": "sqlite-with-gcov",
+   "path": "tasks/pool/terminal-bench-2-1/sqlite-with-gcov",
+   "patches": [
+    "prebuilt docker_image dropped, built from Dockerfile"
+   ]
+  },
+  {
+   "source": "terminal-bench-2-1",
+   "name": "largest-eigenval",
+   "path": "tasks/pool/terminal-bench-2-1/largest-eigenval",
+   "patches": [
+    "prebuilt docker_image dropped, built from Dockerfile"
+   ]
+  },
+  {
+   "source": "terminal-bench-2-1",
+   "name": "sparql-university",
+   "path": "tasks/pool/terminal-bench-2-1/sparql-university",
+   "patches": [
+    "prebuilt docker_image dropped, built from Dockerfile"
+   ]
+  },
+  {
+   "source": "terminal-bench-2-1",
+   "name": "financial-document-processor",
+   "path": "tasks/pool/terminal-bench-2-1/financial-document-processor",
+   "patches": [
+    "prebuilt docker_image dropped, built from Dockerfile"
+   ]
+  },
+  {
+   "source": "openthoughts-tblite",
+   "name": "todos-api",
+   "path": "tasks/pool/openthoughts-tblite/todos-api",
+   "patches": []
+  },
+  {
+   "source": "openthoughts-tblite",
+   "name": "api-endpoint-permission-canonicalizer",
+   "path": "tasks/pool/openthoughts-tblite/api-endpoint-permission-canonicalizer",
+   "patches": []
+  },
+  {
+   "source": "openthoughts-tblite",
+   "name": "build-merkle-tree-cli-sha512",
+   "path": "tasks/pool/openthoughts-tblite/build-merkle-tree-cli-sha512",
+   "patches": []
+  },
+  {
+   "source": "openthoughts-tblite",
+   "name": "fix_async_worker_queue",
+   "path": "tasks/pool/openthoughts-tblite/fix_async_worker_queue",
+   "patches": []
+  },
+  {
+   "source": "openthoughts-tblite",
+   "name": "pandas-etl",
+   "path": "tasks/pool/openthoughts-tblite/pandas-etl",
+   "patches": []
+  },
+  {
+   "source": "openthoughts-tblite",
+   "name": "python-api-rate-limit",
+   "path": "tasks/pool/openthoughts-tblite/python-api-rate-limit",
+   "patches": []
+  },
+  {
+   "source": "openthoughts-tblite",
+   "name": "build-system-task-ordering",
+   "path": "tasks/pool/openthoughts-tblite/build-system-task-ordering",
+   "patches": []
+  },
+  {
+   "source": "openthoughts-tblite",
+   "name": "application-debug",
+   "path": "tasks/pool/openthoughts-tblite/application-debug",
+   "patches": []
+  }
+ ]
+}
