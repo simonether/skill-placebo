@@ -65,9 +65,10 @@ Registry datasets relevant here (from repo `registry.json`): `terminal-bench@2.0
   - claude-code: `cp -r /harbor/skills/* $CLAUDE_CONFIG_DIR/skills/`, i.e. `/logs/agent/sessions/skills` (claude_code.py:1627-1639)
   - codex: `$HOME/.agents/skills/` (codex.py:1197-1205)
   - opencode: `~/.config/opencode/skills/` (opencode.py:447-455)
-- **Only SKILL.md skill directories are handled.** Plugin **hooks, agents, commands, MCP servers and `.claude-plugin/plugin.json` are ignored.** For obra/superpowers the SessionStart hook (`hooks/hooks.json` → `hooks/session-start`) is what injects the `using-superpowers` bootstrap text. With `--skill obra/superpowers`, Claude only sees 14 skill descriptions and never gets the bootstrap. That is a different treatment from "superpowers installed".
+- **Only SKILL.md skill directories are handled.** Plugin **hooks, agents, commands, MCP servers and `.claude-plugin/plugin.json` are ignored.** For obra/superpowers the SessionStart hook (`hooks/hooks.json` → `hooks/session-start`) is what injects the `using-superpowers` bootstrap text. With `--skill obra/superpowers`, Claude only sees 15 skill descriptions and never gets the bootstrap. That is a different treatment from "superpowers installed".
+- **Smoke-tested locally [V]** with the `oracle` agent (no LLM) on a throwaway alpine task. `--skill obra/superpowers@v6.4.1` resolved to commit b92c4fa and uploaded 15 dirs to `/harbor/skills/`. `lock.json` recorded a sha256 digest per skill. `--mounts` and `--ae` were visible inside the agent phase, `--artifact` downloaded files, and the reward was parsed (1.0).
 - Repo compatibility checked via `gh api`:
-  - `obra/superpowers@v6.4.1`: `skills/` holds 14 dirs, each with SKILL.md. OK.
+  - `obra/superpowers@v6.4.1`: `skills/` holds 15 dirs, each with SKILL.md. OK.
   - `DietrichGebert/ponytail`: 6 skill dirs. Probably OK [U].
   - `JuliusBrussee/caveman`: `skills/` contains `generated/` and `native/` without SKILL.md, so **`--skill JuliusBrussee/caveman` will raise**. Use `https://github.com/JuliusBrussee/caveman/tree/<ref>/skills/caveman` per skill.
 
@@ -98,6 +99,7 @@ The cleanest route needs **no Harbor code**:
   - (b) A subclass that appends `claude plugin marketplace add /opt/plugins/x && claude plugin install x@<marketplace>` to the setup command. It must run with `CLAUDE_CONFIG_DIR` already set. Overriding `_build_register_skills_command` does that, because its output is appended to the setup command executed with the run env (claude_code.py:1838-1863).
   - (c) `CLAUDE_CODE_PLUGIN_SEED_DIR`, a pre-populated plugins dir baked into an image (env-vars.md line 338).
   - `extraKnownMarketplaces`/`enabledPlugins` in `--settings` is **not** reliable. A plugin enabled only in settings "isn't fetched onto a machine where it isn't installed" unless the source is relative-path or seeded (plugins/loading.md line 145).
+- **Local check [V]** with host `claude` 2.1.280, a scratch `CLAUDE_CONFIG_DIR` and no credentials. `CLAUDE_CODE_PLUGIN_DIRS=<vendored superpowers> claude plugin list` gives `superpowers@inline … ✔ loaded`. `claude plugin details superpowers` shows 15 skills, Hooks (1) SessionStart, and **always-on ~703 tok**. It labels the hook "harness-only — no model context cost", but running `hooks/session-start` shows it injects `additionalContext` of 3,405 chars / 520 words (about 850 tokens at chars/4; [U] exact count). **So the always-on context is about 1.5k tokens, and `details` under-reports hook-injected context.** Match the placebo against both numbers.
 - Verification in the pilot: look for the hook's injected text or `Skill` tool calls in `/logs/agent/sessions/projects/-app/*.jsonl`. `claude --plugin-dir X plugin list` inside the container should show `X@inline`.
 
 ### A.8 Codex specifics (Harbor side) [V unless marked]
@@ -105,7 +107,7 @@ The cleanest route needs **no Harbor code**:
 - `CODEX_HOME=/tmp/codex-home` (codex.py:81, 1352-1360). Harbor uploads the effective `config.toml` there (user `--ak config` merged with runtime inputs), then runs setup (auth symlink + skills copy).
 - Auth: **`OPENAI_API_KEY` by default**. Harbor writes `$CODEX_HOME/auth.json` as `{"OPENAI_API_KEY": ...}`. ChatGPT-login `auth.json` is used only if `CODEX_AUTH_JSON_PATH=<file>` or `CODEX_FORCE_AUTH_JSON=1` (codex.py:1299-1330, 1344-1395).
 - Command (codex.py:1432-1447): `codex exec --dangerously-bypass-approvals-and-sandbox --skip-git-repo-check --model <model> --json --enable unified_exec [-c model_reasoning_effort=...] -- '<instruction>' | tee /logs/agent/codex.txt`. Sessions are copied to `/logs/agent/sessions`.
-- Model: `-m openai/<model>`. Harbor strips the prefix (codex.py:1338). Effort: `--ak reasoning_effort=low|medium|high|...`.
+- Model: `-m openai/<model>`. Harbor strips the prefix (codex.py:1339). Effort: `--ak reasoning_effort=low|medium|high|...`.
 - Skills (`--skill`) are copied to `$HOME/.agents/skills` (codex.py:1197-1205). That is Codex's documented user-level skills dir. Codex also scans `$CWD/.agents/skills` up to the repo root, `/etc/codex/skills`, and **bundled system skills**, which are present in every arm. The skills catalog budget is at most 2% of the context window, or 8,000 chars (https://learn.chatgpt.com/docs/build-skills).
 - AGENTS.md: global scope is `$CODEX_HOME/AGENTS.override.md` or `AGENTS.md`. Project scope walks root→cwd, capped at `project_doc_max_bytes` = 32 KiB (https://learn.chatgpt.com/docs/agent-configuration/agents-md). The native placebo route is `developer_instructions` via `--ak config`. An AGENTS.md needs a subclass.
 - **Plugins in Codex 0.156.1 (local `codex plugin --help`):**
@@ -118,6 +120,7 @@ The cleanest route needs **no Harbor code**:
   - Trust is stored as `[hooks.state."<key>"] trusted_hash = "<hash>"` in user config.toml (codex-rs/config/src/hook_config.rs:32; core/tests/common/hooks.rs:55-63).
   - `codex exec --dangerously-bypass-hook-trust` runs them without trust (local `codex exec --help`).
   - **Harbor does not pass that flag.** Hook-bearing plugins under Codex therefore need a subclass that appends it (sketch in the Recommended pipeline section).
+- **Local check [V]** with codex 0.156.1, a scratch `CODEX_HOME` and no model calls. `codex plugin marketplace add <vendored superpowers>` gives "Added marketplace `superpowers-dev`" (read from `.agents/plugins/marketplace.json`). `codex plugin add superpowers@superpowers-dev` copied the plugin to `$CODEX_HOME/plugins/cache/superpowers-dev/superpowers/6.4.1` and wrote `[marketplaces.superpowers-dev] source_type="local"` plus `[plugins."superpowers@superpowers-dev"] enabled = true` into `$CODEX_HOME/config.toml`. That works offline, so it will work inside the container after Harbor has written config.toml.
 - What the plugins actually ship for Codex [V via gh api]:
   - superpowers `.codex-plugin/plugin.json` has `"skills": "./skills/", "hooks": {}`, i.e. **no hooks for Codex**. Its `.agents/plugins/marketplace.json` names the marketplace `superpowers-dev`.
   - ponytail's `.codex-plugin/plugin.json` points hooks at `./hooks/claude-codex-hooks.json`, so it does have hooks.
@@ -152,6 +155,9 @@ The cleanest route needs **no Harbor code**:
 - Known macOS issues:
   - `network_mode = "allowlist"` and static `"no-network"` tasks fail on Docker Desktop's LinuxKit kernel before **Docker Desktop 4.86.0**, because of nftables `NFT_FIB_INET` (#2527, #2593; commenters confirm the fix with 4.86/4.87). **This machine runs 4.68, so upgrade Docker Desktop, or avoid such tasks.** TB2 tasks use `allow_internet = true` (checked: fix-git, regex-log, log-summary-date-ranges). [V]
   - Egress sidecar build-lock deadlock with `-n > 1` (#2348). The upstream filelock fix landed, and Harbor pins filelock 3.29.4 [V from the issue thread]. It only matters for allowlist tasks.
+- **Docker Hub rate limit hit during this research [V].** The first real TB2 smoke run (`-t regex-log -a oracle`) failed with `429 Too Many Requests` on `registry-1.docker.io`. The registry's rate-limit headers for this IP read `ratelimit-limit: 100;w=3600`, `ratelimit-remaining: 0`, i.e. the anonymous quota was already used up (docs: unauthenticated 100 pulls / 6 h per IP, personal account 200 / 6 h; https://docs.docker.com/docker-hub/usage/). **Before the pilot:** run `docker login` (the user's own free account), then pre-pull the chosen task images once in a throttled loop. Harbor's `--delete` runs `docker compose down --rmi local`, which keeps tagged pulled images (environments/docker/docker.py:1104-1108), so each image is pulled only once.
+- TB2 verifiers install `curl` and `uv` from the internet at grading time (`tests/test.sh` of regex-log). That makes them slower under emulation and requires network. `terminal-bench-sample@2.0` contains `qemu-alpine-ssh` and `qemu-startup`. Nested QEMU inside an emulated amd64 container is likely to time out on this Mac [U], so exclude them with `-x 'qemu-*'`.
+- Harbor sends PostHog telemetry by default. Opt out with `HARBOR_TELEMETRY=0` (harbor@v0.23.0:src/harbor/telemetry.py:40-45, 480).
 - Resources: TB2 tasks declare `cpus=1, memory_mb=2048`. With 8 GB given to Docker, use **`-n 3`**, or at most 4. The disk has room for the non-huge TB2 images (about 13 GB compressed without the four big ones) [U: estimate].
 
 ---
@@ -200,16 +206,231 @@ No recommendation was made. Revisit when the OpenCode arm is scheduled.
 
 ## Codex (model, pricing, auth; added per scope change)
 
-<!-- CODEX-PRICING-PLACEHOLDER -->
+Harbor-side mechanics (auth, flags, skills, AGENTS.md, plugins, hooks, cost) are in **A.8** and **A.9**. Summary:
+- Agent `-a codex`, model `-m openai/<slug>`, effort `--ak reasoning_effort=...`, pin `--ak version=0.157.0`.
+- Auth is `OPENAI_API_KEY` by default. ChatGPT login is used only with `CODEX_FORCE_AUTH_JSON=1` or `CODEX_AUTH_JSON_PATH`.
+- Skills go to `$HOME/.agents/skills`. For a placebo instruction use `--ak config='{"developer_instructions":"..."}'`.
+- Plugins, including Claude-format marketplaces (`.claude-plugin/marketplace.json`, `.claude-plugin/plugin.json`), install with `codex plugin marketplace add` + `codex plugin add`. Harbor has no native hook for that, so it needs a subclass.
+- Plugin hooks run only if trusted or with `--dangerously-bypass-hook-trust`, which also needs a subclass.
+- Per-trial tokens are recorded. Cost is computed by Harbor through LiteLLM and may be `None` for GPT-6 models, so recompute it.
+
+### Models and prices (OpenAI standard tier, $/MTok; https://developers.openai.com/api/docs/pricing, fetched 2026-09-25) [V]
+| Model | Input | Cached input | Cache write | Output | Notes |
+|---|---|---|---|---|---|
+| gpt-6-astra | 10.00 | 1.00 | 12.50 | 50.00 | top tier, too expensive here |
+| **gpt-6-sol** | **2.00** | **0.20** | **2.50** | **10.00** | "Sol for complex coding and agentic workflows" (learn.chatgpt.com/docs/models) |
+| **gpt-6-luna** | **0.10** | **0.01** | **0.125** | **0.50** | "most efficient model for focused, high-volume tasks" |
+| gpt-5.6-luna | 0.20 | 0.02 | 0.25 | 1.20 | |
+| gpt-5.4-mini | 0.75 | 0.075 | n/a | 4.50 | older |
+- The "gpt-6-sol $2/$0.20/$10" note is **correct**, but add the **$2.50/MTok cache-write** charge. The Artificial Analysis per-task figures reconcile exactly only when cache writes are billed (sub-agent check, below).
+- Long-context rates (2x) apply above 272K input tokens. The Codex model catalog reports `context_window: 272000` for all of these models (`codex debug models`, local 0.156.1), so Codex requests should always be billed at short-context rates [V catalog; U billing edge cases].
+- **Codex default model.** The local catalog orders models by priority: gpt-6-astra (1, default effort low), gpt-6-sol (2, medium), gpt-6-luna (3, medium), gpt-5.6-sol (4). The docs only say it "uses a recommended model" and show `model = "gpt-6-sol"` in the example config. So the no-config default is probably gpt-6-astra, but that is derived from `mark_default_by_picker_visibility` in codex-rs and was not observed [U]. **This is irrelevant under Harbor**, which always passes `--model`.
+- Codex CLI releases: stable rust-v0.157.0 (2026-09-25; notes: "Added GPT-6 Sol and Luna"). The local 0.156.1 already lists gpt-6-sol and luna.
+- **Recommendation.** Use **gpt-6-luna @ medium** as the main Codex arm model for the budget, if the pilot shows a meaningful pass rate (at least 15–20% on the chosen tasks). Otherwise use **gpt-6-sol @ low** on fewer tasks. Run a small gpt-6-sol calibration in the pilot either way. Public data on Luna's pass rate at medium effort was not found [U].
+
+### Claude side, for reference (https://platform.claude.com/docs/en/about-claude/pricing via sub-agent) [V]
+| Model (API id) | Input | 5-min cache write | Cache read | Output |
+|---|---|---|---|---|
+| claude-sonnet-5 | 2.00 | 2.50 | 0.20 | 10.00 |
+| claude-haiku-4-5 | 1.00 | 1.25 | 0.10 | 5.00 |
+| claude-opus-5-5 | 4.00 | 5.00 | 0.20 | 20.00 |
+The Sonnet 5 price of $2/$10 is now the standard price, and the planned move to $3/$15 "will not occur" (pricing-page footnote). LiteLLM 1.102.1 bundled with harbor 0.23.0 has the same claude-sonnet-5 numbers (2.0/0.2/2.5/10.0).
+
+### Claude Max 20x (asked; official sources only) [V quotes, via sub-agent]
+- No official hour or token numbers exist. The plan is "20 times the Pro plan's per-session usage allowance", with 5-hour session resets plus "a weekly usage limit that applies across all models" (https://support.claude.com/en/articles/11049741-what-is-the-max-plan).
+- The July 2025 figure of "240–480 h Sonnet / 24–40 h Opus per week" is **third-party and outdated**. Do not use it.
+- Consumer Terms forbid access "through automated or non-human means… script" except with an API key "or where we otherwise explicitly permit it" (https://www.anthropic.com/legal/consumer-terms). A June 2026 help article says `claude -p` and Agent SDK usage draw from subscription limits (https://support.claude.com/en/articles/15036540). Benchmark-scale automation on a subscription is a grey area, so **use the API key, as planned**.
 
 ---
 
 ## Token and cost estimates per trial
 
-<!-- TOKENS-PLACEHOLDER -->
+### Public data points (sources found by the research sub-agent; URLs as given)
+| Setup | Tasks | Reported per trial | Source |
+|---|---|---|---|
+| Claude Code + Sonnet 5, **low** effort, Harbor | SkillsBench (~10-min tasks) | ~240 trials for ~$106, so **~$0.44/trial**, **~7.2K output tok/trial** | https://blog.jetbrains.com/ai/2026/07/speak-to-ai-agents-like-cavemen-tosave-tokens/ |
+| Claude Code + Sonnet 5, **medium** | SkillsBench | 251 trials for $246.09, so **~$0.98/trial** | https://blog.jetbrains.com/ai/2026/07/ponytail-skill-claude-tested/ |
+| Claude Code + Sonnet 5, low+high mix | SkillsBench | 425 trials for ~$320, so ~$0.75/trial | https://blog.jetbrains.com/ai/2026/07/rtk-claude-code-token-savings/ |
+| Codex + GPT-5.5 | SkillsBench (paper v4, Tab. 15) | 3.22M tok, $3.08/trial | https://arxiv.org/html/2602.12670 |
+| Codex + GPT-6 Sol, **max** | AA Coding Agent Index (22 min avg) | $2.99/task: 9.78M in (9.60M cached, 178K cache-write), 62K out | https://artificialanalysis.ai/agents/coding-agents |
+| Codex + GPT-6 Luna, max | same | $0.18/task | same |
+| Codex + GPT-5.4-mini, medium | JetBrains internal (~3 min tasks) | median $0.139/task | https://blog.jetbrains.com/ai/2026/06/codex-is-now-the-recommended-agent-in-jetbrains-ai/ |
+| Terminal-Bench 2 paper | TB2 | "most trials < 20 min", "< 10M tokens" | https://arxiv.org/html/2601.11868 |
+- The tbench.ai leaderboard now shows Terminal-Bench 4 (cost and token columns, trials of about 28–108 min). There are no TB2 per-run cost pages [V via sub-agent]. The JetBrains SkillsBench posts are the closest match to our setup (Harbor + headless Claude Code + Sonnet 5 + skills). Note that those posts evaluate caveman and ponytail, the same plugins we plan to test. Read them before designing arms.
+
+### Estimates for a ~10-min TB2/SkillsBench-style trial (ESTIMATES, arithmetic shown) [U]
+- **Claude Code + Sonnet 5 @ low:** about **$0.45** (range $0.3–0.7). This is anchored on JetBrains' measured $0.44. Implied profile: 7K output ($0.07) + ~1.2M cache-read ($0.24) + ~45K cache-write ($0.11) + a few K uncached input. The split is assumed.
+- **Claude Code + Sonnet 5 @ medium:** about **$1.0** (measured $0.98). Output is probably 15–25K [U].
+- **User's own prior** (300–600K input mostly cached, 10–20K output) on Sonnet 5: 500K×$0.20 + 30K×$2.50 (writes) + 15K×$10 = 0.10 + 0.075 + 0.15 ≈ **$0.33**. That is consistent with the low-effort data.
+- **Codex + gpt-6-sol @ medium:** about 2.9M cached×$0.20 + 80K writes×$2.50 + 20K uncached×$2 + 25K out×$10 ≈ 0.58 + 0.20 + 0.04 + 0.25 ≈ **$1.07** (range $0.7–1.5). The profile is AA's max-effort tokens scaled to 10/22 of the duration.
+- **Codex + gpt-6-luna @ medium:** the same token profile gives about **$0.05**. Luna tends to use more tokens, so expect **$0.05–0.10**.
+- TB2 on this Mac runs under amd64 emulation. That stretches wall-clock time but not tokens. Longer tool waits do not add model tokens, though timeouts can cut trials short.
+
+### Cost recomputation formulas (use these; don't trust `cost_usd` blindly)
+- Claude (Harbor fields): `uncached = n_input_tokens − n_cache_tokens − cache_write`, where `cache_write = trajectory.final_metrics.extra.total_cache_creation_input_tokens`. Then `$ = (uncached·2 + cache_write·2.5 + n_cache_tokens·0.2 + n_output_tokens·10)/1e6` for Sonnet 5. Compare with `cost_usd`, which is Claude Code's own `total_cost_usd`. Claude Code may use 1-hour cache writes ($4) in some paths [U], and a mismatch would reveal that.
+- Codex: `uncached = n_input − cached − cache_write`, where cache_write = `final_metrics.extra.total_cache_write_input_tokens` if present. Then `$ = (uncached·p_in + cached·p_cached + cache_write·p_write + output·p_out)/1e6`. OpenAI `output_tokens` already include reasoning tokens [U: standard Responses API semantics].
 
 ---
 
 ## Recommended pipeline
 
-<!-- PIPELINE-PLACEHOLDER -->
+Everything below uses Harbor 0.23.0 and local Docker. Items marked [V-offline] were exercised with the `oracle` agent, `--dry-run`, or local CLIs, without any model calls. Everything that needs a model call is [U] until the pilot.
+
+### 0. One-time setup
+```bash
+# Run from a plain terminal, NOT from inside a Claude Code session (it exports ANTHROPIC_BASE_URL etc.)
+unset ANTHROPIC_BASE_URL ANTHROPIC_AUTH_TOKEN CLAUDE_CODE_OAUTH_TOKEN CLAUDE_CODE_EFFORT_LEVEL \
+      CLAUDE_CODE_MAX_TURNS MAX_THINKING_TOKENS CLAUDE_CODE_MAX_OUTPUT_TOKENS CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING
+export HARBOR_TELEMETRY=0
+export ANTHROPIC_API_KEY=...   OPENAI_API_KEY=...        # API keys, not subscriptions
+docker login                                            # user's own account; anonymous Hub quota was exhausted (B)
+# Docker Desktop >= 4.86 recommended (network-policy fixes, B); 8 GB RAM -> -n 3
+uv tool install harbor==0.23.0                          # or: H="uvx --from harbor==0.23.0 harbor"
+git clone --depth 1 --branch v6.4.1 https://github.com/obra/superpowers vendor/superpowers
+# pre-pull task images once (amd64-only; excludes the four >2 GB images and qemu-*)
+```
+Task set for the pilot: `-d terminal-bench-sample@2.0 -x 'qemu-*'` (8 tasks). Or pick TB2 tasks with `-d terminal-bench@2.0 -i <name> ...` and `-x mteb-leaderboard -x mteb-retrieve -x hf-model-inference -x pytorch-model-recovery`.
+
+```bash
+H="harbor"
+COMMON="-d terminal-bench-sample@2.0 -x 'qemu-*' -k 2 -n 3 -o runs --yes --agent-timeout-multiplier 1.5"
+CC="-a claude-code -m anthropic/claude-sonnet-5 --ak version=2.1.282 --ak reasoning_effort=low --ak max_budget_usd=2"
+CX="-a codex -m openai/gpt-6-luna --ak version=0.157.0 --ak reasoning_effort=medium"
+CXP="-a harness.harbor_agents:CodexPlugins -m openai/gpt-6-luna --ak version=0.157.0 --ak reasoning_effort=medium"   # needs PYTHONPATH=$PWD
+# Mount every plugin dir in EVERY arm (symmetry). Only the env var decides whether it loads.
+MNT='[{"type":"bind","source":"'$PWD'/vendor/superpowers","target":"/opt/plugins/superpowers","read_only":true},
+      {"type":"bind","source":"'$PWD'/arms/sham-plugin","target":"/opt/plugins/sham","read_only":true}]'
+```
+Note: `-x 'qemu-*'` must reach harbor unexpanded. In a real script, use an array rather than a string variable.
+
+### 1. Baseline arm (no skill)
+```bash
+$H run $COMMON $CC  --mounts "$MNT" --job-name cc-baseline
+$H run $COMMON $CX  --mounts "$MNT" --job-name cx-baseline
+```
+
+### 2. Placebo arm
+Two placebo levels, matching the two real-skill levels:
+- **2a, skill-level placebo.** `arms/placebo-skills/` contains N `<name>/SKILL.md` dirs. Match the real skills' count, name and description length (always-on tokens), and body length (on-invoke tokens). Use `claude plugin details` numbers (A.7) and a tokenizer count. [V-offline mechanism]
+  ```bash
+  $H run $COMMON $CC --mounts "$MNT" --skill ./arms/placebo-skills --job-name cc-placebo-skill
+  $H run $COMMON $CX --mounts "$MNT" --skill ./arms/placebo-skills --job-name cx-placebo-skill
+  ```
+- **2b, plugin-level placebo ("sham plugin").** `arms/sham-plugin/` copies the real plugin's layout: `.claude-plugin/plugin.json`, `.codex-plugin/plugin.json`, `.agents/plugins/marketplace.json` (marketplace `sham-dev`), `hooks/hooks.json` + a `session-start` script that emits the same JSON shape with a length-matched neutral `additionalContext` (about 850 tokens for superpowers), and `skills/` like 2a.
+  ```bash
+  $H run $COMMON $CC --mounts "$MNT" --ae CLAUDE_CODE_PLUGIN_DIRS=/opt/plugins/sham --job-name cc-placebo-plugin
+  PYTHONPATH=$PWD $H run $COMMON $CXP --mounts "$MNT" \
+     --ae SP_CODEX_MARKETPLACES=/opt/plugins/sham --ae SP_CODEX_PLUGINS=sham@sham-dev --job-name cx-placebo-plugin
+  ```
+- Cheaper, lower-fidelity alternatives for an instruction-only placebo:
+  - Claude: `--ak append_system_prompt="$(cat arms/placebo.md)"`
+  - Codex: `--ak config='{"developer_instructions": "..."}'`
+  These put text in a different position than skills or hooks do, so use them only as an extra "instruction" control.
+
+### 3. Real-skill arm
+- **3a, skills only** (Harbor-native; pinned and recorded in lock.json):
+  ```bash
+  $H run $COMMON $CC --mounts "$MNT" --skill obra/superpowers@v6.4.1 --job-name cc-real-skill
+  $H run $COMMON $CX --mounts "$MNT" --skill obra/superpowers@v6.4.1 --job-name cx-real-skill
+  ```
+- **3b, full plugin** (hooks + skills + agents + commands):
+  ```bash
+  # Claude Code: session-only plugin via env var (CC >= 2.1.280). No Harbor code. [V-offline: loads locally]
+  $H run $COMMON $CC --mounts "$MNT" --ae CLAUDE_CODE_PLUGIN_DIRS=/opt/plugins/superpowers --job-name cc-real-plugin
+  # Codex: plugin install + hook-trust bypass via subclass. [V-offline: dry-run + local plugin add]
+  PYTHONPATH=$PWD $H run $COMMON $CXP --mounts "$MNT" \
+     --ae SP_CODEX_MARKETPLACES=/opt/plugins/superpowers --ae SP_CODEX_PLUGINS=superpowers@superpowers-dev \
+     --job-name cx-real-plugin
+  ```
+  For superpowers on Codex the plugin ships no hooks (`"hooks": {}`), so 3b is roughly the same as 3a. **Skip cx-real-plugin/cx-placebo-plugin for superpowers** and keep them for ponytail (which has Codex hooks) and caveman (Claude-format only, [U] under Codex).
+- In the plugin arms, check that the plugin actually took effect:
+  - Claude: the transcript `agent/sessions/projects/-app/*.jsonl` contains the hook text, and `Skill` tool calls show up.
+  - Codex: `agent/sessions/**/rollout-*.jsonl` shows the plugin skills in the catalog or `SKILL.md` reads.
+  - Abort the arm if nothing fires in the first 2–3 trials.
+
+`harness/harbor_agents.py` (imports and `--dry-run` pass against harbor 0.23.0; not yet run end-to-end):
+```python
+import shlex
+from pathlib import Path
+from harbor.agents.installed.claude_code import ClaudeCode
+from harbor.agents.installed.codex import Codex
+
+_NVM = "if [ -s ~/.nvm/nvm.sh ]; then . ~/.nvm/nvm.sh; fi; "
+
+class CodexPlugins(Codex):
+    """--ae SP_CODEX_MARKETPLACES=/opt/plugins/a:/opt/plugins/b  --ae SP_CODEX_PLUGINS=name@mkt,..."""
+    def _plugin_cmds(self):
+        cmds = [f"{_NVM}codex plugin marketplace add {shlex.quote(s)}"
+                for s in filter(None, (self._get_env("SP_CODEX_MARKETPLACES") or "").split(":"))]
+        cmds += [f"{_NVM}codex plugin add {shlex.quote(p)}"
+                 for p in filter(None, (self._get_env("SP_CODEX_PLUGINS") or "").split(","))]
+        return cmds
+    def _build_register_skills_command(self):
+        # Appended to Codex.run()'s setup, i.e. after config.toml upload, with CODEX_HOME set (codex.py:1405-1413)
+        parts = [p for p in [super()._build_register_skills_command(), *self._plugin_cmds()] if p]
+        return " && ".join(f"( {p} )" for p in parts) if parts else None
+    def build_cli_flags(self):
+        f = super().build_cli_flags()
+        return f"{f} --dangerously-bypass-hook-trust".strip() if self._plugin_cmds() else f
+
+class ClaudeCodeUpload(ClaudeCode):
+    """For Daytona/Modal (no --mounts): --ae SP_UPLOADS='/host/dir=/opt/plugins/x;...'"""
+    async def setup(self, environment):
+        await super().setup(environment)
+        for pair in filter(None, (self._get_env("SP_UPLOADS") or "").split(";")):
+            src, dst = pair.split("=", 1)
+            await environment.upload_dir(source_dir=Path(src), target_dir=dst)
+            await environment.exec(f"chmod -R a+rX {shlex.quote(dst)}", user="root")
+```
+Offline check output: `build_cli_flags()` gives `-c model_reasoning_effort=medium --dangerously-bypass-hook-trust`. `harbor run -a harness.harbor_agents:CodexPlugins ... --dry-run` gives "Dry run OK".
+
+### 4. Extract per-trial pass/fail, tokens, cost
+```python
+# scripts/collect.py  -> runs.csv
+import csv, glob, json, os
+PRICE = {  # $/MTok: in, cached, cache_write, out
+  "claude-sonnet-5": (2.0, 0.20, 2.50, 10.0),
+  "gpt-6-sol": (2.0, 0.20, 2.50, 10.0), "gpt-6-luna": (0.10, 0.01, 0.125, 0.50)}
+rows = []
+for p in glob.glob("runs/*/*/result.json"):
+    r = json.load(open(p)); tdir = os.path.dirname(p)
+    a = r.get("agent_result") or {}; rw = ((r.get("verifier_result") or {}).get("rewards") or {})
+    tj = os.path.join(tdir, "agent", "trajectory.json")
+    fm = (json.load(open(tj)).get("final_metrics") or {}) if os.path.exists(tj) else {}
+    ex = fm.get("extra") or {}
+    cw = ex.get("total_cache_creation_input_tokens") or ex.get("total_cache_write_input_tokens") or 0
+    model = ((r.get("agent_info") or {}).get("model_info") or {}).get("name", "")
+    n_in, n_c, n_out = a.get("n_input_tokens") or 0, a.get("n_cache_tokens") or 0, a.get("n_output_tokens") or 0
+    pi, pc, pw, po = PRICE.get(model.split("/")[-1], (None,) * 4)
+    cost_re = None if pi is None else ((n_in - n_c - cw) * pi + n_c * pc + cw * pw + n_out * po) / 1e6
+    rows.append(dict(job=p.split("/")[-3], task=r["task_name"], trial=r["trial_name"], model=model,
+        reward=rw.get("reward"), exception=(r.get("exception_info") or {}).get("exception_type"),
+        n_input=n_in, n_cached=n_c, n_cache_write=cw, n_output=n_out,
+        cost_harbor=a.get("cost_usd"), cost_recomputed=cost_re,
+        started=r.get("started_at"), finished=r.get("finished_at")))
+with open("runs.csv", "w", newline="") as f:
+    w = csv.DictWriter(f, fieldnames=list(rows[0])); w.writeheader(); w.writerows(rows)
+```
+- Treat `exception` trials (timeouts, install failures, 429s) separately from reward=0. Harbor records them in `exception_info` and `exception.txt`.
+- The skill-fired indicator: count ATIF `steps[].tool_calls[].function_name == "Skill"` (Claude), or `SKILL.md` paths in tool arguments (Codex), in `agent/trajectory.json` (models/trajectories/tool_call.py:8-23).
+
+### 5. Budget sketch (estimates; see token section) [U]
+- **Pilot, ≤ $60:** 8 tasks × 3 arms × k=2 = 48 trials per harness.
+  - Claude Sonnet 5 @ low, about 48 × $0.45 ≈ **$22**.
+  - Codex gpt-6-luna @ medium, about 48 × $0.08 ≈ **$4**.
+  - gpt-6-sol calibration: 8 tasks × baseline × k=1 ≈ **$9**.
+  - Total ≈ **$35**, leaving room for retries and the plugin-level arms of one plugin.
+  - `--ak max_budget_usd=2` hard-caps each Claude trial. Codex has no per-trial cap in Harbor, so rely on agent timeouts.
+- **Main study, the remaining ~$240:**
+  - 30 tasks × 3 arms × k=3 = 270 trials per harness.
+  - Claude @ low ≈ $120. Codex @ luna ≈ $15–30.
+  - Codex @ sol at that size (≈ $290) does **not** fit. Use sol only on a reduced subset, or not at all.
+- Run arms **interleaved in time**: launch the arm jobs concurrently with a smaller `-n` each, or put multiple `agents:` in one `-c job.yaml`. That way API-side drift and rate limits hit all arms equally. Use **one platform** (amd64-emulated prebuilt images) for every arm and record it (B).
+
+### Open items to verify in the pilot (cheap, first 1–2 trials per arm)
+1. The Claude Code hook fires inside the container with `CLAUDE_CODE_PLUGIN_DIRS` (injected text visible in the transcript).
+2. `cost_usd` is non-null for Codex GPT-6 models, via LiteLLM's remote price map. Otherwise rely on `cost_recomputed`.
+3. The Codex token_count events include cache-write tokens, so the gpt-6 cache-write charge can be priced.
+4. Emulated amd64 wall-clock stays within task timeouts, so `--agent-timeout-multiplier` is adequate.
+5. `PYTHONPATH` import of `harness.harbor_agents` works with the `uv tool` install. (It works with a venv install [V-offline].)
+6. The Codex placebo/real plugin arms actually surface plugin skills in the rollout.

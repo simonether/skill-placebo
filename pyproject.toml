@@ -3,9 +3,9 @@ name = "skill-placebo"
 version = "0.0.1"
 description = "Placebo-controlled benchmark of the most-starred coding agent skills"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 license = "MIT"
-dependencies = ["numpy>=1.26"]
+dependencies = ["numpy>=1.26", "harbor==0.23.0"]
 
 [project.scripts]
 skill-placebo = "skill_placebo.cli:main"
