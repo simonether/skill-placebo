@@ -6,8 +6,8 @@ Usage:
   scripts/scrub.py --redact PATH...   rewrite text files in place with [REDACTED:<kind>]
 
 Detects: exact values of every KEY=VALUE in .secrets/api.env (the most reliable check),
-Anthropic / OpenRouter / OpenAI / GitHub key shapes, bearer tokens, the local home directory
-and the owner's e-mail. Binary files are reported, not rewritten.
+Anthropic / OpenRouter / OpenAI / GitHub key shapes, bearer tokens, the runner's own home directory
+(not other people's paths quoted in public task texts) and the owner's e-mail. Binary files are reported, not rewritten.
 """
 import argparse
 import os
@@ -23,7 +23,7 @@ PATTERNS = [
     ("openai-key", re.compile(r"sk-(?!ant-|or-)(?:proj-)?[A-Za-z0-9_\-]{32,}")),
     ("github-token", re.compile(r"\b(?:ghp|gho|ghu|ghs|ghr)_[A-Za-z0-9]{30,}\b|github_pat_[A-Za-z0-9_]{40,}")),
     ("bearer", re.compile(r"(?i)bearer\s+[A-Za-z0-9._\-]{24,}")),
-    ("home-path", re.compile(r"/Users/[A-Za-z0-9._\-]+")),
+    ("home-path", re.compile(re.escape(os.path.expanduser("~")) + r"(?![A-Za-z0-9._\-])")),
     ("email", re.compile(r"owner@example\.invalid", re.I)),
 ]
 
