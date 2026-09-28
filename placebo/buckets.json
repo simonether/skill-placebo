@@ -1,0 +1,141 @@
+{
+ "cc-a": {
+  "bucket": {
+   "id": "cc-a",
+   "members": [
+    "karpathy",
+    "planning-with-files"
+   ],
+   "listing_chars": 1323,
+   "hook_chars": 1172,
+   "n_skills": 7,
+   "body_chars": 1676
+  },
+  "plugin_name": "session-notes-cc-a",
+  "listing_chars": 1323,
+  "hook_chars": 1172,
+  "total_chars": 2495,
+  "members": {
+   "karpathy": {
+    "skill_chars": 2345,
+    "placebo_chars": 2495,
+    "deviation": 0.064
+   },
+   "planning-with-files": {
+    "skill_chars": 2646,
+    "placebo_chars": 2495,
+    "deviation": -0.0571
+   }
+  }
+ },
+ "cc-b": {
+  "bucket": {
+   "id": "cc-b",
+   "members": [
+    "mattpocock"
+   ],
+   "listing_chars": 4106,
+   "hook_chars": 0,
+   "n_skills": 25,
+   "body_chars": 4400
+  },
+  "plugin_name": "session-notes-cc-b",
+  "listing_chars": 4106,
+  "hook_chars": 0,
+  "total_chars": 4106,
+  "members": {
+   "mattpocock": {
+    "skill_chars": 4106,
+    "placebo_chars": 4106,
+    "deviation": 0.0
+   }
+  }
+ },
+ "cc-c": {
+  "bucket": {
+   "id": "cc-c",
+   "members": [
+    "superpowers"
+   ],
+   "listing_chars": 2615,
+   "hook_chars": 3405,
+   "n_skills": 15,
+   "body_chars": 11080
+  },
+  "plugin_name": "session-notes-cc-c",
+  "listing_chars": 2615,
+  "hook_chars": 3405,
+  "total_chars": 6020,
+  "members": {
+   "superpowers": {
+    "skill_chars": 6020,
+    "placebo_chars": 6020,
+    "deviation": 0.0
+   }
+  }
+ },
+ "cc-d": {
+  "bucket": {
+   "id": "cc-d",
+   "members": [
+    "i-have-adhd",
+    "ponytail",
+    "compound-engineering"
+   ],
+   "listing_chars": 3614,
+   "hook_chars": 4089,
+   "n_skills": 14,
+   "body_chars": 5238
+  },
+  "plugin_name": "session-notes-cc-d",
+  "listing_chars": 3614,
+  "hook_chars": 4089,
+  "total_chars": 7703,
+  "members": {
+   "i-have-adhd": {
+    "skill_chars": 7291,
+    "placebo_chars": 7703,
+    "deviation": 0.0565
+   },
+   "ponytail": {
+    "skill_chars": 7874,
+    "placebo_chars": 7703,
+    "deviation": -0.0217
+   },
+   "compound-engineering": {
+    "skill_chars": 7943,
+    "placebo_chars": 7703,
+    "deviation": -0.0302
+   }
+  }
+ },
+ "cc-e": {
+  "bucket": {
+   "id": "cc-e",
+   "members": [
+    "caveman",
+    "agent-skills"
+   ],
+   "listing_chars": 7906,
+   "hook_chars": 2602,
+   "n_skills": 31,
+   "body_chars": 6624
+  },
+  "plugin_name": "session-notes-cc-e",
+  "listing_chars": 7906,
+  "hook_chars": 2602,
+  "total_chars": 10508,
+  "members": {
+   "caveman": {
+    "skill_chars": 10043,
+    "placebo_chars": 10508,
+    "deviation": 0.0463
+   },
+   "agent-skills": {
+    "skill_chars": 10973,
+    "placebo_chars": 10508,
+    "deviation": -0.0424
+   }
+  }
+ }
+}

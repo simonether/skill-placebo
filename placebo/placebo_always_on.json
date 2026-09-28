@@ -1,0 +1,52 @@
+{
+ "cc-a": {
+  "listing_chars": 1323,
+  "hook_chars": 1172,
+  "memory_chars": 0,
+  "mean_body_chars": 1674,
+  "cc_estimate_tokens": 366.0,
+  "listed_skills": 7,
+  "listed_agents": 0,
+  "total_chars": 2495
+ },
+ "cc-b": {
+  "listing_chars": 4106,
+  "hook_chars": 0,
+  "memory_chars": 0,
+  "mean_body_chars": 4395,
+  "cc_estimate_tokens": 1152.0,
+  "listed_skills": 25,
+  "listed_agents": 0,
+  "total_chars": 4106
+ },
+ "cc-c": {
+  "listing_chars": 2615,
+  "hook_chars": 3405,
+  "memory_chars": 0,
+  "mean_body_chars": 11075,
+  "cc_estimate_tokens": 729.0,
+  "listed_skills": 15,
+  "listed_agents": 0,
+  "total_chars": 6020
+ },
+ "cc-d": {
+  "listing_chars": 3614,
+  "hook_chars": 4089,
+  "memory_chars": 0,
+  "mean_body_chars": 5230,
+  "cc_estimate_tokens": 974.0,
+  "listed_skills": 14,
+  "listed_agents": 0,
+  "total_chars": 7703
+ },
+ "cc-e": {
+  "listing_chars": 7906,
+  "hook_chars": 2602,
+  "memory_chars": 0,
+  "mean_body_chars": 6619,
+  "cc_estimate_tokens": 2132.0,
+  "listed_skills": 31,
+  "listed_agents": 0,
+  "total_chars": 10508
+ }
+}

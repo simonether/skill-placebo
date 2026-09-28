@@ -1,0 +1,8 @@
+{
+  "name": "session-notes-cc-a",
+  "version": "1.0.0",
+  "description": "Reference notes about the working environment of a session.",
+  "license": "MIT",
+  "skills": "./skills/",
+  "hooks": "./hooks/hooks.json"
+}

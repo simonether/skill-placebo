@@ -63,8 +63,9 @@ def plugin_details(plugin_dir: Path, cfg: Path, home: Path):
     est = None if not tok else float(tok.group(1).replace(",", "")) * (1000 if tok.group(2) else 1)
     names = {}
     for kind in ("Skills", "Agents"):
-        mm = re.search(rf"^  {kind} \(\d+\)\s+(.*)$", det, re.M)
-        names[kind] = [x.strip() for x in mm.group(1).split(",")] if mm else []
+        # "Agents (0)" has nothing after it; \s+ would swallow the next line ("Hooks (1) ...").
+        mm = re.search(rf"^  {kind} \((\d+)\)[ \t]*(.*)$", det, re.M)
+        names[kind] = [x.strip() for x in mm.group(2).split(",") if x.strip()] if mm and int(mm.group(1)) else []
     return est, names
 
 
@@ -95,6 +96,19 @@ def listing_chars(plugin_dir: Path, names: dict) -> int:
         fm = next((frontmatter(f) for f in agents if f.stem == n or frontmatter(f).get("name") == n), {})
         total += len(n) + len(str(fm.get("description", "")))
     return total
+
+
+def mean_body_chars(plugin_dir: Path, names: dict) -> int:
+    """Mean on-invoke body length (SKILL.md or command file minus frontmatter) of the listed skills."""
+    skills = _candidates(plugin_dir, "skills", "**/SKILL.md")
+    cmds = _candidates(plugin_dir, "commands", "*.md") + _candidates(plugin_dir, ".claude/commands", "*.md")
+    lens = []
+    for n in names.get("Skills", []):
+        f = next((f for f in skills if frontmatter(f).get("name") == n or f.parent.name == n), None) \
+            or next((f for f in cmds if f.stem == n), None)
+        if f:
+            lens.append(len(FM.sub("", f.read_text(errors="replace"), count=1).strip()))
+    return round(sum(lens) / len(lens)) if lens else 0
 
 
 def run_session_start_hooks(plugin_dir: Path, home: Path, cfg: Path) -> str:
@@ -133,9 +147,13 @@ def run_session_start_hooks(plugin_dir: Path, home: Path, cfg: Path) -> str:
 
 
 def main():
+    targets = dict(INSTALL)
+    extra = {Path(a).name: {"plugin": ".", "dir": Path(a).resolve()} for a in sys.argv[1:]}
+    if extra:
+        targets = extra
     result = {}
-    for sid, how in INSTALL.items():
-        d = VENDOR / sid
+    for sid, how in targets.items():
+        d = how.get("dir") or VENDOR / sid
         with tempfile.TemporaryDirectory() as tmp:
             home = Path(tmp)
             cfg = home / ".claude"
@@ -144,7 +162,7 @@ def main():
             for f in how.get("home_files", []):
                 (home / f).parent.mkdir(parents=True, exist_ok=True)
                 (home / f).touch()
-            row = {"listing_chars": 0, "hook_chars": 0, "memory_chars": 0, "cc_estimate_tokens": None}
+            row = {"listing_chars": 0, "hook_chars": 0, "memory_chars": 0, "mean_body_chars": 0, "cc_estimate_tokens": None}
             if "plugin" in how:
                 pdir = (d / how["plugin"]).resolve()
                 est, names = plugin_details(pdir, cfg, home)
@@ -153,13 +171,14 @@ def main():
                 row["listed_skills"] = len(names.get("Skills", []))
                 row["listed_agents"] = len(names.get("Agents", []))
                 row["hook_chars"] = len(run_session_start_hooks(pdir, home, cfg))
+                row["mean_body_chars"] = mean_body_chars(pdir, names)
             if "memory" in how:
                 row["memory_chars"] = len((d / how["memory"]).read_text())
             row["total_chars"] = row["listing_chars"] + row["hook_chars"] + row["memory_chars"]
             result[sid] = row
             print(f"{sid:22s} listing={row['listing_chars']:6d} hook={row['hook_chars']:6d} memory={row['memory_chars']:5d} "
                   f"total={row['total_chars']:6d} cc_est_tok={row['cc_estimate_tokens']}")
-    out = ROOT / "placebo" / "always_on.json"
+    out = ROOT / "placebo" / ("always_on.json" if not extra else "placebo_always_on.json")
     out.write_text(json.dumps(result, indent=1) + "\n")
 
 

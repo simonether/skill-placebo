@@ -1,0 +1,20 @@
+{
+  "name": "session-notes-cc-a-dev",
+  "interface": {
+    "displayName": "Session notes"
+  },
+  "plugins": [
+    {
+      "name": "session-notes-cc-a",
+      "source": {
+        "source": "url",
+        "url": "./"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}
