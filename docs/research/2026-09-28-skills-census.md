@@ -5,10 +5,26 @@ raw.githubusercontent.com only; nothing starred, forked, watched or posted.
 Legend: **[V]** verified from the named source; **[U]** unverified. `O/R@sha7:path:line` = file:line at that commit.
 Written incrementally; sections are appended as each candidate is finished.
 
-## Summary table (filled at the end)
+## Summary table
 
-| repo | stars | type | always-on chars | interactive? | Codex support | numeric claim? | prior measurement? |
+Stars as of 2026-09-28 (`gh api repos/O/R`). Always-on chars = skill/agent/command name+description listing + hook-injected text per
+1-prompt session, Claude Code / Codex (arithmetic in each section). CC = Claude Code.
+
+| repo | stars | type | always-on chars (CC / Codex) | interactive? | Codex support | numeric claim? | prior measurement? |
 |---|---|---|---|---|---|---|---|
+| obra/superpowers | 292,186 | plugin + SessionStart hook + 15 triggered skills | 6,021 / ~2,615 | **YES**: brainstorming HARD-GATE; no documented auto-approve mode | native plugin, but no hook on Codex | no | MindStudio 6-vs-6 (−9% cost, weak); Tessl: brainstorming only |
+| mattpocock/skills | 270,705 | triggered (25 skills) | ~4,108 (U: lower) / n.a. | YES when triggered (tdd confirms seams; setup asks) | no native plugin; `npx skills` | no | none found |
+| affaan-m/ECC (ex everything-claude-code) | 268,429 | EXCLUDED: collection + memory + harness | not computed | - | - | - | - |
+| multica-ai/andrej-karpathy-skills (= forrestchang) | 215,543 | always-on CLAUDE.md, or 1 triggered skill | 2,357 (CLAUDE.md) or 238 (plugin) / not documented | partial ("If uncertain, ask") | not documented (AGENTS.md = our adaptation) | no | Tessl scenario eval "1.14x" only |
+| DietrichGebert/ponytail | 146,937 | plugin + SessionStart/SubagentStart hooks | 7,874 / 7,874 (+5,229 per subagent) | no (but a statusline "offer" nudge in CC) | native plugin + hooks (needs `/hooks` trust) | **yes**: −54% LOC, −20% cost, −27% time | JetBrains cost −10.3% p=0.004 (no placebo); Scott Logic: a 7-word prompt beat it |
+| JuliusBrussee/caveman | 108,071 | plugin + SessionStart + per-prompt hooks | ~10,190 / ~830 (mode needs `/caveman`) | no (statusline nudge in CC) | skills via `npx skills`; per-session only | **yes**: "cuts 65% of tokens" | JetBrains −8.5% output tokens, p=0.82 quality; maxtaylor: "Be brief." matched it |
+| addyosmani/agent-skills | 99,510 | triggered (25 skills + 4 agents + 9 cmds) | 10,915 / 9,266 | partial ("STOP … Wait for resolution") | native plugin | no | LinkedIn head-to-head vs superpowers (U) |
+| Leonxlnx/taste-skill | 90,647 | EXCLUDED: frontend/UI design domain | - | - | - | - | - |
+| gsd-build/get-shit-done → open-gsd/gsd-core | 64,444 (archived) / 9,899 | EXCLUDED: phase orchestrator | - | - | - | - | - |
+| ayghri/i-have-adhd | 51,607 | triggered; opt-in always-on SessionStart | 253 (default) or ~7,237 (always-on, CC only) / 253 | no | native plugin; explicit `$i-have-adhd` only | no | none found |
+| OthmanAdi/planning-with-files | 27,153 | triggered, then 6 hooks once a plan file exists | 625 until a plan exists / U | U (no gate seen) | plugin + hooks (docs/codex.md, U) | **yes**: 96.7% (29/30), 3/3 blind A/B, 13.3→5.0 turns | none found |
+| EveryInc/compound-engineering-plugin | 25,299 | triggered (36 skills); `/lfg` autonomous | 7,943 / 7,943 | YES by default; documented hands-off `/lfg` (ends in push/PR) | native plugin | no (80/20 philosophy only) | natea/harness-eval (U) |
+| nizos/tdd-guard | 2,353 | hooks + separate validation model | not checked | not checked | via successor nizos/probity | not checked | none found |
 
 ## Per-candidate sections
 
@@ -333,4 +349,12 @@ Numbers below are as reported by each source. Pages were read via WebFetch summa
   "superpowers vs agent-skills" experiment (`README.md:382`); natea/harness-eval (ranks Superpowers, Compound Engineering…); Adobe arXiv 2606.24083 (caveman style).
 - **Never measured independently (as far as found):** addyosmani/agent-skills, mattpocock/skills, i-have-adhd, compound-engineering, planning-with-files.
   karpathy-skills has only Tessl scenario evals, and superpowers only a 6-vs-6 vendor blog.
+
+### 13. nizos/tdd-guard (reserve, only partly checked)
+
+- **Meta [V]:** 2,353 stars; created 2025-07-07; pushed 2026-09-14; MIT; `main` HEAD `2579ec1823fac5f4afb73be678d9c500b19885ac`; release `v1.7.0` (2026-06-23).
+- Hook-based TDD enforcement for Claude Code. Install `README.md:43-44` `/plugin marketplace add nizos/tdd-guard` + `/plugin install tdd-guard@tdd-guard`.
+  The README says it "grew into [Probity]" (nizos/probity, 215 stars; adds Codex) and "New projects should start there" (`README.md:10-13`).
+  It validates edits with a separate model ("Choose faster or more capable models", `README.md:29`), which adds its own API spend outside the agent trajectory
+  and complicates cost accounting. Always-on chars, interactivity and claims were **not checked**.
 
