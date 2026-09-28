@@ -509,3 +509,28 @@ matched the owner's usage page (13% and 4%).
 
 **Runs affected:** the calibration runs of step 1 and everything after (no task trial yet).
 
+### Amendment 4 (2026-09-29, before any task trial): final Claude Code placebo buckets, from tokens
+
+As pre-registered in section 4.1, the bucketing rule was re-applied to measured tokens and the
+placebos rescaled before any task trial (`results/pilot/token-check-claude-code.json`,
+`results/pilot/token-recheck-claude-code.json`).
+
+Always-on tokens over the baseline's first request (14,916 tokens), one trivial run per arm:
+
+| Placebo | Members (tokens) | Placebo tokens (measured) | Largest deviation |
+|---|---|---:|---:|
+| cc-1 | planning-with-files (666) | 663 | -0.5% |
+| cc-2 | mattpocock (906), karpathy (986) | 939 | -4.8% |
+| cc-3 | superpowers (2,168), compound-engineering (2,383), i-have-adhd (2,473) | 2,347 | +8.3% |
+| cc-4 | ponytail (2,854) | 2,874 | +0.7% |
+| cc-5 | agent-skills (3,751), caveman (3,917) | 3,800 | -3.0% |
+
+The character-based buckets of section 4.1 are superseded for Claude Code. The placebos were
+rebuilt with the same generator, sized by a token model fitted on the first five placebos
+(tokens ≈ 0.271 x listing characters + 0.264 x hook characters + 12 x listed entries; residuals at
+most 7 tokens), then measured. Codex buckets get the same treatment in the Codex token check.
+
+Calibration cost: 21 trivial runs (16 in the first pass, one of them a duplicate started by a
+resume while a stopped process was still waiting; 5 in the recheck, one retried after an agent
+install timeout). Plan windows unchanged by it (5-hour 13-14%, 7-day 4%).
+

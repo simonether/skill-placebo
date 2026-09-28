@@ -1,31 +1,28 @@
 {
- "all_within_10pct": false,
+ "all_within_10pct": true,
  "buckets": {
-  "cc-1": {
-   "placebo_tokens": 663,
+  "cc-2": {
+   "placebo_tokens": 939,
    "member_tokens": {
-    "planning-with-files": 666
+    "mattpocock": 906,
+    "karpathy": 986
    },
    "deviation": {
-    "planning-with-files": -0.0045
+    "mattpocock": 0.0364,
+    "karpathy": -0.0477
    }
   },
   "cc-3": {
-   "placebo_tokens": null,
+   "placebo_tokens": 2347,
    "member_tokens": {
     "superpowers": 2168,
     "compound-engineering": 2383,
     "i-have-adhd": 2473
    },
-   "deviation": {}
-  },
-  "cc-4": {
-   "placebo_tokens": 2874,
-   "member_tokens": {
-    "ponytail": 2854
-   },
    "deviation": {
-    "ponytail": 0.007
+    "superpowers": 0.0826,
+    "compound-engineering": -0.0151,
+    "i-have-adhd": -0.051
    }
   },
   "cc-5": {
@@ -39,15 +36,22 @@
     "caveman": -0.0299
    }
   },
-  "cc-2": {
-   "placebo_tokens": 939,
+  "cc-4": {
+   "placebo_tokens": 2874,
    "member_tokens": {
-    "mattpocock": 906,
-    "karpathy": 986
+    "ponytail": 2854
    },
    "deviation": {
-    "mattpocock": 0.0364,
-    "karpathy": -0.0477
+    "ponytail": 0.007
+   }
+  },
+  "cc-1": {
+   "placebo_tokens": 663,
+   "member_tokens": {
+    "planning-with-files": 666
+   },
+   "deviation": {
+    "planning-with-files": -0.0045
    }
   }
  }
