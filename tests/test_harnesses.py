@@ -18,5 +18,5 @@ def test_claude_uses_benchmark_token_only(monkeypatch):
 
 
 def test_web_tools_disabled_in_both():
-    assert set(CLAUDE_CODE.kwargs["disallowed_tools"]) == {"WebSearch", "WebFetch"}
+    assert set(CLAUDE_CODE.kwargs["disallowed_tools"].split(",")) == {"WebSearch", "WebFetch"}
     assert CODEX.kwargs["web_search"] == "disabled"

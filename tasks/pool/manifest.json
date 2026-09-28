@@ -141,6 +141,60 @@
    ]
   },
   {
+   "source": "swebench-verified",
+   "name": "django__django-11265",
+   "path": "tasks/pool/swebench-verified/django__django-11265",
+   "patches": [
+    "FROM -> ghcr.io/epoch-research/swe-bench.eval.arm64.django__django-11265@sha256:5ec766194c8370a04d2adcf57e2f5df870a2085f5f438017acae64779d63e6c7",
+    "agent timeout 3000 -> 1200"
+   ]
+  },
+  {
+   "source": "swebench-verified",
+   "name": "django__django-15957",
+   "path": "tasks/pool/swebench-verified/django__django-15957",
+   "patches": [
+    "FROM -> ghcr.io/epoch-research/swe-bench.eval.arm64.django__django-15957@sha256:2b7839f529cdbf38b2748987841670e17d7a449ebaaacc11567d22d5ccf1f4e3",
+    "agent timeout 3000 -> 1200"
+   ]
+  },
+  {
+   "source": "swebench-verified",
+   "name": "django__django-11885",
+   "path": "tasks/pool/swebench-verified/django__django-11885",
+   "patches": [
+    "FROM -> ghcr.io/epoch-research/swe-bench.eval.arm64.django__django-11885@sha256:f88911185c2911801e98aa00ac1e348044a4141cd29fc738c0acf0458f037769",
+    "agent timeout 3000 -> 1200"
+   ]
+  },
+  {
+   "source": "swebench-verified",
+   "name": "django__django-15563",
+   "path": "tasks/pool/swebench-verified/django__django-15563",
+   "patches": [
+    "FROM -> ghcr.io/epoch-research/swe-bench.eval.arm64.django__django-15563@sha256:75079c5da14982bbcdfef420ab8960e8bb4c3e071763fb4ba86580caf4f34b5d",
+    "agent timeout 3000 -> 1200"
+   ]
+  },
+  {
+   "source": "swebench-verified",
+   "name": "django__django-15973",
+   "path": "tasks/pool/swebench-verified/django__django-15973",
+   "patches": [
+    "FROM -> ghcr.io/epoch-research/swe-bench.eval.arm64.django__django-15973@sha256:f4349ec85f109b64f780d09807744e5c01d06c276cca2013620ad1a819b6775e",
+    "agent timeout 3000 -> 1200"
+   ]
+  },
+  {
+   "source": "swebench-verified",
+   "name": "pylint-dev__pylint-7080",
+   "path": "tasks/pool/swebench-verified/pylint-dev__pylint-7080",
+   "patches": [
+    "FROM -> ghcr.io/epoch-research/swe-bench.eval.arm64.pylint-dev__pylint-7080@sha256:a953de0a577f860c32ab4c544ee357c9b008bb6bd31b08207f54077b0b8d385f",
+    "agent timeout 3000 -> 1200"
+   ]
+  },
+  {
    "source": "terminal-bench-2-1",
    "name": "cancel-async-tasks",
    "path": "tasks/pool/terminal-bench-2-1/cancel-async-tasks",
@@ -200,6 +254,38 @@
    "source": "terminal-bench-2-1",
    "name": "financial-document-processor",
    "path": "tasks/pool/terminal-bench-2-1/financial-document-processor",
+   "patches": [
+    "prebuilt docker_image dropped, built from Dockerfile"
+   ]
+  },
+  {
+   "source": "terminal-bench-2-1",
+   "name": "query-optimize",
+   "path": "tasks/pool/terminal-bench-2-1/query-optimize",
+   "patches": [
+    "prebuilt docker_image dropped, built from Dockerfile"
+   ]
+  },
+  {
+   "source": "terminal-bench-2-1",
+   "name": "write-compressor",
+   "path": "tasks/pool/terminal-bench-2-1/write-compressor",
+   "patches": [
+    "prebuilt docker_image dropped, built from Dockerfile"
+   ]
+  },
+  {
+   "source": "terminal-bench-2-1",
+   "name": "headless-terminal",
+   "path": "tasks/pool/terminal-bench-2-1/headless-terminal",
+   "patches": [
+    "prebuilt docker_image dropped, built from Dockerfile"
+   ]
+  },
+  {
+   "source": "terminal-bench-2-1",
+   "name": "adaptive-rejection-sampler",
+   "path": "tasks/pool/terminal-bench-2-1/adaptive-rejection-sampler",
    "patches": [
     "prebuilt docker_image dropped, built from Dockerfile"
    ]

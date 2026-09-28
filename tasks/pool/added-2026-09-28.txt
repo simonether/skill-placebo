@@ -1,0 +1,10 @@
+swebench-verified/django__django-11265
+swebench-verified/django__django-15957
+swebench-verified/django__django-11885
+swebench-verified/django__django-15563
+swebench-verified/django__django-15973
+swebench-verified/pylint-dev__pylint-7080
+terminal-bench-2-1/query-optimize
+terminal-bench-2-1/write-compressor
+terminal-bench-2-1/headless-terminal
+terminal-bench-2-1/adaptive-rejection-sampler

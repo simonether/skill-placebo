@@ -19,7 +19,7 @@ CLAUDE_CODE = Harness(
     kwargs={
         "version": "2.1.282",
         "reasoning_effort": "medium",  # Claude Code default for Opus 5.5 (code.claude.com/docs/en/model-config), explicit
-        "disallowed_tools": ["WebSearch", "WebFetch"],
+        "disallowed_tools": "WebSearch,WebFetch",  # Harbor: comma-separated string
     },
     creds=("CLAUDE_CODE_OAUTH_TOKEN",),
     extra_env={"CLAUDE_FORCE_OAUTH": "1", "SUPERPOWERS_DISABLE_TELEMETRY": "1"},

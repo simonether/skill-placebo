@@ -35,6 +35,10 @@ SOURCES = {
             "django__django-14725", "django__django-16454", "django__django-16950",
             "sympy__sympy-13031", "sympy__sympy-14976", "sympy__sympy-18211",
             "pytest-dev__pytest-7490", "mwaskom__seaborn-3069",
+            # Harder additions for Opus 5.5 (docs/research/2026-09-28-harder-tasks.md): 2/6 and 1/6
+            # on the frontier panel, tests that match their issue text.
+            "django__django-11265", "django__django-15957", "django__django-11885",
+            "django__django-15563", "django__django-15973", "pylint-dev__pylint-7080",
         ],
     },
     "terminal-bench-2-1": {
@@ -44,6 +48,8 @@ SOURCES = {
         "tasks": [
             "cancel-async-tasks", "extract-elf", "openssl-selfsigned-cert", "sanitize-git-repo",
             "sqlite-with-gcov", "largest-eigenval", "sparql-university", "financial-document-processor",
+            # Harder additions (docs/research/2026-09-28-harder-tasks.md)
+            "query-optimize", "write-compressor", "headless-terminal", "adaptive-rejection-sampler",
         ],
     },
     "openthoughts-tblite": {

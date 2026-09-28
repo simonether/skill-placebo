@@ -16,6 +16,12 @@ Agent timeout cap: 1200 s.
 - `swebench-verified/sympy__sympy-18211`: FROM -> ghcr.io/epoch-research/swe-bench.eval.arm64.sympy__sympy-18211@sha256:459e5daffe0a9b8c7513f272afc42ce58e8dc87e253e8b363cbcfcc00d92ea75; agent timeout 3000 -> 1200
 - `swebench-verified/pytest-dev__pytest-7490`: FROM -> ghcr.io/epoch-research/swe-bench.eval.arm64.pytest-dev__pytest-7490@sha256:f049336c9c8201e8c61280685655078ee5fdd2c8e087c9830816af9e54e92fe9; agent timeout 3000 -> 1200
 - `swebench-verified/mwaskom__seaborn-3069`: FROM -> ghcr.io/epoch-research/swe-bench.eval.arm64.mwaskom__seaborn-3069@sha256:d69b41f4a45e52de029b569c7fd7be022b1e9727cb810ca84907908b65c86510; agent timeout 3000 -> 1200
+- `swebench-verified/django__django-11265`: FROM -> ghcr.io/epoch-research/swe-bench.eval.arm64.django__django-11265@sha256:5ec766194c8370a04d2adcf57e2f5df870a2085f5f438017acae64779d63e6c7; agent timeout 3000 -> 1200
+- `swebench-verified/django__django-15957`: FROM -> ghcr.io/epoch-research/swe-bench.eval.arm64.django__django-15957@sha256:2b7839f529cdbf38b2748987841670e17d7a449ebaaacc11567d22d5ccf1f4e3; agent timeout 3000 -> 1200
+- `swebench-verified/django__django-11885`: FROM -> ghcr.io/epoch-research/swe-bench.eval.arm64.django__django-11885@sha256:f88911185c2911801e98aa00ac1e348044a4141cd29fc738c0acf0458f037769; agent timeout 3000 -> 1200
+- `swebench-verified/django__django-15563`: FROM -> ghcr.io/epoch-research/swe-bench.eval.arm64.django__django-15563@sha256:75079c5da14982bbcdfef420ab8960e8bb4c3e071763fb4ba86580caf4f34b5d; agent timeout 3000 -> 1200
+- `swebench-verified/django__django-15973`: FROM -> ghcr.io/epoch-research/swe-bench.eval.arm64.django__django-15973@sha256:f4349ec85f109b64f780d09807744e5c01d06c276cca2013620ad1a819b6775e; agent timeout 3000 -> 1200
+- `swebench-verified/pylint-dev__pylint-7080`: FROM -> ghcr.io/epoch-research/swe-bench.eval.arm64.pylint-dev__pylint-7080@sha256:a953de0a577f860c32ab4c544ee357c9b008bb6bd31b08207f54077b0b8d385f; agent timeout 3000 -> 1200
 - `terminal-bench-2-1/cancel-async-tasks`: prebuilt docker_image dropped, built from Dockerfile
 - `terminal-bench-2-1/extract-elf`: prebuilt docker_image dropped, built from Dockerfile
 - `terminal-bench-2-1/openssl-selfsigned-cert`: prebuilt docker_image dropped, built from Dockerfile
@@ -24,6 +30,10 @@ Agent timeout cap: 1200 s.
 - `terminal-bench-2-1/largest-eigenval`: prebuilt docker_image dropped, built from Dockerfile
 - `terminal-bench-2-1/sparql-university`: prebuilt docker_image dropped, built from Dockerfile
 - `terminal-bench-2-1/financial-document-processor`: prebuilt docker_image dropped, built from Dockerfile
+- `terminal-bench-2-1/query-optimize`: prebuilt docker_image dropped, built from Dockerfile
+- `terminal-bench-2-1/write-compressor`: prebuilt docker_image dropped, built from Dockerfile
+- `terminal-bench-2-1/headless-terminal`: prebuilt docker_image dropped, built from Dockerfile
+- `terminal-bench-2-1/adaptive-rejection-sampler`: prebuilt docker_image dropped, built from Dockerfile
 - `openthoughts-tblite/todos-api`: none
 - `openthoughts-tblite/api-endpoint-permission-canonicalizer`: none
 - `openthoughts-tblite/build-merkle-tree-cli-sha512`: none
