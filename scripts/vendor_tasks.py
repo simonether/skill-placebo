@@ -10,6 +10,9 @@ Patches applied, identical for every arm (recorded in tasks/pool/PATCHES.md):
   2. Terminal-Bench 2.1: the prebuilt amd64-only `docker_image` is dropped, so Harbor builds the
      task's own Dockerfile for the runner's platform (arm64 here, amd64 on a Linux x86 host).
   3. Agent timeout: min(upstream, AGENT_TIMEOUT_CAP) seconds.
+  4. SWE-bench: the grading script's own dependencies (a uv script: python>=3.11, swebench==4.0.3,
+     datasets==2.16.1, fastcore<1.11) are installed into the image's uv cache at build time, so that
+     grading does not download a Python and packages after the agent has finished. Tests unchanged.
 Nothing else in instruction, tests or solution is touched.
 """
 import json
@@ -65,6 +68,15 @@ SOURCES = {
 }
 
 
+# Same PEP 723 header as the parser.py that every SWE-bench test.sh writes and runs with `uv run`.
+WARM_VERIFIER = (
+    "# skill-placebo: pre-install the grading script's dependencies (identical in every arm)\n"
+    "RUN printf '# /// script\\n# requires-python = \">=3.11\"\\n"
+    "# dependencies = [\"swebench==4.0.3\", \"datasets==2.16.1\", \"fastcore<1.11\"]\\n# ///\\n"
+    "import swebench, datasets\\n' > /tmp/sp_warm.py && /root/.local/bin/uv run /tmp/sp_warm.py && rm /tmp/sp_warm.py"
+)
+
+
 def sh(*cmd, cwd=None):
     return subprocess.run(cmd, cwd=cwd, check=True, capture_output=True, text=True).stdout
 
@@ -115,8 +127,10 @@ def main():
                     text2, n = re.subn(r"^FROM swebench/sweb\.eval\.x86_64\.\S+", f"FROM {new_from}", text, flags=re.M)
                     if n != 1:
                         sys.exit(f"{t}: FROM line not found")
+                    text2 = text2.rstrip("\n") + "\n\n" + WARM_VERIFIER + "\n"
                     df.write_text(text2)
                     notes.append(f"FROM -> {new_from}")
+                    notes.append("verifier dependencies pre-installed in the uv cache")
                 if src == "terminal-bench-2-1":
                     tt = d / "task.toml"
                     text, n = re.subn(r"^docker_image\s*=.*$", "# docker_image removed by skill-placebo: build from environment/Dockerfile", tt.read_text(), flags=re.M)

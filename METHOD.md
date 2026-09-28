@@ -1,11 +1,9 @@
 # skill-placebo: pre-registered method
 
-Version 1.0 draft, 2026-09-28. This file is committed to git before any benchmark run. The commit
+Version 1.0, 2026-09-28. This file is committed to git before any benchmark run. The commit
 history is the timestamp of the pre-registration. After the first run the method changes only
 through the [Amendments](#16-amendments) section: date, reason, which runs are affected, written
 before those runs.
-
-<!-- DRAFT: sections marked TBD are filled from docs/research/ before the pre-registration commit. -->
 
 ## 1. Question
 
@@ -60,41 +58,41 @@ guidelines). Excluded: domain skills (design, docs, SEO), memory systems, orches
 collections of unrelated skills. Nine pass; no tenth fits the rule, so the study runs nine.
 
 **Pinned version:** the default-branch commit on 2026-09-28, which is what a marketplace install
-gets that day.
+gets that day. Every install is made from a local checkout of that commit, never from a marketplace
+that would fetch a newer HEAD.
 
-| # | Skill | Stars (28.09) | Commit | Type in Claude Code | Always-on chars (CC) | Numeric README claim | Prior independent measurement |
-|---|---|---:|---|---|---:|---|---|
-| 1 | addyosmani/agent-skills | 99,510 | 2686b62 | triggered pack: 25 skills, 9 commands, 4 agents | 10,973 | none | none found |
-| 2 | mattpocock/skills | 270,709 | c55ee46 | triggered pack: 25 skills | 4,106 | none | none found |
-| 3 | ayghri/i-have-adhd | 51,606 | 839872f | documented always-on mode: SessionStart hook | 7,291 | none | none found |
-| 4 | OthmanAdi/planning-with-files | 27,154 | 51c1caa | triggered; hooks once a plan file exists | 2,646 | 96.7% (29/30), 13.3 → 5.0 turns (`README.md:33-34,75`) | none found |
-| 5 | EveryInc/compound-engineering-plugin | 25,299 | e80c5c4 | triggered pack: 36 skills | 7,943 | none | none found |
-| 6 | multica-ai/andrej-karpathy-skills | 215,547 | 2c60614 | always-on CLAUDE.md (the author's "single CLAUDE.md file") | 2,345 | none | Tessl scenario eval only |
-| 7 | obra/superpowers | 292,189 | 8ca22db | 15 skills + SessionStart hook | 6,020 | none | MindStudio, 6 vs 6 sessions |
-| 8 | DietrichGebert/ponytail | 146,942 | e3ba2aa | 6 skills + SessionStart ruleset hook | 7,874 | ~54% less code, ~20% cheaper, ~27% faster (`README.md:33`) | JetBrains 2026-07: cost -10.3% (p=0.004), no placebo |
-| 9 | JuliusBrussee/caveman | 108,076 | 2fd153c | 20 skills + 3 agents + SessionStart and per-prompt hooks | 10,043 (+245 per prompt) | "cuts 65% of tokens" (repo description) | JetBrains 2026-07: -8.5% output tokens; maxtaylor.me: "Be brief." matched it |
+The table order is the **priority order**: by stars (owner's hub decision, 2026-09-28). The reduced
+designs in section 11.3 drop skills from the bottom of the table.
 
-Always-on characters are measured, not estimated: `scripts/measure_always_on.py` takes exactly the
-components Claude Code lists for the plugin (`claude plugin details`) and runs the plugin's
-SessionStart hooks for real (`placebo/always_on.json`).
+| # | Skill | Stars (28.09) | Commit | Type in Claude Code | Always-on chars (CC) | On Codex | Numeric README claim | Prior independent measurement |
+|---|---|---:|---|---|---:|---|---|---|
+| 1 | obra/superpowers | 292,189 | 8ca22db | 15 skills + SessionStart hook; interactive (see 5.1) | 6,020 | plugin, no hook (2,615) | none | MindStudio, 6 vs 6 sessions |
+| 2 | mattpocock/skills | 270,709 | c55ee46 | triggered pack: 25 skills | 4,106 | skills via `npx skills` path (4,106) | none | none found |
+| 3 | multica-ai/andrej-karpathy-skills | 215,547 | 2c60614 | always-on CLAUDE.md (the author's "single CLAUDE.md file") | 2,345 | not run: no Codex install documented | none | Tessl scenario eval only |
+| 4 | DietrichGebert/ponytail | 146,942 | e3ba2aa | 6 skills + SessionStart ruleset hook | 7,874 | plugin + hooks (8,347) | ~54% less code, ~20% cheaper, ~27% faster (`README.md:33`) | JetBrains 2026-07: cost -10.3% (p=0.004), no placebo |
+| 5 | JuliusBrussee/caveman | 108,076 | 2fd153c | 20 skills + 3 agents + SessionStart and per-prompt hooks | 10,043 (+245 per prompt) | not run: needs a manual /caveman every session | "cuts 65% of tokens" (repo description) | JetBrains 2026-07: -8.5% output tokens; maxtaylor.me: "Be brief." matched it |
+| 6 | addyosmani/agent-skills | 99,510 | 2686b62 | triggered pack: 25 skills, 9 commands, 4 agents | 10,973 | plugin (9,266) | none | none found |
+| 7 | ayghri/i-have-adhd | 51,606 | 839872f | documented always-on mode: SessionStart hook | 7,291 | not run: needs an explicit $i-have-adhd every session | none | none found |
+| 8 | OthmanAdi/planning-with-files | 27,154 | 51c1caa | triggered; hooks once a plan file exists | 2,646 | plugin + hooks (625) | 96.7% (29/30), 13.3 → 5.0 turns (`README.md:33-34,75`) | none found |
+| 9 | EveryInc/compound-engineering-plugin | 25,299 | e80c5c4 | triggered pack: 36 skills | 7,943 | plugin (7,943) | none | none found |
 
-The table order is the **priority order**: skills nobody has measured independently come first
-(task brief). The reduced designs (section 11.3) take the first 8 or 6.
+Always-on characters are measured, not estimated. Claude Code: `scripts/measure_always_on.py` takes
+exactly the components Claude Code lists for the plugin (`claude plugin details`) and runs the
+plugin's SessionStart hooks for real (`placebo/always_on.json`). Codex: every SKILL.md the Codex
+manifest exposes (Codex does not support `disable-model-invocation`) plus the Codex hooks' output
+(`placebo/always_on_codex.json`).
+
+**Codex runs six skills**: those whose author documents a Codex install that works without a manual
+command in every session. The other three are marked "not run on Codex" with the reason above.
 
 **Excluded, with reasons:** affaan-m/ECC (268k stars; 292 skills plus memory and a harness layer),
 Leonxlnx/taste-skill (91k; frontend design), open-gsd/gsd-core, formerly get-shit-done (64k archived +
 10k; a phase orchestrator driven by user commands). Full list in the census.
 
-**Codex:** TBD, hub decision pending: skills whose author documents a Codex install that works
-without a per-session manual command.
-
-**superpowers:** TBD, hub decision pending: its brainstorming skill stops for the user's approval and
-the author documents no unattended mode.
-
 ## 4. Arms
 
 Every task is run in every arm on every harness with the same model, effort, container image,
-tools, permissions, timeout and prompt. Only the installed instruction differs.
+tools, permissions, timeout, prompt and approval rule (5.1). Only the installed instruction differs.
 
 | Arm | What is installed |
 |---|---|
@@ -104,39 +102,50 @@ tools, permissions, timeout and prompt. Only the installed instruction differs.
 
 ### 4.1 Placebo construction
 
-**Buckets.** Skills whose always-on text lies within +-10% of a common length share one placebo.
-Claude Code (`placebo/buckets.json`):
+**Bucketing rule** (`src/skill_placebo/placebo.py: assign_buckets`, with tests). Sort the skills of
+one harness by always-on length; add each skill to the current bucket if the bucket's new mean
+length, which is the placebo's length, stays within +-10% of every member; otherwise start a new
+bucket. One placebo per bucket. The rule, not a hand choice, forms the buckets.
 
-| Placebo | Members (always-on chars) | Placebo chars | Largest deviation |
-|---|---|---:|---:|
-| cc-a | karpathy (2,345), planning-with-files (2,646) | 2,495 | +6.4% |
-| cc-b | mattpocock (4,106) | 4,106 | 0% |
-| cc-c | superpowers (6,020) | 6,020 | 0% |
-| cc-d | i-have-adhd (7,291), ponytail (7,874), compound-engineering (7,943) | 7,703 | +5.7% |
-| cc-e | caveman (10,043), agent-skills (10,973) | 10,508 | +4.6% |
+**Buckets from measured characters** (`placebo/buckets.json`):
 
-**Form.** Each placebo is a plugin in the same format as the real ones (`arms/placebo/<bucket>/`,
-`src/skill_placebo/placebo.py`): k neutral skills whose names and descriptions add up to the
-members' mean listing length (k = the members' mean number of listed components); a SessionStart
-hook that injects neutral text of the members' mean hook-plus-memory length; skill bodies of the
-members' mean body length. The split between listing and injected text is the bucket mean, so in
-mixed buckets the mechanism is matched approximately and the length exactly.
+| Placebo | Harness | Members (always-on chars) | Placebo chars | Largest deviation |
+|---|---|---|---:|---:|
+| cc-1 | Claude Code | karpathy (2,345), planning-with-files (2,646) | 2,495 | +6.4% |
+| cc-2 | Claude Code | mattpocock (4,106) | 4,106 | 0% |
+| cc-3 | Claude Code | superpowers (6,020) | 6,020 | 0% |
+| cc-4 | Claude Code | i-have-adhd (7,291), ponytail (7,874), compound-engineering (7,943) | 7,703 | +5.7% |
+| cc-5 | Claude Code | caveman (10,043), agent-skills (10,973) | 10,508 | +4.6% |
+| cx-1 | Codex | planning-with-files (625) | 625 | 0% |
+| cx-2 | Codex | superpowers (2,615) | 2,615 | 0% |
+| cx-3 | Codex | mattpocock (4,106) | 4,106 | 0% |
+| cx-4 | Codex | compound-engineering (7,943), ponytail (8,347), agent-skills (9,266) | 8,518 | +7.2% |
 
-**Token check before any task.** Characters are not tokens. The pilot starts with one trivial prompt
-per arm; the input tokens of the first request minus baseline give each arm's always-on tokens. If a
-placebo differs from any member of its bucket by more than 10% in tokens, the placebo is rescaled and
-checked again before any task trial (recorded as an amendment).
+**Form.** Each placebo is a plugin in the same format as the real ones (`arms/placebo/<bucket>/`):
+k neutral skills whose names and descriptions add up to the members' mean listing length (k = the
+members' mean number of listed components); a SessionStart hook that prints neutral text of the
+members' mean hook-plus-memory length; skill bodies of the members' mean body length. The split
+between listing and injected text is the bucket mean, so in mixed buckets the mechanism is matched
+approximately and the length exactly. Where every member installs as plain skills (mattpocock on
+Codex), the placebo is installed as plain skills too.
+
+**Token check before any task.** Characters are not tokens, and some skills hide entries from the
+model (`disable-model-invocation`) that the character count includes. The pilot starts with one
+trivial prompt per arm; the input tokens of the first request minus baseline give each arm's
+always-on tokens. The bucketing rule is then re-applied to these token numbers, and every placebo
+is rescaled to its bucket's mean in tokens, before any task trial. The final buckets and lengths are
+recorded as an amendment.
 
 Also fixed:
 
-- The placebo text restates guidance the harness already gives by default (read the task, use the
-  available tools, check the work) in neutral wording. It adds length and the presence of an
-  instruction, but no new direction on process, verbosity, testing, planning or tool choice.
+- The placebo text (`placebo/corpus.md`) describes the environment in neutral, descriptive wording
+  and restates what the agent already knows (the task arrives in a message, files are in the working
+  directory, commands return exit codes). It adds length and the presence of an instruction, but no
+  new direction on process, verbosity, testing, planning or tool choice.
 - It contains no words from the tested skills' names or trigger phrases.
-- Length is matched in characters of the text that reaches the model at session start, and token
-  counts are reported next to it.
-- The placebo corpus is committed in `placebo/` before the first run and never edited afterwards
-  except through an amendment.
+- Token counts are reported next to character counts.
+- The corpus is committed before the first run and never edited afterwards except through an
+  amendment.
 
 ## 5. Harnesses and models
 
@@ -146,83 +155,113 @@ Research behind these choices: `docs/research/2026-09-25-harness-infra.md`.
 |---|---|---|
 | Version | 2.1.282 | 0.157.0 |
 | Model | `claude-opus-5-5` | `gpt-6-sol` |
-| Reasoning effort | Claude Code's default for this model: medium (code.claude.com/docs/en/model-config: "Opus 5.5 defaults to `medium`"), passed explicitly | Codex's default for this model: medium, passed explicitly |
+| Reasoning effort | Claude Code's default for this model: medium (code.claude.com/docs/en/model-config: "Opus 5.5 defaults to `medium`"), passed explicitly | Codex's default for this model: medium (`codex debug models`), passed explicitly |
 | Permissions | `bypassPermissions` (Harbor default) | `--dangerously-bypass-approvals-and-sandbox` (Harbor default) |
+| Plugin hooks | run (headless sessions trust the folder) | run: `--dangerously-bypass-hook-trust` in arms that install a plugin |
 | Built-in web tools | disabled: `WebSearch`, `WebFetch` | disabled: `web_search = "disabled"` |
 | Login | owner's Claude Max subscription via a dedicated long-lived token (`claude setup-token`) | owner's ChatGPT subscription via a separate Codex login (`codex login --device-auth` in its own `CODEX_HOME`) |
 
 - Runner: Harbor 0.23.0 (`harbor-framework/harbor`), local Docker Desktop, native `linux/arm64`
   images, concurrency at most 2. One Harbor job per trial so that the order and the stop rules are
   controlled by `src/skill_placebo/runner.py`. Harbor is started with a clean environment: only the
-  one harness's login, telemetry off.
+  one harness's login, telemetry off. Agent classes: `src/skill_placebo/harbor_agents.py`.
 - Agent timeout: the task's own, capped at 1,200 s. No turn limit, so that multi-step workflows are
   not cut short by the harness. A timeout is a failed trial.
 - Opus 5.5 is the newest Claude model and what subscribers run in Claude Code; effort is the
   harness default, so the setup matches everyday use (owner's choice, 2026-09-28). `gpt-6-sol` is the
   model Codex documents for "complex coding and agentic workflows"
-  (`learn.chatgpt.com/docs/models`, 2026-09-25), at Codex's default effort for it. The effort
-  value is passed explicitly, equal to the default, so that a change of defaults in a later
-  harness release cannot change the setup; it is recorded in every trial.
+  (`learn.chatgpt.com/docs/models`, 2026-09-25). The effort value is passed explicitly, equal to the
+  default, so that a change of defaults in a later release cannot change the setup; it is recorded
+  in every trial.
 - Web tools are off in every arm because the fixes for public benchmark tasks are on GitHub. The
   shell still has network access (the agent needs it to reach the model). Trials that fetch the
   upstream repository of a SWE-bench task are flagged in the data.
-- Permissions: the documented non-interactive mode in every arm. Interactive plugins run only in a
-  mode their authors document for unattended use; the table marks them.
+- **Identical file systems.** Every plugin directory is mounted read-only in every container of
+  every arm; only an environment variable decides whether a plugin loads. Every arm gets the same
+  marker files, so ponytail and caveman do not tell the agent to offer a statusline setup (they
+  would in every fresh container), and i-have-adhd's documented always-on flag is present
+  everywhere (only its own hook reads it). `SUPERPOWERS_DISABLE_TELEMETRY=1` in every arm.
 - **Versions are frozen for a run.** Harness versions, model IDs, Harbor version, skill commits and
   image digests are pinned before the pilot and recorded in every trial's result. If a harness or
   skill releases an update during a run, the run finishes on the pinned version; the update is at
   most a later rerun.
-- One container image per task, identical across arms. Every plugin directory is mounted read-only
-  in every arm; only an environment variable decides whether a plugin loads, so the file systems
-  of the arms do not differ.
 - **Subscriptions, not API keys.** The owner chose to run on existing subscriptions. Nothing is
   billed per token, so every cost in this study is an **estimate from tokens**: recorded input,
   cache write, cache read and output tokens times the public API list price on 2026-09-25
   (`src/skill_placebo/collect.py`). The tables label it that way.
 
+### 5.1 Scripted approval turn
+
+superpowers (brainstorming "HARD-GATE") and, less strictly, karpathy-skills ("If uncertain, ask"),
+agent-skills and mattpocock can stop and wait for the user. Their authors document no unattended
+mode. In a headless run a stop would end the trial with nothing done, which is not how the skills
+are used. So every arm of every harness gets the same simulated user:
+
+- After the agent's run, if its final message has a `?` in its last 200 characters, the harness
+  sends, in the same session: *"If you are waiting for approval to continue the task, you have it:
+  proceed with your best judgment. If the task is complete, reply DONE."*
+- At most 2 times per trial. The text and the rule never change.
+- Implementation: `harbor_agents.py` (`CHECK_JS`, `APPROVAL_TEXT`); Claude Code continues with
+  `--continue`, Codex with `codex exec resume --last`; tokens of approval turns count in the trial.
+- The number of approval turns per trial is a secondary outcome. The results table marks
+  superpowers (and any skill whose trials use approval turns) as **"scripted approval, not an
+  author-documented mode"**.
+- Check: if approval turns change the cost of the baseline or placebo arms by more than 5% (their
+  share of those arms' total estimated cost), this is reported to the owner before the main run.
+
 ## 6. Tasks
 
-Research: `docs/research/2026-09-25-task-pool.md`. SkillsBench is not used: about half of its
-tasks need domain knowledge that a general workflow skill cannot supply, and several of its images
-ship skills that would leak into the control arms.
+Research: `docs/research/2026-09-25-task-pool.md`, `docs/research/2026-09-28-harder-tasks.md`.
+SkillsBench is not used: about half of its tasks need domain knowledge that a general workflow skill
+cannot supply, and several of its images ship skills that would leak into the control arms.
 
-- **Candidate pool: 30 tasks** with deterministic test-based verifiers, no LLM judges, vendored at
+- **Candidate pool: 40 tasks** with deterministic test-based verifiers, no LLM judges, vendored at
   pinned upstream commits in `tasks/pool/` (`manifest.json`, `PATCHES.md`):
-  - 14 SWE-bench Verified (real bug fixes and small features in django, sympy, pytest, seaborn),
-    picked where 2-4 of 6 frontier-model runs pass. Images: Epoch's arm64 builds, pinned by digest.
-  - 8 Terminal-Bench 2.1 (scripting, parsing, build, performance, data processing), built from
-    their own Dockerfiles.
+  - 20 SWE-bench Verified (real bug fixes and small features in django, sympy, pytest, pylint,
+    seaborn): 14 where 2-4 of 6 frontier-model runs pass, 6 harder ones where 1-2 of 6 pass, because
+    Opus 5.5 is stronger than the models with public per-task data. Images: Epoch's arm64 builds,
+    pinned by digest.
+  - 12 Terminal-Bench 2.1 (scripting, parsing, build, performance, compression, data processing),
+    built from their own Dockerfiles.
   - 8 OpenThoughts-TBLite (bug fixes and features in small Python services and CLIs).
-- Patches are identical for every arm: base image for arm64, agent timeout cap. Nothing in any
-  instruction, test or solution is changed.
-- **Oracle check:** every pool task passes with its reference solution 2 of 2 times on the runner
-  (`tasks/pool/ORACLE.md`, 2026-09-25).
+- Patches are identical for every arm: base image for arm64; agent timeout cap; for SWE-bench, the
+  grading script's own dependencies (a Python >= 3.11 and swebench, datasets, fastcore at the
+  versions the script pins) are installed into the image at build time, because the unpatched
+  grader downloads them after the agent has finished and a network stall there hung a grading run
+  for 20 minutes. Nothing in any instruction, test or solution is changed. Base images that
+  Docker Hub throttled were taken from its official mirror `mirror.gcr.io`
+  (`tasks/pool/BASE_IMAGES.txt`).
+- **Oracle check:** before the pilot every pool task runs its reference solution 2 times on the
+  runner; a task that does not pass both times leaves the pool (`tasks/pool/ORACLE.md`).
 - **Selection** (Claude Code baseline arm, in the pilot):
   1. Every pool task runs 2 times. Tasks with 1 of 2 passes qualify.
   2. If fewer than 20 qualify, tasks at 0/2 or 2/2 get a third trial, in the seeded order, while the
      pilot cap allows; 1/3 and 2/3 qualify.
   3. If more than 20 qualify, 20 are drawn with seed 20260928, keeping the source mix as close to
-     the pool's as possible (14:8:8).
+     the pool's as possible (20:12:8).
   4. If fewer than 15 qualify, the set is filled to 15 with tasks that passed every pilot trial, in
      the seeded order. They carry no pass-rate information but still measure cost; they are flagged.
+     With Opus 5.5 many tasks may sit at the ceiling; the headline rests on cost, so this is
+     acceptable.
 - The candidate list, seed and pilot results are committed before the main run.
 - **Pilot runs are not reused as main-run data.** Selecting tasks on baseline results and then
   reusing those results would bias the baseline (regression to the mean). The main run repeats the
   baseline from scratch.
-- The same 20 tasks are used on both harnesses. The Codex baseline pass rate is reported as
-  observed, even if it falls outside 30-70%.
-- Tasks are public and may be in model training data. Contamination affects all arms equally, so
-  within-harness comparisons stay valid; absolute pass rates are not claimed to generalise.
+- The same tasks are used on both harnesses. The Codex baseline pass rate is reported as observed,
+  even if it falls outside 30-70%.
+- Tasks are public and may be in model training data (section 13).
 
 ## 7. Procedure
 
 - N = 5 trials per task per arm per harness in the full design (section 11.3 for the reduced ones).
 - Order: trials are interleaved in randomized blocks (one block = every arm on every task once), so
   that drift in model serving over the run window affects all arms equally. The seed is committed.
-- Infrastructure failures (container did not start, API 5xx or rate limit before the agent's first
-  action, verifier crashed) are retried up to 2 times and logged. Agent failures (timeout, turn
-  limit, gave up, broke the environment) are not retried: they count as failed trials and their cost
-  counts.
+- Infrastructure failures (container did not start, agent install timed out, verifier crashed, API
+  5xx before the agent's first action) are retried up to 2 times and logged. Agent failures
+  (timeout, gave up, broke the environment, stopped after the last approval turn) are not retried:
+  they count as failed trials and their cost counts.
+- A limit warning, a rate-limit error or an authentication failure stops the whole batch (section
+  12); the interrupted trial is rerun after the stop is cleared.
 - Every trial is kept, including failed and aborted ones, with the reason.
 
 ## 8. Outcomes
@@ -234,7 +273,8 @@ Primary, per trial:
 2. **Pass**: verifier reward = 1.
 
 Secondary: tokens by type; turns; tool calls; wall time; USD per solved task (total cost / trials
-passed); size of the final diff.
+passed); size of the final diff; approval turns (5.1); whether the skill fired (Skill tool calls,
+hook output in the session log).
 
 ## 9. Analysis
 
@@ -246,7 +286,7 @@ All comparisons are within one harness and paired by task.
   same tasks for both arms), keep all trials of each resampled task, 10,000 resamples, seed
   20260925. Two-sided p-values from the same bootstrap distribution. Implementation:
   `src/skill_placebo/analysis.py`, committed before any data.
-- Multiple comparisons: Holm correction across the 10 skills, separately per harness and per
+- Multiple comparisons: Holm correction across the skills run on a harness (9 or 6), separately per harness and per
   outcome. Tables show unadjusted 95% CIs; verdicts use Holm-adjusted p < 0.05.
 - The same statistics are reported for skill vs baseline and placebo vs baseline.
 
@@ -282,60 +322,59 @@ they get the verdict only.
 
 ## 11. Pilot and kill test
 
-The pilot is capped at 150 trials per harness and runs with concurrency 2.
+The pilot is capped at 150 runs per harness and runs with concurrency 2.
 
 ### 11.1 Claude Code (at most 150 runs)
 
-- Token check (section 4.1): one trivial prompt per arm, 15 runs.
+- Token check (section 4.1): one trivial prompt per arm, 15 runs (baseline, 5 placebos, 9 skills).
 - Task selection (section 6): 40 pool tasks x 2 baseline trials = 80, plus at most 5 third trials.
-- Kill test: caveman, ponytail and i-have-adhd with their placebos cc-e and cc-d (5 arms), on 5
+- Kill test: caveman, ponytail and i-have-adhd with their placebos cc-5 and cc-4 (5 arms), on 5
   tasks drawn from the pool with seed 20260928 before the pilot (3 SWE-bench, 1 TB2.1, 1 TBLite),
-  2 trials each = 50. These three are chosen because they put the most always-on text into the
-  context without any interactive gate, so they are the likeliest to move cost if anything does.
+  2 trials each = 50. These three put the most always-on text into the context without an
+  interactive gate, so they are the likeliest to move cost if anything does.
 
 ### 11.2 Codex (at most 100 runs)
 
-- Token check for the Codex arms.
+- Token check: one trivial prompt per Codex arm, 11 runs (baseline, 4 placebos, 6 skills).
 - 40 pool tasks x 1 baseline trial: checks that every task runs under Codex and gives a first base
   rate.
-- Kill test on Codex with the Codex-eligible skills among the three above plus the next ones in
-  priority order, up to 5 arms x 5 tasks x 2 = 50.
+- Kill test: ponytail, agent-skills and compound-engineering with their placebo cx-4 (4 arms), on
+  the same 5 tasks, 2 trials each = 40.
 
 ### 11.3 Kill rule and the size of the main run
 
 - **Kill rule.** If no skill on either harness shows a non-trivial cost difference vs its placebo,
   the project stops at a write-up without a repo release. Non-trivial means a point estimate of R
-  outside 0.90-1.10 **and** a 95% CI that excludes 1. With 6 tasks the CI is wide; the gate only
+  outside 0.90-1.10 **and** a 95% CI that excludes 1. With 5 tasks the CI is wide; the gate only
   asks whether anything moves at all.
-- **Size of the main run** is chosen after the pilot, from resource numbers only (share of the
-  weekly subscription limit per trial, wall time per trial), never from effect estimates:
+- **Designs** (arms counted with the buckets of section 4.1; the token check may change the number
+  of placebos slightly):
 
-  | Design | Skills | Tasks | N | Arms per harness |
-  |---|---|---|---|---|
-  | Full | 10 | 20 | 5 | baseline + placebos + 10 |
-  | Reduced | first 8 in priority order | first 15 of the selected set, seeded order | 3 | baseline + placebos + 8 |
-  | Minimal | first 6 | 15 | 3 | baseline + placebos + 6 |
+  | Design | Skills (priority order, section 3) | Tasks | N | Claude Code runs | Codex runs |
+  |---|---|---|---|---:|---:|
+  | Full | all 9 | 20 | 5 | 15 arms x 100 = 1,500 | 11 arms x 100 = 1,100 |
+  | Reduced | first 8 (drops compound-engineering) | first 15 of the selected set, seeded order | 3 | 14 x 45 = 630 | 10 x 45 = 450 |
+  | Minimal | first 6 (also drops planning-with-files, i-have-adhd) | 15 | 3 | 12 x 45 = 540 | 8 x 45 = 360 |
 
-  **Thresholds**, applied per harness to pilot measurements only:
-  - `u` = share of the plan's weekly limit used per trial (pilot total / pilot trials);
-  - `t` = mean wall time per trial at concurrency 2;
-  - `H` = hours from the start of the main run to 2026-10-09 12:00 MSK, minus 12 hours of reserve;
-  - `L` = 25% of the weekly limit per weekly period, times the number of weekly periods the main
-    run overlaps (1 unless the plan's reset falls inside the window), unless the owner sets a
-    different ceiling before the main run.
+- **Choice of design, from resource numbers only, never from effect estimates** (owner's hub
+  decision, 2026-09-28). For each harness, `U` = the share of that plan's weekly limit the pilot used,
+  scaled to 150 runs:
+  - `U <= 3%`: **Full**, spread up to 2026-10-09 across the plan's weekly reset;
+  - `3% < U <= 6%`: **Reduced**;
+  - `U > 6%`: **Minimal**.
 
-  The main run uses the **largest** design D with `trials(D) x u <= L` **and**
-  `trials(D) x t / 2 <= H`, where trials(D) counts every arm including baseline and placebos. If not
-  even the minimal design fits on a harness, that harness runs the minimal design on as many of the
-  15 tasks as fit, in the seeded order, and the gap is reported; if that leaves fewer than 10 tasks
-  the harness is dropped from the main run and the owner is asked. The choice and the numbers
-  behind it are recorded as an amendment before the main run.
+  A design is also dropped a step if its runs cannot finish by 2026-10-09 12:00 MSK at the pilot's
+  mean wall time per run with concurrency 2, keeping 12 hours of reserve. If even the minimal design
+  does not fit, that harness runs it on as many of the 15 tasks as fit, in the seeded order, and the
+  gap is reported; fewer than 10 tasks drops the harness and the owner is asked. The 25% stop rule of
+  section 12 holds throughout. The choice and the numbers behind it are recorded as an amendment
+  before the main run.
 - Pilot trials are not reused in the main analysis. The pilot's own numbers are published
   separately.
 
 ## 12. Budget and stop rules
 
-Runs use the owner's subscriptions, whose weekly limits are shared with his other work. The
+Runs use the owner's subscriptions, whose weekly limits are shared with the owner's other work. The
 runner stops the batch and the result is reported to the owner when:
 
 - the benchmark has used more than 25% of the weekly limit of either plan since the batch started
@@ -381,7 +420,8 @@ cost estimate.
 
 ## 15. Reproduction and data release
 
-- One command reproduces a skill's row: `uvx skill-placebo run <owner/repo>` (TBD exact flags).
+- One command reproduces a skill's row: `uvx skill-placebo run <owner/repo>`; its exact flags are
+  documented in the README when the CLI ships (it wraps the runner used here).
 - Raw trajectories, verifier outputs, token usage and the analysis notebook are published.
 - Before release every artifact passes `scripts/scrub.py --check`: no API keys, no local paths,
   no personal e-mail.

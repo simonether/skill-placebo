@@ -41,3 +41,5 @@ WORKDIR /testbed
 RUN curl -LsSf https://astral.sh/uv/0.7.13/install.sh | sh 
 RUN mkdir -p /logs
 
+# skill-placebo: pre-install the grading script's dependencies (identical in every arm)
+RUN printf '# /// script\n# requires-python = ">=3.11"\n# dependencies = ["swebench==4.0.3", "datasets==2.16.1", "fastcore<1.11"]\n# ///\nimport swebench, datasets\n' > /tmp/sp_warm.py && /root/.local/bin/uv run /tmp/sp_warm.py && rm /tmp/sp_warm.py
