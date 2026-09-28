@@ -358,3 +358,40 @@ Numbers below are as reported by each source. Pages were read via WebFetch summa
   It validates edits with a separate model ("Choose faster or more capable models", `README.md:29`), which adds its own API spend outside the agent trajectory
   and complicates cost accounting. Always-on chars, interactivity and claims were **not checked**.
 
+## Recommendation: 10 to run (never-measured first)
+
+Nine candidates pass the scope filter. The 10th slot is a reserve that was not fully checked. Each entry gives the author-documented install mode to use.
+
+| # | candidate | mode to run | why / status |
+|---|---|---|---|
+| 1 | addyosmani/agent-skills | native plugin on both harnesses | Never measured. Symmetric CC/Codex install. Largest triggered listing (~9-11k chars). |
+| 2 | mattpocock/skills | CC plugin; Codex `npx skills add` (all 25 plugin skills, non-interactive flags [U]) | Never measured, 2nd by stars. Expect low activation on unattended tasks. `/setup-matt-pocock-skills` is interactive: skip it and record that as a deviation. |
+| 3 | ayghri/i-have-adhd | CC: plugin + documented always-on flag (`INSTALL.md:154`); Codex: plugin (explicit-only) | Never measured. Output-shape skill, the natural companion to caveman. Codex arm is expected to be null unless invoked; pre-register that. |
+| 4 | OthmanAdi/planning-with-files | native plugin (hooks included) | Never independently measured, and the author makes numeric claims. Hooks stay silent until the agent writes `task_plan.md`. |
+| 5 | EveryInc/compound-engineering-plugin | native plugin, default (triggered) mode | Never measured. `/lfg` is the documented hands-off mode, but it is user-invoked and ends in `git push`/PR, so it breaks offline. Default mode is safer. If `/lfg` is used, the placebo arm needs a matched prefix. |
+| 6 | multica-ai/andrej-karpathy-skills | CC: `CLAUDE.md` (Option B, `README.md:119`); Codex: same text as `AGENTS.md` (flag as our adaptation) | Only a Tessl scenario eval exists. Cleanest always-on treatment (2,357 chars). Repo has no LICENSE file: reference it, don't vendor it into `results/`. |
+| 7 | obra/superpowers | CC plugin; Codex plugin | **Conditional.** Most-starred, but only a weak 6-vs-6 measurement exists. Brainstorming HARD-GATE plus no documented auto-approve mode means that under CLAUDE.md ("нет такого режима - исключить с причиной") it is **excluded unless the maintainers approve a documented deviation** (e.g. a scripted "approved, proceed" turn in all arms). Decide before the pilot. |
+| 8 | DietrichGebert/ponytail | native plugin (hooks) on both | Replication **with a placebo**. JetBrains had none, and Scott Logic's 7-word prompt beat the skill. The highest-value "does it beat placebo" test. |
+| 9 | JuliusBrussee/caveman | CC plugin (hooks); Codex `npx skills` per `INSTALL.md:51` | Replication with a placebo. JetBrains −8.5% and maxtaylor ("Be brief." = caveman) suggest a null against placebo. Skill-only track, no proxy. |
+| 10 | reserve: nizos/tdd-guard / nizos/probity | not checked | Low stars (2.4k). Its validation model spends API outside the trajectory, so cost accounting would need an extra meter. Only take it if a slot frees up. |
+
+### Fairness caveats (pre-register these in METHOD.md)
+
+1. **Length matching must target what is actually loaded.** Always-on text ranges from 238 chars (karpathy plugin) to ~10,190 (caveman CC). The placebo should mirror
+   the component structure: the same number of skills with equal-length neutral descriptions and bodies, plus equal-length hook injection. Matching only the total SKILL.md bytes
+   is not enough (e.g. agent-skills 344,948 B total but ~9k always-on).
+2. **Harness asymmetry.** caveman (hooks in CC, manual `/caveman` in Codex), superpowers (no SessionStart hook on Codex), i-have-adhd (Codex explicit-only),
+   mattpocock and karpathy (no Codex plugin). Report per harness and don't pool. A null on Codex can simply mean the skill never loaded.
+3. **Activation.** JetBrains saw ponytail self-activate 0/10 when installed as a plain skill. Measure the author-documented install and log the activation rate per trial
+   (Skill tool calls, hook fired). Forcing activation is a separate, pre-registered arm, if we add it at all.
+4. **Fresh-container nudges.** ponytail (`hooks/ponytail-activate.js:63-106`) and caveman (`src/hooks/caveman-activate.js:405-421`) add a "Proactively offer
+   to set up statusline" instruction whenever no statusLine or marker exists. That happens in every fresh container. Pre-create the marker files in the
+   image for **all arms**.
+5. **Interactivity as outcome.** If an agent stops to ask (karpathy `CLAUDE.md:12,15`, agent-skills, mattpocock tdd, superpowers), a headless trial ends.
+   Pre-register "stopped with a question" as a failed trial, counted per arm, and never re-run it.
+6. **Identical images.** Hooks need `node` (ponytail, caveman, i-have-adhd), `jq`/`sh`, and for planning-with-files `python3`. Install them in every arm's image.
+   Set `SUPERPOWERS_DISABLE_TELEMETRY=1` (and `DISABLE_TELEMETRY`) in all arms.
+7. **Pin installs.** Marketplace installs fetch the moving HEAD, so install from a local checkout at the shas listed above (record them in `skills.lock`).
+   Codex hook trust (ponytail `README.md:149`) must be pre-configured headlessly [U: mechanism].
+8. **Subagent and hook costs are part of the treatment.** ponytail adds 5,229 chars per subagent, caveman adds 245 chars per prompt, and planning-with-files injects the plan per
+   prompt/tool once it exists. Count all of it in cost, don't subtract it.
