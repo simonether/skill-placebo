@@ -109,7 +109,7 @@ def test_rate_limit_event_allowed_is_not_a_stop(tmp_path):
     (d / "claude-code.txt").write_text(json.dumps(ok))
     assert limit_hits(tmp_path / "trial") == []
     from skill_placebo.runner import claude_windows
-    assert claude_windows(tmp_path / "trial") == {"five_hour": 0.13, "seven_day": 0.04, "seven_day_resets": 1}
+    assert claude_windows(tmp_path / "trial") == {"five_hour": 0.13, "seven_day": 0.04, "seven_day_resets": 1}  # regression: "allowed" never stops
     warn = dict(ok, rate_limit_info=dict(ok["rate_limit_info"], status="allowed_warning"))
     (d / "claude-code.txt").write_text(json.dumps(warn))
     assert limit_hits(tmp_path / "trial")

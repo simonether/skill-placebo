@@ -481,3 +481,30 @@ reading of the usage page, Max 20x, 4% of the week used, reset Mon 2026-10-05 10
 
 **Runs affected:** all (no run has happened yet).
 
+### Amendment 3 (2026-09-29, after the first calibration run, before any task trial): plan windows as the main guard
+
+**Reason.** Claude Code writes a `rate_limit_event` into its stream in every run. Its status
+"allowed" is informational; the runner first read it as a limit signal and stopped after one
+calibration run (a false stop; no trial was lost). The same event carries the plan's own
+utilization of the 5-hour and 7-day windows for the whole account (`unifiedWindows`), which
+matched the owner's usage page (13% and 4%).
+
+**Change** (adds to amendment 2):
+
+1. A limit stop is a `rate_limit_event` whose status is not "allowed", or that reports overage use;
+   plus the rate-limit errors and authentication failures of section 12.
+2. Main guard for Claude Code, from the last event of each trial: stop when the 7-day utilization
+   reaches its value before the pilot + 0.25 (0.04 → 0.29) or 0.80 absolute; pause until the
+   5-hour window resets when its utilization is 0.85 or more. This counts all of the owner's use,
+   so it is conservative.
+3. The units and $-equivalent ledger stays: it attributes use to the benchmark and carries the
+   design thresholds (hub, 2026-09-29: at most $45 / $90 per 150 pilot runs, and 17 / 35 million
+   units; the stricter decides). The weekly $370 and 145-million-unit stops stay as second guards.
+4. The ledger records the 5-hour and 7-day utilization after every trial.
+5. A regression test pins that an "allowed" event never stops a batch.
+6. Codex (ChatGPT Plus): stop at +25 points over the weekly percentage before the pilot or at 80%
+   absolute; pause at 40% of the 5-hour window. If the first Codex trials show that the planned 90
+   runs cannot fit, the Codex pilot is cut to its kill test and the gap is reported as a limitation.
+
+**Runs affected:** the calibration runs of step 1 and everything after (no task trial yet).
+

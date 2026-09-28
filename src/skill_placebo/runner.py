@@ -200,6 +200,8 @@ def claude_windows(trial_dir: Path) -> dict:
                     out[k] = float(w[k]["utilization"])
             if (w.get("seven_day") or {}).get("resetsAt"):
                 out["seven_day_resets"] = w["seven_day"]["resetsAt"]
+            if (w.get("five_hour") or {}).get("resetsAt"):
+                out["five_hour_resets"] = w["five_hour"]["resetsAt"]
     return out
 
 
@@ -294,7 +296,8 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
               codex_weekly_start: float | None = None, codex_pace_pct: float = 40.0,
               codex_weekly_cap: float = 80.0,
               usd_budget: float | None = None, pace_usd_5h: float | None = None,
-              claude_week_start: float | None = None, claude_five_hour_pause: float = 0.80) -> BatchState:
+              claude_week_start: float | None = None, claude_five_hour_pause: float = 0.85,
+              claude_week_cap: float = 0.80) -> BatchState:
     """units_budget: stop once the ledger's limit units since window_start (the plan's weekly reset,
     UTC) reach it - the translation of 25% of the week (METHOD.md amendment 2). Required for
     real runs. pace_units_5h: never start a trial while the trailing 5 hours hold that many units.
@@ -384,7 +387,7 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
                 wk = rl.get("weekly")
                 cw = claude_windows(tdir) if harness.name == "claude-code" else {}
                 if cw.get("five_hour") is not None and cw["five_hour"] >= claude_five_hour_pause:
-                    codex_pause["until"] = time.time() + 1800  # re-check in 30 min
+                    codex_pause["until"] = float(cw.get("five_hour_resets") or time.time() + 1800)  # until the window resets
                 if cw.get("seven_day") is not None:
                     if claude_week_start is None:
                         claude_week_start = cw["seven_day"]
@@ -405,6 +408,8 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
                     state.stopped = "limit marker: " + hits[0][:300]
                 elif wk is not None and state.codex_weekly_start is not None and wk - state.codex_weekly_start > weekly_budget_pp:
                     state.stopped = f"codex weekly usage +{wk - state.codex_weekly_start:.1f} pp > {weekly_budget_pp} pp"
+                elif cw.get("seven_day") is not None and cw["seven_day"] >= claude_week_cap:
+                    state.stopped = f"claude plan week utilization {cw['seven_day']:.0%} >= cap {claude_week_cap:.0%}"
                 elif cw.get("seven_day") is not None and (cw["seven_day"] - claude_week_start) * 100 >= weekly_budget_pp:
                     state.stopped = f"claude plan week utilization {cw['seven_day']:.0%} (+{(cw['seven_day']-claude_week_start)*100:.0f} pp)"
                 elif wk is not None and wk >= codex_weekly_cap:
