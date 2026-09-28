@@ -113,3 +113,16 @@ def test_rate_limit_event_allowed_is_not_a_stop(tmp_path):
     warn = dict(ok, rate_limit_info=dict(ok["rate_limit_info"], status="allowed_warning"))
     (d / "claude-code.txt").write_text(json.dumps(warn))
     assert limit_hits(tmp_path / "trial")
+
+
+def test_plugin_hook_text_with_401_does_not_stop(tmp_path):
+    """Regression (29.09 pilot): i-have-adhd's SessionStart hook injects an example with '401' and 'auth'."""
+    d = tmp_path / "trial" / "agent"
+    d.mkdir(parents=True)
+    ev = {"type": "system", "subtype": "hook_response", "hook_event": "SessionStart",
+          "output": 'Good: "Test fails at `auth.spec.ts:42`: expected 200, got 401. Cause: missing auth header."'}
+    (d / "claude-code.txt").write_text(json.dumps(ev) + "\n" + json.dumps({"type": "result", "is_error": False, "result": "OK"}))
+    assert limit_hits(tmp_path / "trial") == []
+    api_err = {"type": "result", "is_error": True, "api_error_status": 429, "result": "API Error: 429 rate_limit_error"}
+    (d / "claude-code.txt").write_text(json.dumps(api_err))
+    assert limit_hits(tmp_path / "trial")

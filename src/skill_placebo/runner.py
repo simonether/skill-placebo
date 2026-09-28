@@ -118,9 +118,10 @@ def harbor_cmd(trial: Trial, h: Harness, arm: Arm, jobs_dir: Path, mounts: str |
 
 
 def limit_hits(trial_dir: Path) -> list[str]:
-    """Limit, throttling and auth-failure markers in a finished trial. Only harness-level events
-    are scanned (Claude Code stream-json events other than assistant/user turns, Codex error and
-    turn.failed events), so a task that itself deals with HTTP 401/429 cannot trigger a stop."""
+    """Limit, throttling and auth-failure markers in a finished trial. Only events that report a
+    harness error are scanned (errored results, error/retry/limit system events without hook output,
+    non-"allowed" rate_limit_events, Codex error and turn.failed), so neither a task nor a plugin's
+    text that mentions HTTP 401/429 can trigger a stop."""
     hits = []
 
     def check(name, text):
@@ -144,18 +145,24 @@ def limit_hits(trial_dir: Path) -> list[str]:
             if not isinstance(ev, dict):
                 continue
             typ = str(ev.get("type", ""))
-            if typ in ("assistant", "user") or typ.startswith("item."):
-                continue
             if typ == "rate_limit_event":
                 # Claude Code reports the plan's windows on every run; only a non-"allowed" status or
                 # overage use is a limit signal.
                 info = ev.get("rate_limit_info") or {}
                 if info.get("status") != "allowed" or info.get("isUsingOverage"):
                     hits.append(f"{p.name}: rate_limit_event status={info.get('status')} overage={info.get('isUsingOverage')}")
-                continue
-            if typ == "result" and not ev.get("is_error") and not ev.get("api_error_status"):
-                continue
-            check(p.name, line)
+            elif typ == "result":
+                # Only an errored result carries harness-level text (e.g. "Not logged in", "API Error: 429").
+                if ev.get("is_error") or ev.get("api_error_status"):
+                    check(p.name, f"{ev.get('api_error_status')} {ev.get('result')}")
+            elif typ == "system":
+                # Informational system events (init, hook_started/hook_response with a plugin's text)
+                # never count; only error/retry/limit subtypes, without any hook output.
+                sub = str(ev.get("subtype", ""))
+                if re.search(r"error|retry|limit|fail", sub, re.I):
+                    check(p.name, json.dumps({k: v for k, v in ev.items() if k not in ("output", "stdout", "stderr")}))
+            elif typ in ("error", "turn.failed"):  # Codex
+                check(p.name, json.dumps(ev))
     return hits
 
 
