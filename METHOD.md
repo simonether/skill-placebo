@@ -2,7 +2,7 @@
 
 Version 1.0 draft, 2026-09-28. This file is committed to git before any benchmark run. The commit
 history is the timestamp of the pre-registration. After the first run the method changes only
-through the [Amendments](#15-amendments) section: date, reason, which runs are affected, written
+through the [Amendments](#16-amendments) section: date, reason, which runs are affected, written
 before those runs.
 
 <!-- DRAFT: sections marked TBD are filled from docs/research/ before the pre-registration commit. -->
@@ -106,6 +106,10 @@ Research behind these choices: `docs/research/2026-09-25-harness-infra.md`.
   upstream repository of a SWE-bench task are flagged in the data.
 - Permissions: the documented non-interactive mode in every arm. Interactive plugins run only in a
   mode their authors document for unattended use; the table marks them.
+- **Versions are frozen for a run.** Harness versions, model IDs, Harbor version, skill commits and
+  image digests are pinned before the pilot and recorded in every trial's result. If a harness or
+  skill releases an update during a run, the run finishes on the pinned version; the update is at
+  most a later rerun.
 - One container image per task, identical across arms. Every plugin directory is mounted read-only
   in every arm; only an environment variable decides whether a plugin loads, so the file systems
   of the arms do not differ.
@@ -245,8 +249,20 @@ The pilot is capped at 150 trials per harness and runs with concurrency 2.
   | Reduced | first 8 in priority order | first 15 of the selected set, seeded order | 3 | baseline + placebos + 8 |
   | Minimal | first 6 | 15 | 3 | baseline + placebos + 6 |
 
-  The choice, and whether Codex runs the same design as Claude Code, is recorded as an amendment
-  before the main run.
+  **Thresholds**, applied per harness to pilot measurements only:
+  - `u` = share of the plan's weekly limit used per trial (pilot total / pilot trials);
+  - `t` = mean wall time per trial at concurrency 2;
+  - `H` = hours from the start of the main run to 2026-10-09 12:00 MSK, minus 12 hours of reserve;
+  - `L` = 25% of the weekly limit per weekly period, times the number of weekly periods the main
+    run overlaps (1 unless the plan's reset falls inside the window), unless the owner sets a
+    different ceiling before the main run.
+
+  The main run uses the **largest** design D with `trials(D) x u <= L` **and**
+  `trials(D) x t / 2 <= H`, where trials(D) counts every arm including baseline and placebos. If not
+  even the minimal design fits on a harness, that harness runs the minimal design on as many of the
+  15 tasks as fit, in the seeded order, and the gap is reported; if that leaves fewer than 10 tasks
+  the harness is dropped from the main run and the owner is asked. The choice and the numbers
+  behind it are recorded as an amendment before the main run.
 - Pilot trials are not reused in the main analysis. The pilot's own numbers are published
   separately.
 
@@ -265,7 +281,25 @@ runner stops the batch and the result is reported to the owner when:
 Usage before and after every batch is recorded in `docs/budget.md` together with the token-based
 cost estimate.
 
-## 13. Fairness to skill authors
+## 13. Limitations
+
+- **Contamination.** SWE-bench Verified (public since 2024) and Terminal-Bench 2 (public since
+  2025) are probably in the training data of both models, and solutions to them are published. This
+  inflates absolute pass rates on these tasks. It affects all arms equally, so the comparisons
+  skill vs placebo vs baseline stay fair, but the absolute pass rates here say little about new,
+  unseen work. A fresh-task rerun (for example a recent SWE-rebench slice) is the planned check.
+- **Two models, one effort level.** Results are for Sonnet 5 and gpt-6-sol at medium effort in
+  headless mode. Other models, effort levels or interactive use can behave differently.
+- **Short tasks.** Tasks take minutes, not days. Skills that pay off over long sessions (memory,
+  multi-day planning) are not measured by this design.
+- **Headless.** Interactive skills run in their documented unattended mode, which is not how every
+  user runs them.
+- **Power.** With 20 tasks x 5 trials the 95% CI on a pass-rate difference is about +-14 pp; smaller
+  effects on quality are not detectable. Cost differences are measured more precisely.
+- **Cost is estimated from tokens.** Runs used subscriptions; cost is tokens x public list prices,
+  not an invoice.
+
+## 14. Fairness to skill authors
 
 - Each skill is installed the way its author documents, at a pinned commit, including hooks,
   agents and commands when the author ships them.
@@ -275,13 +309,13 @@ cost estimate.
 - Neutral wording. The results say what was measured, on which tasks and models, and nothing about
   intent.
 
-## 14. Reproduction and data release
+## 15. Reproduction and data release
 
 - One command reproduces a skill's row: `uvx skill-placebo run <owner/repo>` (TBD exact flags).
 - Raw trajectories, verifier outputs, token usage and the analysis notebook are published.
 - Before release every artifact passes `scripts/scrub.py --check`: no API keys, no local paths,
   no personal e-mail.
 
-## 15. Amendments
+## 16. Amendments
 
 None yet.

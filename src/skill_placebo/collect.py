@@ -73,7 +73,11 @@ def rows(jobs_dir: Path):
         yield {
             **meta,
             "trial": r.get("trial_name"),
+            "agent": (r.get("agent_info") or {}).get("name"),
+            "agent_version": (r.get("agent_info") or {}).get("version"),
             "model": model,
+            "task_checksum": r.get("task_checksum"),
+            "reasoning_effort": (((r.get("config") or {}).get("agent") or {}).get("kwargs") or {}).get("reasoning_effort"),
             "reward": reward,
             "passed": None if reward is None else int(float(reward) >= 1.0),
             "exception": (r.get("exception_info") or {}).get("exception_type"),
