@@ -1,7 +1,7 @@
 # skill-placebo: pre-registered method
 
-Version 1.0 draft, 2026-09-25. This file is committed to git before any paid run. The commit
-history is the timestamp of the pre-registration. After the first paid run the method changes only
+Version 1.0 draft, 2026-09-28. This file is committed to git before any benchmark run. The commit
+history is the timestamp of the pre-registration. After the first run the method changes only
 through the [Amendments](#15-amendments) section: date, reason, which runs are affected, written
 before those runs.
 
@@ -81,27 +81,65 @@ Fixed now:
 
 ## 5. Harnesses and models
 
-TBD from `docs/research/2026-09-25-harness-infra.md`: pinned versions of Harbor, Claude Code and
-Codex CLI; model IDs; reasoning effort; timeouts; network policy; how each arm is installed.
+Research behind these choices: `docs/research/2026-09-25-harness-infra.md`.
 
-Fixed now:
+| | Claude Code | Codex CLI |
+|---|---|---|
+| Version | 2.1.282 | 0.157.0 |
+| Model | `claude-sonnet-5` | `gpt-6-sol` |
+| Reasoning effort | medium | medium |
+| Permissions | `bypassPermissions` (Harbor default) | `--dangerously-bypass-approvals-and-sandbox` (Harbor default) |
+| Built-in web tools | disabled: `WebSearch`, `WebFetch` | disabled: `web_search = "disabled"` |
+| Login | owner's Claude Max subscription via a dedicated long-lived token (`claude setup-token`) | owner's ChatGPT subscription via a separate Codex login (`codex login --device-auth` in its own `CODEX_HOME`) |
 
-- Claude Code and Codex CLI. OpenCode is planned for a later rerun.
-- Permissions: the documented non-interactive / auto-approve mode in every arm. Interactive plugins
-  run only in a mode their authors document for unattended use; the table marks them.
-- One container image per task, identical across arms.
+- Runner: Harbor 0.23.0 (`harbor-framework/harbor`), local Docker Desktop, native `linux/arm64`
+  images, concurrency at most 2. One Harbor job per trial so that the order and the stop rules are
+  controlled by `src/skill_placebo/runner.py`. Harbor is started with a clean environment: only the
+  one harness's login, telemetry off.
+- Agent timeout: the task's own, capped at 1,200 s. No turn limit, so that multi-step workflows are
+  not cut short by the harness. A timeout is a failed trial.
+- Sonnet 5 at medium effort matches the JetBrains ponytail study, so the numbers are comparable with
+  the closest prior art. `gpt-6-sol` is the model Codex documents for "complex coding and agentic
+  workflows" (`learn.chatgpt.com/docs/models`, 2026-09-25).
+- Web tools are off in every arm because the fixes for public benchmark tasks are on GitHub. The
+  shell still has network access (the agent needs it to reach the model). Trials that fetch the
+  upstream repository of a SWE-bench task are flagged in the data.
+- Permissions: the documented non-interactive mode in every arm. Interactive plugins run only in a
+  mode their authors document for unattended use; the table marks them.
+- One container image per task, identical across arms. Every plugin directory is mounted read-only
+  in every arm; only an environment variable decides whether a plugin loads, so the file systems
+  of the arms do not differ.
+- **Subscriptions, not API keys.** The owner chose to run on existing subscriptions. Nothing is
+  billed per token, so every cost in this study is an **estimate from tokens**: recorded input,
+  cache write, cache read and output tokens times the public API list price on 2026-09-25
+  (`src/skill_placebo/collect.py`). The tables label it that way.
 
 ## 6. Tasks
 
-TBD from `docs/research/2026-09-25-task-pool.md`: source datasets and version, candidate pool.
+Research: `docs/research/2026-09-25-task-pool.md`. SkillsBench is not used: about half of its
+tasks need domain knowledge that a general workflow skill cannot supply, and several of its images
+ship skills that would leak into the control arms.
 
-Fixed now:
-
-- 20 tasks with deterministic verifiers in Harbor format. No LLM judges.
-- Selection in the pilot: each candidate task runs in the baseline arm on Claude Code; tasks whose
-  observed baseline pass rate is between 30% and 70% qualify. If more than 20 qualify, 20 are drawn
-  with a fixed seed, stratified by category. The candidate list, seed and pilot results are
-  committed before the main run.
+- **Candidate pool: 30 tasks** with deterministic test-based verifiers, no LLM judges, vendored at
+  pinned upstream commits in `tasks/pool/` (`manifest.json`, `PATCHES.md`):
+  - 14 SWE-bench Verified (real bug fixes and small features in django, sympy, pytest, seaborn),
+    picked where 2-4 of 6 frontier-model runs pass. Images: Epoch's arm64 builds, pinned by digest.
+  - 8 Terminal-Bench 2.1 (scripting, parsing, build, performance, data processing), built from
+    their own Dockerfiles.
+  - 8 OpenThoughts-TBLite (bug fixes and features in small Python services and CLIs).
+- Patches are identical for every arm: base image for arm64, agent timeout cap. Nothing in any
+  instruction, test or solution is changed.
+- **Oracle check:** every pool task passes with its reference solution 2 of 2 times on the runner
+  (`tasks/pool/ORACLE.md`, 2026-09-25).
+- **Selection** (Claude Code baseline arm, in the pilot):
+  1. Every pool task runs 2 times. Tasks with 1 of 2 passes qualify.
+  2. If fewer than 20 qualify, tasks at 0/2 or 2/2 get a third trial, in the seeded order, while the
+     pilot cap allows; 1/3 and 2/3 qualify.
+  3. If more than 20 qualify, 20 are drawn with seed 20260928, keeping the source mix as close to
+     the pool's as possible (14:8:8).
+  4. If fewer than 15 qualify, the set is filled to 15 with tasks that passed every pilot trial, in
+     the seeded order. They carry no pass-rate information but still measure cost; they are flagged.
+- The candidate list, seed and pilot results are committed before the main run.
 - **Pilot runs are not reused as main-run data.** Selecting tasks on baseline results and then
   reusing those results would bias the baseline (regression to the mean). The main run repeats the
   baseline from scratch.
@@ -112,7 +150,7 @@ Fixed now:
 
 ## 7. Procedure
 
-- N = 5 trials per task per arm per harness.
+- N = 5 trials per task per arm per harness in the full design (section 11.3 for the reduced ones).
 - Order: trials are interleaved in randomized blocks (one block = every arm on every task once), so
   that drift in model serving over the run window affects all arms equally. The seed is committed.
 - Infrastructure failures (container did not start, API 5xx or rate limit before the agent's first
@@ -178,23 +216,54 @@ they get the verdict only.
 
 ## 11. Pilot and kill test
 
-TBD: pilot size and cost after the per-trial cost is known from the infrastructure research.
+The pilot is capped at 150 trials per harness and runs with concurrency 2.
 
-Fixed now:
+### 11.1 Claude Code (at most 150 trials)
 
-- The pilot (1) selects the 20 tasks (section 6) and (2) runs a kill test: a subset of skills and
-  the placebo on a subset of tasks.
-- **Kill rule.** If no skill in the kill test shows a non-trivial cost difference vs placebo, the
-  project stops at a write-up without a repo release. Non-trivial means a point estimate of R
-  outside 0.90-1.10 **and** a 95% CI that excludes 1.
+- Task selection (section 6): 30 tasks x 2 baseline trials = 60, plus at most 18 third trials.
+- Kill test: the first 3 skills of the priority order (section 3) and their placebo arms, on 6
+  tasks drawn from the pool with seed 20260928 before the pilot (2 SWE-bench, 2 TB2.1, 2 TBLite),
+  2 trials each. At most 6 arms x 12 = 72 trials.
+
+### 11.2 Codex (at most 102 trials)
+
+- 30 tasks x 1 baseline trial: checks that every task runs under Codex and gives a first base rate.
+- The same kill test as 11.1: at most 72 trials.
+
+### 11.3 Kill rule and the size of the main run
+
+- **Kill rule.** If no skill on either harness shows a non-trivial cost difference vs its placebo,
+  the project stops at a write-up without a repo release. Non-trivial means a point estimate of R
+  outside 0.90-1.10 **and** a 95% CI that excludes 1. With 6 tasks the CI is wide; the gate only
+  asks whether anything moves at all.
+- **Size of the main run** is chosen after the pilot, from resource numbers only (share of the
+  weekly subscription limit per trial, wall time per trial), never from effect estimates:
+
+  | Design | Skills | Tasks | N | Arms per harness |
+  |---|---|---|---|---|
+  | Full | 10 | 20 | 5 | baseline + placebos + 10 |
+  | Reduced | first 8 in priority order | first 15 of the selected set, seeded order | 3 | baseline + placebos + 8 |
+  | Minimal | first 6 | 15 | 3 | baseline + placebos + 6 |
+
+  The choice, and whether Codex runs the same design as Claude Code, is recorded as an amendment
+  before the main run.
+- Pilot trials are not reused in the main analysis. The pilot's own numbers are published
+  separately.
 
 ## 12. Budget and stop rules
 
-- API budget: pilot at most $60, whole project at most $300. Any excess is approved by the owner
-  before it is spent.
-- Before each batch the cost is estimated from the measured cost per trial; spend is recorded in
-  `docs/budget.md` after each batch from the trajectories.
-- A batch that spends more than 1.5x its estimate is stopped and reviewed.
+Runs use the owner's subscriptions, whose weekly limits are shared with his other work. The
+runner stops the batch and the result is reported to the owner when:
+
+- the benchmark has used more than 25% of the weekly limit of either plan since the batch started
+  (Codex: the weekly `used_percent` in session logs; Claude: the plan's usage page, read before and
+  after each batch);
+- any trial shows a limit warning, a rate-limit error or an authentication failure (structured
+  harness events only, so a task that itself deals with HTTP 401/429 cannot trigger it);
+- Docker Hub throttles image pulls.
+
+Usage before and after every batch is recorded in `docs/budget.md` together with the token-based
+cost estimate.
 
 ## 13. Fairness to skill authors
 
