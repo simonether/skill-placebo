@@ -305,6 +305,7 @@ def ledger_add(harness: str, trial_dir: Path) -> float:
                 continue
             rec = {"ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "job": trial_dir.name, "trial": row["trial"],
                    "arm": row["arm"], "model": row["model"], "exception": row["exception"],
+                   "attempt": row["attempt"], "infra_failure": row["infra_failure"],
                    "n_input": row["n_input"], "n_cached": row["n_cached"], "n_cache_write": row["n_cache_write"],
                    "n_output": row["n_output"], "cost_est_usd": row["cost_est_usd"], "units": row["units"],
                    "plan_five_hour": windows.get("five_hour", rl.get("five_hour")),

@@ -85,9 +85,17 @@ def main():
         trials = plan(kill_tasks, arms, a.harness, n=2, seed=SEED)
 
     jobs_dir = ROOT / "jobs" / "pilot" / a.harness / a.step
-    done_before = sum(1 for _ in (ROOT / "jobs" / "pilot" / a.harness).glob("*/*/*/result.json"))
-    if done_before + len(trials) > PILOT_CAP[a.harness] and not a.dry_run:
-        sys.exit(f"pilot cap: {done_before} done + {len(trials)} planned > {PILOT_CAP[a.harness]}")
+    # The cap counts task trials only (METHOD.md amendment 5): calibration runs and infrastructure
+    # retries are excluded; a trial is its base job, whatever its number of attempts.
+    task_steps = ("selection", "kill")
+    done_before = len({d.name.split("__r")[0] for st in task_steps
+                       for d in (ROOT / "jobs" / "pilot" / a.harness / st).glob("b*__*") if d.is_dir()})
+    planned_new = len(trials) if a.step in task_steps else 0
+    if a.step in task_steps:
+        already = {d.name.split("__r")[0] for d in jobs_dir.glob("b*__*") if d.is_dir()} if jobs_dir.exists() else set()
+        planned_new = len([t for t in trials if t.job_name not in already])
+    if done_before + planned_new > PILOT_CAP[a.harness] and not a.dry_run:
+        sys.exit(f"pilot cap: {done_before} task trials done + {planned_new} planned > {PILOT_CAP[a.harness]}")
     print(f"{a.harness} {a.step}: {len(trials)} trials, arms: {', '.join(x.name for x in arms)}")
     state = run_batch(trials, h, {x.name: x for x in arms}, jobs_dir, mounts=mounts(),
                       concurrency=a.concurrency, dry_run=a.dry_run,

@@ -534,3 +534,20 @@ Calibration cost: 21 trivial runs (16 in the first pass, one of them a duplicate
 resume while a stopped process was still waiting; 5 in the recheck, one retried after an agent
 install timeout). Plan windows unchanged by it (5-hour 13-14%, 7-day 4%).
 
+### Amendment 5 (2026-09-29, before the kill test): what counts toward the pilot cap
+
+**Reason** (resource, not effect): the pilot cap of 150 runs per harness protects the owner's
+subscription limits. The 21 calibration runs of section 4.1 (trivial one-line prompts) used about
+0.2 million units ($0.6 equivalent) and did not move the plan's windows; infrastructure retries
+happen before the agent works and use close to nothing. Counting them would cut the kill test.
+
+**Change:** the cap of 150 (Claude Code) and 100 (Codex) counts task trials only (selection,
+third trials, kill test), one per trial however many infrastructure attempts it needed.
+Calibration runs and infrastructure retries are excluded from the cap but stay in the ledger:
+every attempt is logged with its attempt number and an infrastructure-failure flag, and its tokens
+count in the attribution of use to the benchmark and in every stop rule. Decided by the hub,
+2026-09-29.
+
+**Runs affected:** the selection step (in progress; its first trials are unaffected) and the kill
+test.
+
