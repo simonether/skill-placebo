@@ -26,3 +26,6 @@ runs/raw/
 tmp/
 *.log
 .pytest_cache/
+
+# Skill checkouts at pinned shas (scripts/vendor_skills.py)
+vendor/

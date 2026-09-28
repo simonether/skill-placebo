@@ -1,0 +1,14 @@
+{
+  "note": "Pinned 2026-09-28: default-branch HEAD at census time (what a marketplace install gets that day); latest release for reference. Stars from gh api on 2026-09-28. Source: docs/research/2026-09-28-skills-census.md",
+  "skills": [
+    {"id": "agent-skills", "repo": "addyosmani/agent-skills", "sha": "2686b620fc1fed2e8f60c704839c766b8594c6b6", "latest_release": "0.6.11", "stars": 99510, "license": "MIT"},
+    {"id": "mattpocock", "repo": "mattpocock/skills", "sha": "c55ee46073ed923f86ce59a5eb3b6d895095d1b7", "latest_release": "v1.2.3", "stars": 270709, "license": "MIT"},
+    {"id": "i-have-adhd", "repo": "ayghri/i-have-adhd", "sha": "839872f9d1cd634fed642b4589ce7226199cc15f", "latest_release": null, "stars": 51606, "license": "MIT"},
+    {"id": "planning-with-files", "repo": "OthmanAdi/planning-with-files", "sha": "51c1caa27f9fefe259e45a7cc92fa79ee8787cd7", "latest_release": "v3.21.0", "stars": 27154, "license": "MIT"},
+    {"id": "compound-engineering", "repo": "EveryInc/compound-engineering-plugin", "sha": "e80c5c40440b90672d78f032f6dfaedc0daeb292", "latest_release": "compound-engineering-v3.29.0", "stars": 25299, "license": "MIT"},
+    {"id": "karpathy", "repo": "multica-ai/andrej-karpathy-skills", "sha": "2c606141936f1eeef17fa3043a72095b4765b9c2", "latest_release": null, "stars": 215547, "license": null},
+    {"id": "superpowers", "repo": "obra/superpowers", "sha": "8ca22dba9a94f28898bbce59f2537ff4d87c747d", "latest_release": "v6.4.2", "stars": 292189, "license": "MIT"},
+    {"id": "ponytail", "repo": "DietrichGebert/ponytail", "sha": "e3ba2aa6f1e6f0bc4d69eb09c9f0d0a93af56156", "latest_release": "v4.10.0", "stars": 146942, "license": "MIT"},
+    {"id": "caveman", "repo": "JuliusBrussee/caveman", "sha": "2fd153c67988e980fb0b2455c90832159a6a5a25", "latest_release": "v2.7.0", "stars": 108076, "license": "MIT (skill part); BSL-1.1 for engine/proxy dirs"}
+  ]
+}

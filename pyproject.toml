@@ -11,7 +11,10 @@ dependencies = ["numpy>=1.26", "harbor==0.23.0"]
 skill-placebo = "skill_placebo.cli:main"
 
 [dependency-groups]
-dev = ["pytest>=8"]
+dev = [
+    "pytest>=8",
+    "pyyaml>=6.0.3",
+]
 
 [build-system]
 requires = ["hatchling"]

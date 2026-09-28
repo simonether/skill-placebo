@@ -14,7 +14,7 @@ CODEX_AUTH_JSON = ROOT / ".secrets" / "codex-home" / "auth.json"
 
 CLAUDE_CODE = Harness(
     name="claude-code",
-    agent="claude-code",
+    agent="skill_placebo.harbor_agents:ClaudeCodeArms",
     model="anthropic/claude-opus-5-5",
     kwargs={
         "version": "2.1.282",
@@ -22,7 +22,7 @@ CLAUDE_CODE = Harness(
         "disallowed_tools": ["WebSearch", "WebFetch"],
     },
     creds=("CLAUDE_CODE_OAUTH_TOKEN",),
-    extra_env={"CLAUDE_FORCE_OAUTH": "1"},
+    extra_env={"CLAUDE_FORCE_OAUTH": "1", "SUPERPOWERS_DISABLE_TELEMETRY": "1"},
 )
 
 CODEX = Harness(
@@ -35,7 +35,7 @@ CODEX = Harness(
         "web_search": "disabled",
     },
     creds=(),
-    extra_env={"CODEX_AUTH_JSON_PATH": str(CODEX_AUTH_JSON)},
+    extra_env={"CODEX_AUTH_JSON_PATH": str(CODEX_AUTH_JSON), "SUPERPOWERS_DISABLE_TELEMETRY": "1"},
 )
 
 HARNESSES = {h.name: h for h in (CLAUDE_CODE, CODEX)}

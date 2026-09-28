@@ -1,0 +1,81 @@
+{
+ "agent-skills": {
+  "listing_chars": 10973,
+  "hook_chars": 0,
+  "memory_chars": 0,
+  "cc_estimate_tokens": 2863.0,
+  "listed_skills": 34,
+  "listed_agents": 4,
+  "total_chars": 10973
+ },
+ "mattpocock": {
+  "listing_chars": 4115,
+  "hook_chars": 0,
+  "memory_chars": 0,
+  "cc_estimate_tokens": 1145.0,
+  "listed_skills": 25,
+  "listed_agents": 1,
+  "total_chars": 4115
+ },
+ "i-have-adhd": {
+  "listing_chars": 316,
+  "hook_chars": 7038,
+  "memory_chars": 0,
+  "cc_estimate_tokens": 67.0,
+  "listed_skills": 1,
+  "listed_agents": 1,
+  "total_chars": 7354
+ },
+ "planning-with-files": {
+  "listing_chars": 2760,
+  "hook_chars": 0,
+  "memory_chars": 0,
+  "cc_estimate_tokens": 735.0,
+  "listed_skills": 14,
+  "listed_agents": 6,
+  "total_chars": 2760
+ },
+ "compound-engineering": {
+  "listing_chars": 7952,
+  "hook_chars": 0,
+  "memory_chars": 0,
+  "cc_estimate_tokens": 2184.0,
+  "listed_skills": 36,
+  "listed_agents": 1,
+  "total_chars": 7952
+ },
+ "karpathy": {
+  "listing_chars": 0,
+  "hook_chars": 0,
+  "memory_chars": 2345,
+  "cc_estimate_tokens": null,
+  "total_chars": 2345
+ },
+ "superpowers": {
+  "listing_chars": 2678,
+  "hook_chars": 3405,
+  "memory_chars": 0,
+  "cc_estimate_tokens": 703.0,
+  "listed_skills": 15,
+  "listed_agents": 1,
+  "total_chars": 6083
+ },
+ "ponytail": {
+  "listing_chars": 2738,
+  "hook_chars": 5228,
+  "memory_chars": 0,
+  "cc_estimate_tokens": 676.0,
+  "listed_skills": 6,
+  "listed_agents": 3,
+  "total_chars": 7966
+ },
+ "caveman": {
+  "listing_chars": 4838,
+  "hook_chars": 5205,
+  "memory_chars": 0,
+  "cc_estimate_tokens": 1257.0,
+  "listed_skills": 21,
+  "listed_agents": 3,
+  "total_chars": 10043
+ }
+}
