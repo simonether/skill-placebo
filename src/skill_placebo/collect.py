@@ -54,39 +54,48 @@ def cost_from_tokens(model: str, n_input: int, n_cached: int, n_cache_write: int
     return (uncached * p[0] + n_cached * p[1] + n_cache_write * p[2] + n_output * p[3]) / 1e6
 
 
+def trial_row(res: Path) -> dict | None:
+    """One trial's row from its result.json (jobs/<...>/<job>/<trial>/result.json)."""
+    tdir = res.parent
+    job = tdir.parent.name
+    r = _load(res)
+    if not r.get("task_name"):
+        return None
+    m = JOB_RE.match(job)
+    meta = m.groupdict() if m else {"block": "", "order": "", "harness": "", "arm": job, "task": r["task_name"]}
+    a = r.get("agent_result") or {}
+    rw = (r.get("verifier_result") or {}).get("rewards") or {}
+    ex = (_load(tdir / "agent" / "trajectory.json").get("final_metrics") or {}).get("extra") or {}
+    cw = ex.get("total_cache_creation_input_tokens") or ex.get("total_cache_write_input_tokens") or 0
+    model = ((r.get("agent_info") or {}).get("model_info") or {}).get("name", "")
+    n_in, n_c, n_out = a.get("n_input_tokens") or 0, a.get("n_cache_tokens") or 0, a.get("n_output_tokens") or 0
+    reward = rw.get("reward")
+    turns_file = tdir / "agent" / "approval_turns.txt"
+    return {
+        **meta,
+        "trial": r.get("trial_name"),
+        "agent": (r.get("agent_info") or {}).get("name"),
+        "agent_version": (r.get("agent_info") or {}).get("version"),
+        "model": model,
+        "task_checksum": r.get("task_checksum"),
+        "reasoning_effort": (((r.get("config") or {}).get("agent") or {}).get("kwargs") or {}).get("reasoning_effort"),
+        "reward": reward,
+        "passed": None if reward is None else int(float(reward) >= 1.0),
+        "exception": (r.get("exception_info") or {}).get("exception_type"),
+        "n_input": n_in, "n_cached": n_c, "n_cache_write": cw, "n_output": n_out,
+        "cost_est_usd": cost_from_tokens(model, n_in, n_c, cw, n_out),
+        "cost_harbor_usd": a.get("cost_usd"),
+        "skill_fired": skill_fired(tdir),
+        "approval_turns": int(turns_file.read_text().strip() or 0) if turns_file.exists() else None,
+        "started": r.get("started_at"), "finished": r.get("finished_at"),
+    }
+
+
 def rows(jobs_dir: Path):
     for res in sorted(jobs_dir.glob("*/*/result.json")):
-        tdir = res.parent
-        job = tdir.parent.name
-        r = _load(res)
-        if not r.get("task_name"):
-            continue
-        m = JOB_RE.match(job)
-        meta = m.groupdict() if m else {"block": "", "order": "", "harness": "", "arm": job, "task": r["task_name"]}
-        a = r.get("agent_result") or {}
-        rw = (r.get("verifier_result") or {}).get("rewards") or {}
-        ex = (_load(tdir / "agent" / "trajectory.json").get("final_metrics") or {}).get("extra") or {}
-        cw = ex.get("total_cache_creation_input_tokens") or ex.get("total_cache_write_input_tokens") or 0
-        model = ((r.get("agent_info") or {}).get("model_info") or {}).get("name", "")
-        n_in, n_c, n_out = a.get("n_input_tokens") or 0, a.get("n_cache_tokens") or 0, a.get("n_output_tokens") or 0
-        reward = rw.get("reward")
-        yield {
-            **meta,
-            "trial": r.get("trial_name"),
-            "agent": (r.get("agent_info") or {}).get("name"),
-            "agent_version": (r.get("agent_info") or {}).get("version"),
-            "model": model,
-            "task_checksum": r.get("task_checksum"),
-            "reasoning_effort": (((r.get("config") or {}).get("agent") or {}).get("kwargs") or {}).get("reasoning_effort"),
-            "reward": reward,
-            "passed": None if reward is None else int(float(reward) >= 1.0),
-            "exception": (r.get("exception_info") or {}).get("exception_type"),
-            "n_input": n_in, "n_cached": n_c, "n_cache_write": cw, "n_output": n_out,
-            "cost_est_usd": cost_from_tokens(model, n_in, n_c, cw, n_out),
-            "cost_harbor_usd": a.get("cost_usd"),
-            "skill_fired": skill_fired(tdir),
-            "started": r.get("started_at"), "finished": r.get("finished_at"),
-        }
+        row = trial_row(res)
+        if row:
+            yield row
 
 
 def write_csv(jobs_dir: Path, out: Path) -> int:

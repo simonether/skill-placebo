@@ -6,7 +6,8 @@
   scripts/pilot.py selection   --harness codex         pool tasks x 1 in the baseline arm
   scripts/pilot.py kill        --harness claude-code   kill-test skills and their placebos (section 11)
   scripts/pilot.py collect                             jobs/pilot -> results/pilot/trials.csv
-Add --dry-run to print the Harbor commands without running anything.
+Add --dry-run to print the Harbor commands without running anything. Real runs need --usd-budget
+(the $-equivalent threshold for 25% of the weekly limit; METHOD.md amendment 1).
 """
 import argparse
 import json
@@ -45,6 +46,8 @@ def main():
     ap.add_argument("--harness", choices=list(HARNESSES), default="claude-code")
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--concurrency", type=int, default=2)
+    ap.add_argument("--usd-budget", type=float, help="stop when the ledger's $ equivalent since --window-start exceeds this (the threshold)")
+    ap.add_argument("--window-start", help="ISO time of the plan's weekly reset, e.g. 2026-09-29T10:00:00+0300")
     a = ap.parse_args()
 
     if a.step == "collect":
@@ -76,7 +79,8 @@ def main():
         sys.exit(f"pilot cap: {done_before} done + {len(trials)} planned > {PILOT_CAP[a.harness]}")
     print(f"{a.harness} {a.step}: {len(trials)} trials, arms: {', '.join(x.name for x in arms)}")
     state = run_batch(trials, h, {x.name: x for x in arms}, jobs_dir, mounts=mounts(),
-                      concurrency=a.concurrency, dry_run=a.dry_run)
+                      concurrency=a.concurrency, dry_run=a.dry_run,
+                      usd_budget=a.usd_budget, window_start=a.window_start)
     if state.stopped:
         print(f"STOPPED: {state.stopped}")
         sys.exit(2)

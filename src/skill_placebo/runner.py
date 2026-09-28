@@ -176,11 +176,52 @@ class BatchState:
     stopped: str | None = None
     codex_weekly_start: float | None = None
     codex_weekly_last: float | None = None
+    usd_spent_window: float = 0.0
+
+
+def ledger_path(harness: str) -> Path:
+    """Every trial of the benchmark on one harness, with its token-based $ equivalent (METHOD.md
+    amendment 1). The stop rule sums this ledger, across batches, from the window start."""
+    return ROOT / "jobs" / f"ledger-{harness}.jsonl"
+
+
+def ledger_spent(harness: str, window_start: str | None) -> float:
+    p = ledger_path(harness)
+    if not p.exists():
+        return 0.0
+    total = 0.0
+    for line in p.read_text().splitlines():
+        row = json.loads(line)
+        if window_start is None or row["ts"] >= window_start:
+            total += row.get("cost_est_usd") or 0.0
+    return total
+
+
+def ledger_add(harness: str, trial_dir: Path) -> float:
+    """Append every trial found under trial_dir's job to the ledger; returns their $ equivalent."""
+    from .collect import trial_row  # local import: collect imports nothing from runner
+
+    added = 0.0
+    with open(ledger_path(harness), "a") as f:
+        for res in sorted(trial_dir.glob("*/result.json")):
+            row = trial_row(res)
+            if not row:
+                continue
+            rec = {"ts": time.strftime("%Y-%m-%dT%H:%M:%S%z"), "job": trial_dir.name, "trial": row["trial"],
+                   "arm": row["arm"], "model": row["model"], "exception": row["exception"],
+                   "n_input": row["n_input"], "n_cached": row["n_cached"], "n_cache_write": row["n_cache_write"],
+                   "n_output": row["n_output"], "cost_est_usd": row["cost_est_usd"]}
+            f.write(json.dumps(rec) + "\n")
+            added += row["cost_est_usd"] or 0.0
+    return added
 
 
 def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
               jobs_dir: Path, mounts: str | None = None, concurrency: int = 2,
-              weekly_budget_pp: float = 25.0, dry_run: bool = False) -> BatchState:
+              weekly_budget_pp: float = 25.0, dry_run: bool = False,
+              usd_budget: float | None = None, window_start: str | None = None) -> BatchState:
+    """usd_budget: stop once the ledger's token-based $ equivalent since window_start exceeds it
+    (the translation of 25% of the weekly limit, METHOD.md amendment 1). Required for real runs."""
     jobs_dir.mkdir(parents=True, exist_ok=True)
     state_path = jobs_dir / "batch-state.json"
     state = BatchState(**json.loads(state_path.read_text())) if state_path.exists() else BatchState()
@@ -188,8 +229,17 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
     unresolved = [k for k, v in harness.kwargs.items() if "TBD" in json.dumps(v)]
     if unresolved and not dry_run:
         raise SystemExit(f"{harness.name}: unresolved placeholders in {', '.join(unresolved)}")
+    if not dry_run and usd_budget is None:
+        raise SystemExit("usd_budget is required for real runs (METHOD.md amendment 1)")
     env = None if dry_run else clean_env(harness, load_secrets())
     todo = [t for t in trials if t.job_name not in state.done]
+    if not dry_run:
+        state.usd_spent_window = ledger_spent(harness.name, window_start)
+        if state.usd_spent_window >= usd_budget:
+            state.stopped = f"$ budget already used: {state.usd_spent_window:.2f} >= {usd_budget:.2f}"
+            state_path.write_text(json.dumps(asdict(state), indent=1))
+            print(f"STOP: {state.stopped}")
+            return state
 
     def save():
         state_path.write_text(json.dumps(asdict(state), indent=1))
@@ -225,11 +275,15 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
                         state.codex_weekly_start = wk
                     state.codex_weekly_last = wk
                 state.done.append(t.job_name)
-                print(f"{time.strftime('%H:%M:%S')} {t.job_name} rc={rc}" + (f" codex-weekly={wk}%" if wk is not None else ""))
+                state.usd_spent_window += ledger_add(harness.name, tdir)
+                print(f"{time.strftime('%H:%M:%S')} {t.job_name} rc={rc} spent=${state.usd_spent_window:.2f}/{usd_budget:.2f}"
+                      + (f" codex-weekly={wk}%" if wk is not None else ""))
                 if hits:
                     state.stopped = "limit marker: " + hits[0][:300]
                 elif wk is not None and state.codex_weekly_start is not None and wk - state.codex_weekly_start > weekly_budget_pp:
                     state.stopped = f"codex weekly usage +{wk - state.codex_weekly_start:.1f} pp > {weekly_budget_pp} pp"
+                elif state.usd_spent_window > usd_budget:
+                    state.stopped = f"$ equivalent {state.usd_spent_window:.2f} > budget {usd_budget:.2f}"
                 save()
                 if state.stopped:
                     print(f"STOP: {state.stopped}")

@@ -428,4 +428,29 @@ cost estimate.
 
 ## 16. Amendments
 
-None yet.
+### Amendment 1 (2026-09-29, before any benchmark run): how subscription use is measured
+
+**Reason.** The owner uses Claude Code for other projects in parallel, so the change in the plan's
+usage page between "before" and "after" a batch mixes the benchmark with other work and cannot
+measure the benchmark's share (owner, 2026-09-29, via the hub).
+
+**Change** (replaces the measurement in sections 11.3 and 12; the thresholds themselves are unchanged):
+
+1. The benchmark's use is the sum over its trials of the tokens recorded in each trial's session
+   logs inside the containers (input, cache write, cache read, output), converted to a $ equivalent
+   at public API list prices (`claude-opus-5-5`, `gpt-6-sol`). The runner appends every trial to
+   `jobs/ledger-<harness>.jsonl` and keeps the running total. This is the same token-based cost
+   estimate that is already a secondary outcome.
+2. The hub converts $ to a share of the weekly limit: the owner gives one reading of the plan's usage
+   page (% of the week and the reset time); the hub computes the owner's local Claude Code use since
+   that reset from the session logs on this machine at the same prices; their ratio is "% of the
+   week per $". Same model (Opus 5.5), so the ratio carries over. It is conservative: use on other
+   machines is not in the local logs, so the ratio overstates the share per $.
+3. The 25% stop rule and the design thresholds of section 11.3 are applied to this estimate. The
+   runner stops a batch when the ledger's $ equivalent since the weekly reset exceeds the $
+   threshold the hub derives from 25%; it refuses to run without one.
+4. Codex: the weekly `used_percent` from Codex's own rate-limit events is used as before when the
+   owner does not use Codex in parallel; otherwise the same token method applies. Both stops are
+   active.
+
+**Runs affected:** all (no run has happened yet).

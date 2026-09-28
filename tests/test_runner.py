@@ -62,4 +62,22 @@ def test_run_batch_refuses_placeholders(tmp_path):
     from skill_placebo.runner import run_batch
     h = Harness("claude-code", "claude-code", "m", kwargs={"reasoning_effort": "EFFORT_TBD"})
     with pytest.raises(SystemExit):
+        run_batch([], h, {}, tmp_path, usd_budget=1.0)
+
+
+def test_real_run_requires_usd_budget(tmp_path):
+    import pytest
+    from skill_placebo.runner import run_batch
+    h = Harness("claude-code", "claude-code", "m")
+    with pytest.raises(SystemExit):
         run_batch([], h, {}, tmp_path)
+
+
+def test_ledger_window(tmp_path, monkeypatch):
+    import skill_placebo.runner as r
+    monkeypatch.setattr(r, "ledger_path", lambda h: tmp_path / f"ledger-{h}.jsonl")
+    (tmp_path / "ledger-cc.jsonl").write_text(
+        json.dumps({"ts": "2026-09-28T10:00:00+0300", "cost_est_usd": 1.5}) + "\n"
+        + json.dumps({"ts": "2026-09-30T10:00:00+0300", "cost_est_usd": 2.0}) + "\n")
+    assert r.ledger_spent("cc", None) == 3.5
+    assert r.ledger_spent("cc", "2026-09-29T00:00:00+0300") == 2.0
