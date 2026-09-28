@@ -5,7 +5,8 @@ Usage:
   scripts/scrub.py --check PATH...    exit 1 if anything sensitive is found (prints file:line, never the value)
   scripts/scrub.py --redact PATH...   rewrite text files in place with [REDACTED:<kind>]
 
-Detects: exact values of every KEY=VALUE in .secrets/api.env (the most reliable check),
+Detects: exact values of every KEY=VALUE in .secrets/api.env and of every token in
+.secrets/codex-home/auth.json (the most reliable check),
 Anthropic / OpenRouter / OpenAI / GitHub key shapes, bearer tokens, the runner's own home directory
 (not other people's paths quoted in public task texts) and the owner's e-mail. Binary files are reported, not rewritten.
 """
@@ -16,6 +17,7 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRETS_ENV = os.path.join(ROOT, ".secrets", "api.env")
+CODEX_AUTH = os.path.join(ROOT, ".secrets", "codex-home", "auth.json")
 
 PATTERNS = [
     ("anthropic-key", re.compile(r"sk-ant-[A-Za-z0-9_\-]{20,}")),
@@ -41,6 +43,24 @@ def secret_values():
                 if len(v) >= 12:
                     vals.append((name.strip(), v))
     except FileNotFoundError:
+        pass
+    # Every long string in the dedicated Codex login (access/refresh/id tokens, account id).
+    try:
+        import json
+
+        def walk(o, key=""):
+            if isinstance(o, dict):
+                for k, v in o.items():
+                    walk(v, k)
+            elif isinstance(o, list):
+                for v in o:
+                    walk(v, key)
+            elif isinstance(o, str) and len(o) >= 20 and ("token" in key or key in ("account_id", "OPENAI_API_KEY")):
+                vals.append((f"codex-auth:{key}", o))
+
+        with open(CODEX_AUTH, encoding="utf-8") as f:
+            walk(json.load(f))
+    except (FileNotFoundError, ValueError):
         pass
     return vals
 
