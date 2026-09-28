@@ -44,3 +44,63 @@ Written incrementally; sections are appended as each candidate is finished.
   telemetry ping; opt out with `SUPERPOWERS_DISABLE_TELEMETRY` (`README.md:399`). Set it in runs.
 - **Prior measurement:** see "Prior measurements" section below.
 
+### 2. DietrichGebert/ponytail
+
+- **Meta [V]** (`gh api repos/DietrichGebert/ponytail`): 146,937 stars; created 2026-06-12; pushed 2026-09-14; MIT;
+  `main` HEAD `e3ba2aa6f1e6f0bc4d69eb09c9f0d0a93af56156`; latest release `v4.10.0` (2026-09-14).
+- **Components [V]** (`git/trees/e3ba2aa`): 6 SKILL.md under `skills/` (16,144 B; main `skills/ponytail/SKILL.md`
+  6,637 B), plus 6 duplicates in `.openclaw/skills/` and `benchmarks/arms/caveman-SKILL.md` (a benchmark arm, not installed).
+  Hooks `hooks/claude-codex-hooks.json` (shared by the Claude and Codex manifests): **SessionStart** (`startup|resume|clear|compact`
+  → `ponytail-activate.js`), **SubagentStart** (→ `ponytail-subagent.js`), **UserPromptSubmit** (→ `ponytail-mode-tracker.js`).
+  6 commands (`commands/*.toml`, Gemini format). No agents. Rules copies: `.agents/rules`, `.cursor/rules`, `.qoder`,
+  `.windsurf`, root `AGENTS.md` (2,593 B, Qoder always-on). Manifests: `.claude-plugin/plugin.json` yes, `.codex-plugin/plugin.json` yes
+  (`"hooks": "./hooks/claude-codex-hooks.json"`, `"skills": "./skills/"`).
+- **Always-on chars ≈ 7,874 (Claude Code), ≈ 7,874 (Codex) [V arithmetic]:** 6 × (name + description) = 2,645 +
+  SessionStart ruleset `getPonytailInstructions('full')` = **5,229** chars (computed by running
+  `hooks/ponytail-instructions.js` from the pinned sha against pinned `skills/ponytail/SKILL.md`: header
+  `PONYTAIL MODE ACTIVE — level: full` + SKILL.md body without frontmatter and with lite/ultra rows filtered out,
+  `hooks/ponytail-instructions.js:77-88`). 2,645 + 5,229 = **7,874**. On top of that, each **subagent** gets another 5,229
+  (`hooks/ponytail-subagent.js:25`). UserPromptSubmit injects only on mode-switch commands in Claude/Codex
+  (`hooks/ponytail-mode-tracker.js:115-137`, every-prompt injection is Qoder only).
+- **Confound [V]:** in Claude Code (not Codex), on the first session where `~/.claude/settings.json` has no `statusLine`, the hook
+  appends a "STATUSLINE SETUP NEEDED … Proactively offer to set this up for the user on first interaction" nudge
+  (`hooks/ponytail-activate.js:63-106`), about 400 more chars. A fresh container per trial triggers it **every trial**.
+  Pre-create `~/.claude/.ponytail-statusline-nudged` or a `statusLine` in the image for all arms.
+- **Install [V]:** Claude Code `README.md:133-136` `/plugin marketplace add DietrichGebert/ponytail` then
+  `/plugin install ponytail@ponytail`. Codex `README.md:145-149` `codex plugin marketplace add DietrichGebert/ponytail`,
+  `codex plugin add ponytail@ponytail`, then "open `/hooks`, review and trust its two lifecycle hooks", which is an interactive
+  trust step that must be reproduced headlessly via config [U: how]. Needs `node` on PATH (`README.md:128`).
+- **Interactive: NO [V].** Ruleset says "Ship the lazy version and question the complex request in the same response — never stall"
+  (fallback copy `hooks/ponytail-instructions.js:62`; same rule in SKILL.md). Only the statusline nudge asks the user something (above).
+  Default level `full`; `PONYTAIL_DEFAULT_MODE` env var sets it (`README.md:295`).
+- **Numeric claims [V]:** `README.md:33` "~54% less code (up to 94%) · ~20% cheaper · ~27% faster · 100% safe";
+  `README.md:34` says this is the mean over 12 feature tasks (Haiku 4.5, n=4). Table at `README.md:85`: LOC -54%, tokens -22%, cost -20%,
+  time -27%. Earlier single-shot claim "80-94% less code" was withdrawn as the ceiling rather than the average (`README.md:100`, citing issue #126).
+  The author's own benchmark includes a caveman arm (`README.md:86`: caveman tokens +7%, cost +3%).
+- **Prior measurement:** see "Prior measurements" section below.
+
+### 3. multica-ai/andrej-karpathy-skills (= forrestchang/andrej-karpathy-skills)
+
+- **Canonical [V]:** `gh api repos/forrestchang/andrej-karpathy-skills` and `repos/multica-ai/andrej-karpathy-skills` return the same
+  repo id **1142983825** with `full_name` `multica-ai/andrej-karpathy-skills`. The repo was transferred and the forrestchang URL redirects,
+  so there is one repo and no fork question. The README still documents the forrestchang paths (`README.md:105,119`).
+- **Meta [V]:** 215,543 stars; created 2026-01-27; pushed 2026-04-20 (inactive since then); **no license file**
+  (`license: null`; `.claude-plugin/plugin.json` says `"license": "MIT"`, a contradiction); `main` HEAD
+  `2c606141936f1eeef17fa3043a72095b4765b9c2`; no releases.
+- **Components [V]:** 1 SKILL.md (`skills/karpathy-guidelines/SKILL.md`, 2,518 B), `CLAUDE.md` 2,357 B (same guidelines),
+  `.cursor/rules/karpathy-guidelines.mdc`, `EXAMPLES.md` (not installed). No hooks, agents or commands. `.claude-plugin/plugin.json` yes
+  (`"skills": ["./skills/karpathy-guidelines"]`); **no `.codex-plugin`**.
+- **Always-on chars [V]:** depends on the install option the author documents.
+  (A) plugin: name 19 + description 219 = **238** (skill triggered on demand; body 2,242 chars only when invoked).
+  (B) CLAUDE.md: **2,357** always-on (whole file). Option B is the lab-cleanest "always-on rules text" and matches the
+  repo's own description ("A single CLAUDE.md file", `README.md:7`).
+- **Install [V]:** Claude Code `README.md:105-110` `/plugin marketplace add forrestchang/andrej-karpathy-skills` +
+  `/plugin install andrej-karpathy-skills@karpathy-skills`; or `README.md:119` `curl -o CLAUDE.md …/CLAUDE.md`.
+  **Codex: not documented** (no "codex"/"AGENTS.md" in README). Putting CLAUDE.md into `AGENTS.md` would be our adaptation and
+  must be flagged as such.
+- **Interactive: PARTIAL [V].** No approval gate, but the text says "If uncertain, ask." (`CLAUDE.md:12`) and "If something is
+  unclear, stop. Name what's confusing. Ask." (`CLAUDE.md:15`). In headless runs this can end a trial with a question.
+  Count it as a real effect of the skill, not a harness failure (pre-register this). No non-interactive mode (none needed).
+- **Numeric claims:** none. Only qualitative criteria ("fewer unnecessary changes in diffs…", `CLAUDE.md:65`).
+- **Prior measurement:** see "Prior measurements" section below.
+
