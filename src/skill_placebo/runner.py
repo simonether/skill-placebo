@@ -182,6 +182,9 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm], datas
     state_path = jobs_dir / "batch-state.json"
     state = BatchState(**json.loads(state_path.read_text())) if state_path.exists() else BatchState()
     (jobs_dir / "plan.json").write_text(json.dumps([asdict(t) for t in trials], indent=1))
+    unresolved = [k for k, v in harness.kwargs.items() if "TBD" in json.dumps(v)]
+    if unresolved and not dry_run:
+        raise SystemExit(f"{harness.name}: unresolved placeholders in {', '.join(unresolved)}")
     env = None if dry_run else clean_env(harness, load_secrets())
     todo = [t for t in trials if t.job_name not in state.done]
 

@@ -55,3 +55,11 @@ def test_exception_txt_task_text_does_not_stop(tmp_path):
     assert limit_hits(t) == []
     (t / "exception.txt").write_text("failed to resolve source metadata for docker.io/library/python: unexpected status from HEAD request to https://registry-1.docker.io/v2/x: 429 Too Many Requests")
     assert limit_hits(t)
+
+
+def test_run_batch_refuses_placeholders(tmp_path):
+    import pytest
+    from skill_placebo.runner import run_batch
+    h = Harness("claude-code", "claude-code", "m", kwargs={"reasoning_effort": "EFFORT_TBD"})
+    with pytest.raises(SystemExit):
+        run_batch([], h, {}, [], tmp_path)

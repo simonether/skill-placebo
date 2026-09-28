@@ -86,8 +86,8 @@ Research behind these choices: `docs/research/2026-09-25-harness-infra.md`.
 | | Claude Code | Codex CLI |
 |---|---|---|
 | Version | 2.1.282 | 0.157.0 |
-| Model | `claude-sonnet-5` | `gpt-6-sol` |
-| Reasoning effort | medium | medium |
+| Model | `claude-opus-5-5` | `gpt-6-sol` |
+| Reasoning effort | Claude Code's default for this model: EFFORT_TBD, passed explicitly | Codex's default for this model: medium, passed explicitly |
 | Permissions | `bypassPermissions` (Harbor default) | `--dangerously-bypass-approvals-and-sandbox` (Harbor default) |
 | Built-in web tools | disabled: `WebSearch`, `WebFetch` | disabled: `web_search = "disabled"` |
 | Login | owner's Claude Max subscription via a dedicated long-lived token (`claude setup-token`) | owner's ChatGPT subscription via a separate Codex login (`codex login --device-auth` in its own `CODEX_HOME`) |
@@ -98,9 +98,12 @@ Research behind these choices: `docs/research/2026-09-25-harness-infra.md`.
   one harness's login, telemetry off.
 - Agent timeout: the task's own, capped at 1,200 s. No turn limit, so that multi-step workflows are
   not cut short by the harness. A timeout is a failed trial.
-- Sonnet 5 at medium effort matches the JetBrains ponytail study, so the numbers are comparable with
-  the closest prior art. `gpt-6-sol` is the model Codex documents for "complex coding and agentic
-  workflows" (`learn.chatgpt.com/docs/models`, 2026-09-25).
+- Opus 5.5 is the newest Claude model and what subscribers run in Claude Code; effort is the
+  harness default, so the setup matches everyday use (owner's choice, 2026-09-28). `gpt-6-sol` is the
+  model Codex documents for "complex coding and agentic workflows"
+  (`learn.chatgpt.com/docs/models`, 2026-09-25), at Codex's default effort for it. The effort
+  value is passed explicitly, equal to the default, so that a change of defaults in a later
+  harness release cannot change the setup; it is recorded in every trial.
 - Web tools are off in every arm because the fixes for public benchmark tasks are on GitHub. The
   shell still has network access (the agent needs it to reach the model). Trials that fetch the
   upstream repository of a SWE-bench task are flagged in the data.
@@ -288,8 +291,11 @@ cost estimate.
   inflates absolute pass rates on these tasks. It affects all arms equally, so the comparisons
   skill vs placebo vs baseline stay fair, but the absolute pass rates here say little about new,
   unseen work. A fresh-task rerun (for example a recent SWE-rebench slice) is the planned check.
-- **Two models, one effort level.** Results are for Sonnet 5 and gpt-6-sol at medium effort in
-  headless mode. Other models, effort levels or interactive use can behave differently.
+- **Two models, default effort.** Results are for Opus 5.5 and gpt-6-sol at their harness default
+  effort in headless mode. Other models, effort levels or interactive use can behave differently.
+- **No direct comparison with JetBrains.** The JetBrains series used Sonnet 5 on SkillsBench; this
+  study uses Opus 5.5 on a different task set. Where both measured the same skill, the numbers are
+  shown side by side as context, not as a replication.
 - **Short tasks.** Tasks take minutes, not days. Skills that pay off over long sessions (memory,
   multi-day planning) are not measured by this design.
 - **Headless.** Interactive skills run in their documented unattended mode, which is not how every
