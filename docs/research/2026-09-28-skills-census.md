@@ -289,3 +289,48 @@ Written incrementally; sections are appended as each candidate is finished.
   29 of 30 vs 2 of 30 … average rubric score 10.0 vs 6.8" (`README.md:707`).
 - **Prior measurement:** none independent found [U].
 
+### Also screened and excluded (from the 7 `gh api search/repositories` queries, sort=stars, 2026-09-28)
+
+One line each; stars from the search output.
+- shanraisshan/claude-code-best-practice (66,462): a guide/reference repo; no plugin manifest (tree has 0 `plugin.json`); ships sound-effect hooks. Guide, not a skill.
+- anthropics/skills (178,667): collection of domain skills (office docs etc.). Collection.
+- thedotmack/claude-mem (94,802), NevaMind-AI/memU, zilliztech/memsearch, rohitg00/pro-workflow: memory systems.
+- rtk-ai/rtk (81,838), headroomlabs-ai/headroom (73,962): CLI/tool-output proxies.
+- Graphify-Labs/graphify (121,882), Egonex-AI/Understand-Anything (84,346), DeusData/codebase-memory-mcp: knowledge graph / MCP.
+- nextlevelbuilder/ui-ux-pro-max-skill (131,033), Leonxlnx/taste-skill, cathrynlavery/diagram-design, tt-a1i/archify, nexu-io/open-design: design/diagram domain.
+- code-yeongyu/oh-my-openagent (69,602), ruvnet/ruflo, stablyai/orca, NousResearch/hermes-agent: orchestrators / agents.
+- wshobson/agents (40,038), alirezarezvani/claude-skills, VoltAgent/awesome-*, ComposioHQ/awesome-claude-skills, hesreallyhim/awesome-claude-code, sickn33/agentic-awesome-skills: marketplaces / awesome-lists.
+- blader/humanizer (52,360), mvanhorn/last30days-skill, K-Dense-AI/scientific-agent-skills, cloudflare/security-audit-skill: prose / research / science / security domain.
+- Low-star general coding workflow plugins below the bar: ramziddin/solid-skills (600), tzachbon/smart-ralph (550), athola/claude-night-market (339), kunchenguid/kun (365).
+
+## Prior measurements (independent or semi-independent)
+
+Numbers below are as reported by each source. Pages were read via WebFetch summaries, so re-check any number before quoting it publicly.
+- **JetBrains, caveman (July 2026)** https://blog.jetbrains.com/ai/2026/07/speak-to-ai-agents-like-cavemen-tosave-tokens/ (Denis Shiryaev): Harbor 0.17,
+  Claude Sonnet 5 at low effort, 86/87 SkillsBench tasks, ~240 billed trials, ~USD 106. Output tokens **−8.5%** (advertised −65%), cost about −10%,
+  quality sign test **p = 0.82**. Skill **forced on** ("this is the ceiling"). Also quoted by the caveman author (`JuliusBrussee/caveman@2fd153c:README.md:205`).
+- **JetBrains, ponytail (July 2026)** https://blog.jetbrains.com/ai/2026/07/ponytail-skill-claude-tested/: Harbor 0.18, Claude Code 2.1.201 headless,
+  claude-sonnet-5 at medium effort, 80 paired tasks. Code **−15.4% (p = 0.088)**, cost **−10.3% (p = 0.004)**, time −11%, quality no significant difference.
+  Installed normally, the skill "self-activated **zero times**" in ten sessions, so they forced the ruleset via a SessionStart hook. **No placebo arm.**
+- **JetBrains, rtk (July 2026)** https://blog.jetbrains.com/ai/2026/07/rtk-claude-code-token-savings/: same setup, 425 billed trials. Cost **+7.6% at low effort
+  (p = 0.004)**, +0.1% at high (p = 0.99), turns +13.8% (p = 0.03), quality tied. rtk is out of scope (CLI proxy); listed only as method context.
+- **Scott Logic, ponytail (2026-06-16)** https://blog.scottlogic.com/2026/06/16/ponytail-yagni-and-the-problem-with-prompt-benchmarks.html (Colin Eberhardt):
+  promptfoo single-shot on Claude Haiku. Mean LOC: baseline 108, "YAGNI principles" 10.4, ponytail 8.25, "Follow YAGNI principles, and one-liner solutions" **6.9**.
+  A seven-word prompt beat the skill on the skill's own benchmark; correctness 100% everywhere. This is the closest thing to a **placebo/active-control result** that exists.
+  The ponytail author later rebuilt the benchmark (`README.md:100`, issue #126) and reports his own "YAGNI + one-liners" arm (`README.md:87`).
+- **maxtaylor.me, caveman vs "Be brief." (2026-04-29)** https://www.maxtaylor.me/articles/i-benchmarked-caveman-against-two-words (HN item 47954745,
+  "I benchmarked Claude Code's caveman plugin against 'be brief.'", 89 points, per the HN API): Opus 4.7, 24 prompts. Mean tokens: baseline 636, "Be brief." 419,
+  caveman lite 401 / full 404 / ultra 449; quality 0.985 / 0.985 / 0.976 / 0.975 / 0.970. **"Be brief." matched caveman.** Chat prompts, not agentic tasks.
+- **MindStudio, superpowers** https://www.mindstudio.ai/blog/5-claude-code-skills-cut-token-costs-70-percent-benchmarked: "Twelve automated sessions. Six with
+  Superpowers, six without". Reports −9% cost, −14% tokens. n = 6 per arm, vendor blog, no CI. Weak evidence.
+- **Tessl registry**: karpathy-guidelines Quality 83%, Impact 92% "1.14x", "Average score across 3 eval scenarios"
+  (https://tessl.io/registry/skills/github/multica-ai/andrej-karpathy-skills/karpathy-guidelines/quality). superpowers: only `brainstorming` has evals,
+  Impact 100% "1.81x"; the other 14 skills show "No eval scenarios have been run" (https://tessl.io/registry/skills/github/obra/superpowers). These are registry scenario evals,
+  not cost/pass-rate on real tasks.
+- **SWE-Skills-Bench (arXiv 2603.15401)** https://arxiv.org/abs/2603.15401: 49 public SWE skills, ~565 task instances, paired with/without. "39 of 49 skills
+  yield zero pass-rate improvement", average +1.2%, 3 skills degrade (up to −10%) (per search-result abstract). Whether any census skill is among the 49 was not checked [U].
+- **Also seen, not opened [U]:** arXiv 2608.11888 "Agent Skills Can Be Harmful…"; InfoQ 2026-08 on the ponytail benchmark correction; addyosmani's linked LinkedIn
+  "superpowers vs agent-skills" experiment (`README.md:382`); natea/harness-eval (ranks Superpowers, Compound Engineering…); Adobe arXiv 2606.24083 (caveman style).
+- **Never measured independently (as far as found):** addyosmani/agent-skills, mattpocock/skills, i-have-adhd, compound-engineering, planning-with-files.
+  karpathy-skills has only Tessl scenario evals, and superpowers only a 6-vs-6 vendor blog.
+
