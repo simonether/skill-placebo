@@ -495,7 +495,8 @@ matched the owner's usage page (13% and 4%).
    plus the rate-limit errors and authentication failures of section 12.
 2. Main guard for Claude Code, from the last event of each trial: stop when the 7-day utilization
    reaches its value before the pilot + 0.25 (0.04 → 0.29) or 0.80 absolute; pause until the
-   5-hour window resets when its utilization is 0.85 or more. This counts all of the owner's use,
+   5-hour window resets when its utilization is 0.80 or more (the stricter of the two values
+   discussed; hub, 2026-09-29). This counts all of the owner's use,
    so it is conservative.
 3. The units and $-equivalent ledger stays: it attributes use to the benchmark and carries the
    design thresholds (hub, 2026-09-29: at most $45 / $90 per 150 pilot runs, and 17 / 35 million

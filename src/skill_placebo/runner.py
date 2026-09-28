@@ -296,7 +296,7 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
               codex_weekly_start: float | None = None, codex_pace_pct: float = 40.0,
               codex_weekly_cap: float = 80.0,
               usd_budget: float | None = None, pace_usd_5h: float | None = None,
-              claude_week_start: float | None = None, claude_five_hour_pause: float = 0.85,
+              claude_week_start: float | None = None, claude_five_hour_pause: float = 0.80,
               claude_week_cap: float = 0.80) -> BatchState:
     """units_budget: stop once the ledger's limit units since window_start (the plan's weekly reset,
     UTC) reach it - the translation of 25% of the week (METHOD.md amendment 2). Required for
