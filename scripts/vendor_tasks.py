@@ -102,7 +102,7 @@ def patch_timeout(toml: Path) -> str | None:
 def main():
     POOL.mkdir(parents=True, exist_ok=True)
     manifest = {"sources": {}, "tasks": []}
-    patches = ["# Patches to vendored tasks", "", f"Agent timeout cap: {AGENT_TIMEOUT_CAP} s.", ""]
+    patches = [(ROOT / "tasks" / "PATCHES_HEADER.md").read_text().rstrip("\n"), "", f"Agent timeout cap: {AGENT_TIMEOUT_CAP} s.", ""]
     for src, cfg in SOURCES.items():
         manifest["sources"][src] = {k: cfg[k] for k in ("git", "commit")}
         with tempfile.TemporaryDirectory() as tmp:
