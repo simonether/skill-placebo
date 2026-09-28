@@ -1,0 +1,17 @@
+[metadata]
+author_name = "skill-placebo"
+difficulty = "trivial"
+category = "calibration"
+tags = ["calibration"]
+
+[verifier]
+timeout_sec = 60
+
+[agent]
+timeout_sec = 300
+
+[environment]
+build_timeout_sec = 600.0
+cpus = 1
+memory = '1G'
+storage = '2G'

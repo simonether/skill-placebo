@@ -1,0 +1,59 @@
+{
+ "seed": 20260928,
+ "seeded_order": {
+  "openthoughts-tblite": [
+   "openthoughts-tblite/fix_async_worker_queue",
+   "openthoughts-tblite/pandas-etl",
+   "openthoughts-tblite/api-endpoint-permission-canonicalizer",
+   "openthoughts-tblite/application-debug",
+   "openthoughts-tblite/python-api-rate-limit",
+   "openthoughts-tblite/todos-api",
+   "openthoughts-tblite/build-merkle-tree-cli-sha512",
+   "openthoughts-tblite/build-system-task-ordering"
+  ],
+  "swebench-verified": [
+   "swebench-verified/django__django-15957",
+   "swebench-verified/pytest-dev__pytest-7490",
+   "swebench-verified/django__django-11265",
+   "swebench-verified/mwaskom__seaborn-3069",
+   "swebench-verified/django__django-10973",
+   "swebench-verified/django__django-13925",
+   "swebench-verified/sympy__sympy-18211",
+   "swebench-verified/django__django-15973",
+   "swebench-verified/django__django-14404",
+   "swebench-verified/django__django-16950",
+   "swebench-verified/django__django-15563",
+   "swebench-verified/django__django-14725",
+   "swebench-verified/sympy__sympy-13031",
+   "swebench-verified/pylint-dev__pylint-7080",
+   "swebench-verified/django__django-14534",
+   "swebench-verified/django__django-11885",
+   "swebench-verified/django__django-16454",
+   "swebench-verified/django__django-13401",
+   "swebench-verified/django__django-14376",
+   "swebench-verified/sympy__sympy-14976"
+  ],
+  "terminal-bench-2-1": [
+   "terminal-bench-2-1/largest-eigenval",
+   "terminal-bench-2-1/extract-elf",
+   "terminal-bench-2-1/sparql-university",
+   "terminal-bench-2-1/financial-document-processor",
+   "terminal-bench-2-1/sqlite-with-gcov",
+   "terminal-bench-2-1/cancel-async-tasks",
+   "terminal-bench-2-1/adaptive-rejection-sampler",
+   "terminal-bench-2-1/openssl-selfsigned-cert",
+   "terminal-bench-2-1/headless-terminal",
+   "terminal-bench-2-1/query-optimize",
+   "terminal-bench-2-1/sanitize-git-repo",
+   "terminal-bench-2-1/write-compressor"
+  ]
+ },
+ "kill_test_tasks": [
+  "swebench-verified/django__django-15957",
+  "swebench-verified/pytest-dev__pytest-7490",
+  "swebench-verified/django__django-11265",
+  "terminal-bench-2-1/largest-eigenval",
+  "openthoughts-tblite/fix_async_worker_queue"
+ ],
+ "rule": "first 3 SWE-bench, 1 TB2.1, 1 TBLite in seeded order; a task that fails the oracle is replaced by the next in its source's order"
+}

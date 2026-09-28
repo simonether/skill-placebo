@@ -62,7 +62,7 @@ class Trial:
 
     @property
     def job_name(self) -> str:
-        safe = re.sub(r"[^A-Za-z0-9_.-]", "_", self.task)
+        safe = re.sub(r"[^A-Za-z0-9_.-]", "_", self.task.split("/")[-1])
         return f"b{self.block:02d}-{self.order:04d}__{self.harness}__{self.arm}__{safe}"
 
 
@@ -102,9 +102,10 @@ def plan(tasks: list[str], arms: list[Arm], harness: str, n: int, seed: int) -> 
     return trials
 
 
-def harbor_cmd(trial: Trial, h: Harness, arm: Arm, dataset: list[str], jobs_dir: Path, mounts: str | None) -> list[str]:
-    cmd = ["uv", "run", "--project", str(ROOT), "harbor", "run", *dataset,
-           "-i", trial.task, "-a", h.agent, "-m", h.model, "-k", "1", "-n", "1",
+def harbor_cmd(trial: Trial, h: Harness, arm: Arm, jobs_dir: Path, mounts: str | None) -> list[str]:
+    """trial.task is a task directory relative to tasks/ (e.g. pool/swebench-verified/django__django-15957)."""
+    cmd = ["uv", "run", "--project", str(ROOT), "harbor", "run", "-p", str(ROOT / "tasks" / trial.task),
+           "-a", h.agent, "-m", h.model, "-k", "1", "-n", "1",
            "-o", str(jobs_dir), "--job-name", trial.job_name, "--yes",
            # Agent install (apt/npm) is not the agent's work; slow mirrors must not fail trials.
            "--agent-setup-timeout-multiplier", "3"]
@@ -177,7 +178,7 @@ class BatchState:
     codex_weekly_last: float | None = None
 
 
-def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm], dataset: list[str],
+def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
               jobs_dir: Path, mounts: str | None = None, concurrency: int = 2,
               weekly_budget_pp: float = 25.0, dry_run: bool = False) -> BatchState:
     jobs_dir.mkdir(parents=True, exist_ok=True)
@@ -194,7 +195,7 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm], datas
         state_path.write_text(json.dumps(asdict(state), indent=1))
 
     def one(t: Trial):
-        cmd = harbor_cmd(t, harness, arms[t.arm], dataset, jobs_dir, mounts)
+        cmd = harbor_cmd(t, harness, arms[t.arm], jobs_dir, mounts)
         if dry_run:
             return t, 0, " ".join(shlex.quote(c) for c in cmd)
         log = jobs_dir / f"{t.job_name}.runner.log"

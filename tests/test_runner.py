@@ -62,4 +62,4 @@ def test_run_batch_refuses_placeholders(tmp_path):
     from skill_placebo.runner import run_batch
     h = Harness("claude-code", "claude-code", "m", kwargs={"reasoning_effort": "EFFORT_TBD"})
     with pytest.raises(SystemExit):
-        run_batch([], h, {}, [], tmp_path)
+        run_batch([], h, {}, tmp_path)
