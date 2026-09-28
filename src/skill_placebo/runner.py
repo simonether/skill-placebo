@@ -102,13 +102,32 @@ def plan(tasks: list[str], arms: list[Arm], harness: str, n: int, seed: int) -> 
     return trials
 
 
-def harbor_cmd(trial: Trial, h: Harness, arm: Arm, jobs_dir: Path, mounts: str | None) -> list[str]:
+INFRA_EXCEPTIONS = {"AgentSetupTimeoutError", "EnvironmentStartTimeoutError", "HealthcheckError", "SandboxBuildFailedError"}
+MAX_INFRA_RETRIES = 2
+
+
+def infra_failure(job_dir: Path) -> str | None:
+    """The exception type if the trial failed for infrastructure reasons (METHOD.md section 7):
+    the agent never got to work, so the trial is rerun. VerifierTimeoutError is not infra: the
+    agent's own code can hang the tests."""
+    for res in job_dir.glob("*/result.json"):
+        try:
+            info = json.loads(res.read_text()).get("exception_info") or {}
+        except (OSError, json.JSONDecodeError):
+            continue
+        typ, msg = info.get("exception_type"), str(info.get("exception_message") or "")
+        if typ in INFRA_EXCEPTIONS or (typ == "RuntimeError" and "docker" in msg.lower()):
+            return typ
+    return None
+
+
+def harbor_cmd(trial: Trial, h: Harness, arm: Arm, jobs_dir: Path, mounts: str | None, job_name: str | None = None) -> list[str]:
     """trial.task is a task directory relative to tasks/ (e.g. pool/swebench-verified/django__django-15957)."""
     cmd = ["uv", "run", "--project", str(ROOT), "harbor", "run", "-p", str(ROOT / "tasks" / trial.task),
            "-a", h.agent, "-m", h.model, "-k", "1", "-n", "1",
-           "-o", str(jobs_dir), "--job-name", trial.job_name, "--yes",
+           "-o", str(jobs_dir), "--job-name", job_name or trial.job_name, "--yes",
            # Agent install (apt/npm) is not the agent's work; slow mirrors must not fail trials.
-           "--agent-setup-timeout-multiplier", "3"]
+           "--agent-setup-timeout-multiplier", "2"]
     for k, v in h.kwargs.items():
         cmd += ["--ak", f"{k}={json.dumps(v) if not isinstance(v, str) else v}"]
     if mounts:
@@ -344,6 +363,14 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
             if t.job_name not in state.done and list((jobs_dir / t.job_name).glob("*/result.json")):
                 state.done.append(t.job_name)
                 ledger_add(harness.name, jobs_dir / t.job_name)
+    def attempts_so_far(t: Trial) -> list[Path]:
+        return [d for d in [jobs_dir / t.job_name] + sorted(jobs_dir.glob(f"{t.job_name}__r*")) if d.is_dir()]
+
+    if not dry_run:  # a trial whose last attempt failed on infrastructure gets its remaining retries
+        for t in trials:
+            tries = attempts_so_far(t)
+            if t.job_name in state.done and tries and infra_failure(tries[-1]) and len(tries) <= MAX_INFRA_RETRIES:
+                state.done.remove(t.job_name)
     todo = [t for t in trials if t.job_name not in state.done]
     if not dry_run:
         state.stopped = None
@@ -359,13 +386,20 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
         state_path.write_text(json.dumps(asdict(state), indent=1))
 
     def one(t: Trial):
-        cmd = harbor_cmd(t, harness, arms[t.arm], jobs_dir, mounts)
         if dry_run:
-            return t, 0, " ".join(shlex.quote(c) for c in cmd)
-        log = jobs_dir / f"{t.job_name}.runner.log"
-        with open(log, "w") as f:
-            rc = subprocess.run(cmd, cwd=ROOT, env=env, stdout=f, stderr=subprocess.STDOUT).returncode
-        return t, rc, str(log)
+            return t, 0, " ".join(shlex.quote(c) for c in harbor_cmd(t, harness, arms[t.arm], jobs_dir, mounts))
+        rc = 0
+        name = t.job_name
+        for attempt in range(len(attempts_so_far(t)), MAX_INFRA_RETRIES + 1):
+            name = t.job_name if attempt == 0 else f"{t.job_name}__r{attempt}"
+            with open(jobs_dir / f"{name}.runner.log", "w") as f:
+                rc = subprocess.run(harbor_cmd(t, harness, arms[t.arm], jobs_dir, mounts, name),
+                                    cwd=ROOT, env=env, stdout=f, stderr=subprocess.STDOUT).returncode
+            why = infra_failure(jobs_dir / name)
+            if not why:
+                break
+            print(f"{time.strftime('%H:%M:%S')} {name}: infrastructure failure {why}, retry {attempt + 1}/{MAX_INFRA_RETRIES}", flush=True)
+        return t, rc, name
 
     completed_here = 0
     if codex_weekly_start is not None:
@@ -399,7 +433,7 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
             if dry_run:
                 print(info)
             else:
-                tdir = jobs_dir / t.job_name
+                tdir = jobs_dir / info  # the last attempt's job directory
                 hits = limit_hits(tdir)
                 rl = codex_rate_limits(tdir) if harness.name == "codex" else {}
                 wk = rl.get("weekly")
@@ -417,6 +451,9 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
                         state.codex_weekly_start = wk
                     state.codex_weekly_last = wk
                 state.done.append(t.job_name)
+                for prev in sorted(jobs_dir.glob(f"{t.job_name}__r*")) + [jobs_dir / t.job_name]:
+                    if prev.is_dir() and prev != tdir:
+                        state.usd_spent_window += ledger_add(harness.name, prev)  # failed attempts (usually 0 tokens)
                 state.usd_spent_window += ledger_add(harness.name, tdir)
                 dollars = ledger_spent(harness.name, window_start, "cost_est_usd")
                 completed_here += 1

@@ -126,3 +126,15 @@ def test_plugin_hook_text_with_401_does_not_stop(tmp_path):
     api_err = {"type": "result", "is_error": True, "api_error_status": 429, "result": "API Error: 429 rate_limit_error"}
     (d / "claude-code.txt").write_text(json.dumps(api_err))
     assert limit_hits(tmp_path / "trial")
+
+
+def test_infra_failure_classification(tmp_path):
+    from skill_placebo.runner import infra_failure
+    j = tmp_path / "job"
+    (j / "t1").mkdir(parents=True)
+    (j / "t1" / "result.json").write_text(json.dumps({"exception_info": {"exception_type": "AgentSetupTimeoutError"}}))
+    assert infra_failure(j) == "AgentSetupTimeoutError"
+    (j / "t1" / "result.json").write_text(json.dumps({"exception_info": {"exception_type": "VerifierTimeoutError"}}))
+    assert infra_failure(j) is None
+    (j / "t1" / "result.json").write_text(json.dumps({"exception_info": {"exception_type": "RuntimeError", "exception_message": "Docker compose command failed ... 429"}}))
+    assert infra_failure(j) == "RuntimeError"

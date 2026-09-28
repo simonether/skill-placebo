@@ -1,0 +1,54 @@
+{
+ "all_within_10pct": false,
+ "buckets": {
+  "cc-1": {
+   "placebo_tokens": 663,
+   "member_tokens": {
+    "planning-with-files": 666
+   },
+   "deviation": {
+    "planning-with-files": -0.0045
+   }
+  },
+  "cc-3": {
+   "placebo_tokens": null,
+   "member_tokens": {
+    "superpowers": 2168,
+    "compound-engineering": 2383,
+    "i-have-adhd": 2473
+   },
+   "deviation": {}
+  },
+  "cc-4": {
+   "placebo_tokens": 2874,
+   "member_tokens": {
+    "ponytail": 2854
+   },
+   "deviation": {
+    "ponytail": 0.007
+   }
+  },
+  "cc-5": {
+   "placebo_tokens": 3800,
+   "member_tokens": {
+    "agent-skills": 3751,
+    "caveman": 3917
+   },
+   "deviation": {
+    "agent-skills": 0.0131,
+    "caveman": -0.0299
+   }
+  },
+  "cc-2": {
+   "placebo_tokens": 939,
+   "member_tokens": {
+    "mattpocock": 906,
+    "karpathy": 986
+   },
+   "deviation": {
+    "mattpocock": 0.0364,
+    "karpathy": -0.0477
+   }
+  }
+ }
+}

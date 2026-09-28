@@ -68,8 +68,13 @@ def trial_row(res: Path) -> dict | None:
     r = _load(res)
     if not r.get("task_name"):
         return None
+    attempt = 0
+    mm = re.search(r"__r(\d+)$", job)
+    if mm:
+        attempt, job = int(mm.group(1)), job[: mm.start()]
     m = JOB_RE.match(job)
     meta = m.groupdict() if m else {"block": "", "order": "", "harness": "", "arm": job, "task": r["task_name"]}
+    exc = r.get("exception_info") or {}
     a = r.get("agent_result") or {}
     rw = (r.get("verifier_result") or {}).get("rewards") or {}
     ex = (_load(tdir / "agent" / "trajectory.json").get("final_metrics") or {}).get("extra") or {}
@@ -88,7 +93,11 @@ def trial_row(res: Path) -> dict | None:
         "reasoning_effort": (((r.get("config") or {}).get("agent") or {}).get("kwargs") or {}).get("reasoning_effort"),
         "reward": reward,
         "passed": None if reward is None else int(float(reward) >= 1.0),
-        "exception": (r.get("exception_info") or {}).get("exception_type"),
+        "exception": exc.get("exception_type"),
+        "attempt": attempt,
+        "infra_failure": int(exc.get("exception_type") in {"AgentSetupTimeoutError", "EnvironmentStartTimeoutError",
+                                                           "HealthcheckError", "SandboxBuildFailedError"}
+                             or (exc.get("exception_type") == "RuntimeError" and "docker" in str(exc.get("exception_message", "")).lower())),
         "n_input": n_in, "n_cached": n_c, "n_cache_write": cw, "n_output": n_out,
         "cost_est_usd": cost_from_tokens(model, n_in, n_c, cw, n_out),
         "units": units_from_tokens(n_in, n_c, cw, n_out),
