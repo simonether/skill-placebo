@@ -14,7 +14,7 @@ Most of these promises were never tested against a control that accounts for the
 alternative explanation: *any* extra instruction of the same length changes what the agent does and
 what it costs.
 
-For each of the 10 most-starred general-purpose coding skills we ask:
+For each of the most-starred general-purpose coding skills (nine qualify, section 3) we ask:
 
 1. **Does the skill beat a placebo?** A placebo is a neutral instruction of the same length,
    installed the same way, that adds no new direction.
@@ -29,28 +29,67 @@ This project is a replication and extension, not a first. What was already measu
 
 | Work | Date | What it did | Result |
 |---|---|---|---|
-| JetBrains AI blog, 3-part series | 2026-07 | caveman, rtk, ponytail on SkillsBench tasks via Harbor, Sonnet 5 | caveman ~8.5% token savings vs 65% claimed, quality flat (p=0.82); rtk +7.6% vs -60..-90% claimed; ponytail -15.4% code vs -54% claimed, cost -10.3% (p=0.004, 251 trials) |
-| maxtaylor.me, caveman vs "be brief" | 2026-04 | 24 prompts, 5 arms incl. a "be brief" control (HN 47954745) | "be brief" as an active control |
-| SWE-Skills-Bench (arXiv 2603.15401) | 2026-03 | 49 public SWE skills | 39 with zero gain, mean +1.2%, token overhead up to +451% |
-| SkillsBench (arXiv 2602.12670) | 2026-02 | curated task-specific skills, 87 tasks | +16.6 pp with curated skills |
-| ACES / NVIDIA SkillEvaluator (arXiv 2608.20614) | 2026-08 | paired with/without trials on Harbor, 145 enterprise skills | mean "Skill Lift" 0.21 |
-| sjh9714/skill-receipts | 2026-07 | same placebo idea | no published matrix found |
-| currenjin/skillbench | 2026-07 | weekly skill benchmark with baseline | abandoned before results |
-| Tessl registry "Impact" scores | 2026-02 onward | auto-generated scenarios, with vs without | caveman 0.94x on 2 scenarios |
-| `claude plugin eval` (Claude Code 2.1.269) | 2026-09-11 | first-party WITH / W/OUT ablation for one plugin | tool, no public comparison |
+| JetBrains AI blog: [caveman](https://blog.jetbrains.com/ai/2026/07/speak-to-ai-agents-like-cavemen-tosave-tokens/) | 2026-07 | Harbor 0.17, Claude Code, Sonnet 5 low effort, 86 SkillsBench tasks, skill forced on | output tokens -8.5% (claimed 65%), cost about -10%, quality sign test p = 0.82 |
+| JetBrains: [ponytail](https://blog.jetbrains.com/ai/2026/07/ponytail-skill-claude-tested/) | 2026-07 | Harbor 0.18, Sonnet 5 medium, 80 paired tasks, 251 trials; ruleset forced (installed normally it self-activated 0 of 10 times) | cost -10.3% (p = 0.004), code -15.4% (p = 0.088), quality no difference; no placebo arm |
+| JetBrains: [rtk](https://blog.jetbrains.com/ai/2026/07/rtk-claude-code-token-savings/) | 2026-07 | same setup, 425 trials (a CLI proxy, out of scope here) | cost +7.6% at low effort (p = 0.004) against claimed -60..-90% |
+| [Scott Logic on ponytail](https://blog.scottlogic.com/2026/06/16/ponytail-yagni-and-the-problem-with-prompt-benchmarks.html) | 2026-06 | promptfoo, single-shot, Claude Haiku | a seven-word "Follow YAGNI principles, and one-liner solutions" prompt beat the skill on its own benchmark |
+| [maxtaylor.me: caveman vs "Be brief."](https://www.maxtaylor.me/articles/i-benchmarked-caveman-against-two-words) | 2026-04 | 24 chat prompts, Opus 4.7, 5 arms (HN 47954745) | "Be brief." matched caveman on tokens and quality |
+| [MindStudio on superpowers](https://www.mindstudio.ai/blog/5-claude-code-skills-cut-token-costs-70-percent-benchmarked) | 2026 | 6 sessions with vs 6 without | -9% cost, -14% tokens, no CI |
+| [SWE-Skills-Bench](https://arxiv.org/abs/2603.15401) | 2026-03 | 49 public SWE skills, paired with/without | 39 of 49 with zero pass-rate gain, mean +1.2% |
+| [SkillsBench](https://arxiv.org/abs/2602.12670) | 2026-02 | curated task-specific skills, 87 tasks | curated skills help; general workflow skills not studied |
+| [ACES / NVIDIA SkillEvaluator](https://arxiv.org/abs/2608.20614) | 2026-08 | paired with/without on Harbor, 145 enterprise skills | mean "Skill Lift" 0.21 |
+| Tessl registry | 2026 | auto-generated scenario evals | karpathy-guidelines "1.14x"; superpowers: only brainstorming has evals |
+| sjh9714/skill-receipts, currenjin/skillbench | 2026-07 | the same idea (placebo arm; weekly with baseline) | no published results found |
+| `claude plugin eval` (Claude Code 2.1.269) | 2026-09-11 | first-party with/without ablation for one plugin | a tool; no placebo arm, no public comparison |
 
-TBD: final table with links and exact numbers from `docs/research/2026-09-25-skills-census.md`.
+The closest thing to a placebo result so far is two active controls ("Be brief.", the YAGNI prompt)
+on single-shot prompts. Numbers above are as each source reports them.
 
-What this project adds: 10 skills in one design; a length-matched placebo arm; two harnesses
+What this project adds: nine skills in one design; a length-matched placebo arm; two harnesses
 (Claude Code and Codex CLI); the method fixed before data; README claims next to measured numbers;
 every trajectory published.
 
 ## 3. Skills under test
 
-TBD from the census: selection rule, the 10 skills with pinned commit, stars on 2026-09-25, type
-(always-on / model-triggered / plugin with hooks), install method as documented by the author,
-interactive or not, numeric README claim (quote, file:line), prior measurement. Excluded
-candidates are listed with the reason.
+Source: `docs/research/2026-09-28-skills-census.md` (stars, components, install docs, claims, with
+file:line at the pinned commit). Pins: `skills.lock.json`.
+
+**Selection rule.** The most-starred skills or plugins for coding agents on 2026-09-28 that plausibly
+change behaviour on *any* coding task (workflow discipline, planning, testing, brevity, engineering
+guidelines). Excluded: domain skills (design, docs, SEO), memory systems, orchestrators, CLI proxies,
+collections of unrelated skills. Nine pass; no tenth fits the rule, so the study runs nine.
+
+**Pinned version:** the default-branch commit on 2026-09-28, which is what a marketplace install
+gets that day.
+
+| # | Skill | Stars (28.09) | Commit | Type in Claude Code | Always-on chars (CC) | Numeric README claim | Prior independent measurement |
+|---|---|---:|---|---|---:|---|---|
+| 1 | addyosmani/agent-skills | 99,510 | 2686b62 | triggered pack: 25 skills, 9 commands, 4 agents | 10,973 | none | none found |
+| 2 | mattpocock/skills | 270,709 | c55ee46 | triggered pack: 25 skills | 4,106 | none | none found |
+| 3 | ayghri/i-have-adhd | 51,606 | 839872f | documented always-on mode: SessionStart hook | 7,291 | none | none found |
+| 4 | OthmanAdi/planning-with-files | 27,154 | 51c1caa | triggered; hooks once a plan file exists | 2,646 | 96.7% (29/30), 13.3 → 5.0 turns (`README.md:33-34,75`) | none found |
+| 5 | EveryInc/compound-engineering-plugin | 25,299 | e80c5c4 | triggered pack: 36 skills | 7,943 | none | none found |
+| 6 | multica-ai/andrej-karpathy-skills | 215,547 | 2c60614 | always-on CLAUDE.md (the author's "single CLAUDE.md file") | 2,345 | none | Tessl scenario eval only |
+| 7 | obra/superpowers | 292,189 | 8ca22db | 15 skills + SessionStart hook | 6,020 | none | MindStudio, 6 vs 6 sessions |
+| 8 | DietrichGebert/ponytail | 146,942 | e3ba2aa | 6 skills + SessionStart ruleset hook | 7,874 | ~54% less code, ~20% cheaper, ~27% faster (`README.md:33`) | JetBrains 2026-07: cost -10.3% (p=0.004), no placebo |
+| 9 | JuliusBrussee/caveman | 108,076 | 2fd153c | 20 skills + 3 agents + SessionStart and per-prompt hooks | 10,043 (+245 per prompt) | "cuts 65% of tokens" (repo description) | JetBrains 2026-07: -8.5% output tokens; maxtaylor.me: "Be brief." matched it |
+
+Always-on characters are measured, not estimated: `scripts/measure_always_on.py` takes exactly the
+components Claude Code lists for the plugin (`claude plugin details`) and runs the plugin's
+SessionStart hooks for real (`placebo/always_on.json`).
+
+The table order is the **priority order**: skills nobody has measured independently come first
+(task brief). The reduced designs (section 11.3) take the first 8 or 6.
+
+**Excluded, with reasons:** affaan-m/ECC (268k stars; 292 skills plus memory and a harness layer),
+Leonxlnx/taste-skill (91k; frontend design), open-gsd/gsd-core, formerly get-shit-done (64k archived +
+10k; a phase orchestrator driven by user commands). Full list in the census.
+
+**Codex:** TBD, hub decision pending: skills whose author documents a Codex install that works
+without a per-session manual command.
+
+**superpowers:** TBD, hub decision pending: its brainstorming skill stops for the user's approval and
+the author documents no unattended mode.
 
 ## 4. Arms
 
@@ -65,10 +104,30 @@ tools, permissions, timeout and prompt. Only the installed instruction differs.
 
 ### 4.1 Placebo construction
 
-TBD after the census: matching unit (per skill or per length tier), matching tolerance, and the
-mechanism mirror for each skill type.
+**Buckets.** Skills whose always-on text lies within +-10% of a common length share one placebo.
+Claude Code (`placebo/buckets.json`):
 
-Fixed now:
+| Placebo | Members (always-on chars) | Placebo chars | Largest deviation |
+|---|---|---:|---:|
+| cc-a | karpathy (2,345), planning-with-files (2,646) | 2,495 | +6.4% |
+| cc-b | mattpocock (4,106) | 4,106 | 0% |
+| cc-c | superpowers (6,020) | 6,020 | 0% |
+| cc-d | i-have-adhd (7,291), ponytail (7,874), compound-engineering (7,943) | 7,703 | +5.7% |
+| cc-e | caveman (10,043), agent-skills (10,973) | 10,508 | +4.6% |
+
+**Form.** Each placebo is a plugin in the same format as the real ones (`arms/placebo/<bucket>/`,
+`src/skill_placebo/placebo.py`): k neutral skills whose names and descriptions add up to the
+members' mean listing length (k = the members' mean number of listed components); a SessionStart
+hook that injects neutral text of the members' mean hook-plus-memory length; skill bodies of the
+members' mean body length. The split between listing and injected text is the bucket mean, so in
+mixed buckets the mechanism is matched approximately and the length exactly.
+
+**Token check before any task.** Characters are not tokens. The pilot starts with one trivial prompt
+per arm; the input tokens of the first request minus baseline give each arm's always-on tokens. If a
+placebo differs from any member of its bucket by more than 10% in tokens, the placebo is rescaled and
+checked again before any task trial (recorded as an amendment).
+
+Also fixed:
 
 - The placebo text restates guidance the harness already gives by default (read the task, use the
   available tools, check the work) in neutral wording. It adds length and the presence of an
@@ -225,17 +284,22 @@ they get the verdict only.
 
 The pilot is capped at 150 trials per harness and runs with concurrency 2.
 
-### 11.1 Claude Code (at most 150 trials)
+### 11.1 Claude Code (at most 150 runs)
 
-- Task selection (section 6): 30 tasks x 2 baseline trials = 60, plus at most 18 third trials.
-- Kill test: the first 3 skills of the priority order (section 3) and their placebo arms, on 6
-  tasks drawn from the pool with seed 20260928 before the pilot (2 SWE-bench, 2 TB2.1, 2 TBLite),
-  2 trials each. At most 6 arms x 12 = 72 trials.
+- Token check (section 4.1): one trivial prompt per arm, 15 runs.
+- Task selection (section 6): 40 pool tasks x 2 baseline trials = 80, plus at most 5 third trials.
+- Kill test: caveman, ponytail and i-have-adhd with their placebos cc-e and cc-d (5 arms), on 5
+  tasks drawn from the pool with seed 20260928 before the pilot (3 SWE-bench, 1 TB2.1, 1 TBLite),
+  2 trials each = 50. These three are chosen because they put the most always-on text into the
+  context without any interactive gate, so they are the likeliest to move cost if anything does.
 
-### 11.2 Codex (at most 102 trials)
+### 11.2 Codex (at most 100 runs)
 
-- 30 tasks x 1 baseline trial: checks that every task runs under Codex and gives a first base rate.
-- The same kill test as 11.1: at most 72 trials.
+- Token check for the Codex arms.
+- 40 pool tasks x 1 baseline trial: checks that every task runs under Codex and gives a first base
+  rate.
+- Kill test on Codex with the Codex-eligible skills among the three above plus the next ones in
+  priority order, up to 5 arms x 5 tasks x 2 = 50.
 
 ### 11.3 Kill rule and the size of the main run
 
