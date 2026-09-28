@@ -87,7 +87,7 @@ Research behind these choices: `docs/research/2026-09-25-harness-infra.md`.
 |---|---|---|
 | Version | 2.1.282 | 0.157.0 |
 | Model | `claude-opus-5-5` | `gpt-6-sol` |
-| Reasoning effort | Claude Code's default for this model: EFFORT_TBD, passed explicitly | Codex's default for this model: medium, passed explicitly |
+| Reasoning effort | Claude Code's default for this model: medium (code.claude.com/docs/en/model-config: "Opus 5.5 defaults to `medium`"), passed explicitly | Codex's default for this model: medium, passed explicitly |
 | Permissions | `bypassPermissions` (Harbor default) | `--dangerously-bypass-approvals-and-sandbox` (Harbor default) |
 | Built-in web tools | disabled: `WebSearch`, `WebFetch` | disabled: `web_search = "disabled"` |
 | Login | owner's Claude Max subscription via a dedicated long-lived token (`claude setup-token`) | owner's ChatGPT subscription via a separate Codex login (`codex login --device-auth` in its own `CODEX_HOME`) |

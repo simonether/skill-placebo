@@ -18,7 +18,7 @@ CLAUDE_CODE = Harness(
     model="anthropic/claude-opus-5-5",
     kwargs={
         "version": "2.1.282",
-        "reasoning_effort": "EFFORT_TBD",  # Claude Code's default for Opus 5.5, passed explicitly
+        "reasoning_effort": "medium",  # Claude Code default for Opus 5.5 (code.claude.com/docs/en/model-config), explicit
         "disallowed_tools": ["WebSearch", "WebFetch"],
     },
     creds=("CLAUDE_CODE_OAUTH_TOKEN",),
