@@ -105,7 +105,9 @@ def plan(tasks: list[str], arms: list[Arm], harness: str, n: int, seed: int) -> 
 def harbor_cmd(trial: Trial, h: Harness, arm: Arm, dataset: list[str], jobs_dir: Path, mounts: str | None) -> list[str]:
     cmd = ["uv", "run", "--project", str(ROOT), "harbor", "run", *dataset,
            "-i", trial.task, "-a", h.agent, "-m", h.model, "-k", "1", "-n", "1",
-           "-o", str(jobs_dir), "--job-name", trial.job_name, "--yes"]
+           "-o", str(jobs_dir), "--job-name", trial.job_name, "--yes",
+           # Agent install (apt/npm) is not the agent's work; slow mirrors must not fail trials.
+           "--agent-setup-timeout-multiplier", "3"]
     for k, v in h.kwargs.items():
         cmd += ["--ak", f"{k}={json.dumps(v) if not isinstance(v, str) else v}"]
     if mounts:

@@ -1,15 +1,15 @@
 {
- "cc-a": {
+ "cc-1": {
   "listing_chars": 1323,
-  "hook_chars": 1172,
+  "hook_chars": 1171,
   "memory_chars": 0,
   "mean_body_chars": 1674,
   "cc_estimate_tokens": 366.0,
   "listed_skills": 7,
   "listed_agents": 0,
-  "total_chars": 2495
+  "total_chars": 2494
  },
- "cc-b": {
+ "cc-2": {
   "listing_chars": 4106,
   "hook_chars": 0,
   "memory_chars": 0,
@@ -19,34 +19,34 @@
   "listed_agents": 0,
   "total_chars": 4106
  },
- "cc-c": {
+ "cc-3": {
   "listing_chars": 2615,
-  "hook_chars": 3405,
+  "hook_chars": 3398,
   "memory_chars": 0,
   "mean_body_chars": 11075,
   "cc_estimate_tokens": 729.0,
   "listed_skills": 15,
   "listed_agents": 0,
-  "total_chars": 6020
+  "total_chars": 6013
  },
- "cc-d": {
+ "cc-4": {
   "listing_chars": 3614,
-  "hook_chars": 4089,
+  "hook_chars": 4077,
   "memory_chars": 0,
   "mean_body_chars": 5230,
   "cc_estimate_tokens": 974.0,
   "listed_skills": 14,
   "listed_agents": 0,
-  "total_chars": 7703
+  "total_chars": 7691
  },
- "cc-e": {
+ "cc-5": {
   "listing_chars": 7906,
-  "hook_chars": 2602,
+  "hook_chars": 2599,
   "memory_chars": 0,
   "mean_body_chars": 6619,
   "cc_estimate_tokens": 2132.0,
   "listed_skills": 31,
   "listed_agents": 0,
-  "total_chars": 10508
+  "total_chars": 10505
  }
 }

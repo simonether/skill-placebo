@@ -9,7 +9,7 @@ placebo/corpus.md:
   hook     a SessionStart hook that injects neutral text of the members' mean hook + memory length
   bodies   each neutral skill body has the members' mean on-invoke body length
 
-The hook only runs `cat` on a prebuilt JSON file, so it needs no node or python in the container.
+The hook only runs `cat` on a prebuilt text file, so it needs no node or python in the container.
 Everything is deterministic: the same inputs give byte-identical output.
 """
 from __future__ import annotations
@@ -100,11 +100,10 @@ def build(bucket: Bucket, out_dir: Path) -> dict:
         {"name": name, "description": desc, "version": "1.0.0", "license": "MIT"}, indent=2) + "\n")
     hooks = {"hooks": {}}
     if bucket.hook_chars:
+        # Plain text on stdout, like ponytail's hook: added as context by Claude Code and Codex alike.
         hooks = {"hooks": {"SessionStart": [{"matcher": "startup|clear|compact", "hooks": [
-            {"type": "command", "command": "cat \"${CLAUDE_PLUGIN_ROOT}/hooks/session-start.json\""}]}]}}
-        ctx = neutral_text(bucket.hook_chars)
-        (out_dir / "hooks" / "session-start.json").write_text(json.dumps(
-            {"hookSpecificOutput": {"hookEventName": "SessionStart", "additionalContext": ctx}}) + "\n")
+            {"type": "command", "command": "cat \"${CLAUDE_PLUGIN_ROOT}/hooks/session-start.txt\""}]}]}}
+        (out_dir / "hooks" / "session-start.txt").write_text(neutral_text(bucket.hook_chars))
     (out_dir / "hooks" / "hooks.json").write_text(json.dumps(hooks, indent=2) + "\n")
     (out_dir / ".codex-plugin" / "plugin.json").write_text(json.dumps(
         {"name": name, "version": "1.0.0", "description": desc, "license": "MIT", "skills": "./skills/",
@@ -132,3 +131,20 @@ def build(bucket: Bucket, out_dir: Path) -> dict:
             listing += len(n) + len(description)
     return {"bucket": bucket.__dict__, "plugin_name": name, "listing_chars": listing,
             "hook_chars": bucket.hook_chars, "total_chars": listing + bucket.hook_chars}
+
+
+def assign_buckets(lengths: dict[str, float], tolerance: float = 0.10) -> list[list[str]]:
+    """Deterministic bucketing (METHOD.md 4.1): sort by always-on length, then add each skill to the
+    current bucket if the bucket's new mean (the placebo length) stays within +-tolerance of every
+    member; otherwise start a new bucket. Ties broken by name."""
+    buckets: list[list[str]] = []
+    for name in sorted(lengths, key=lambda k: (lengths[k], k)):
+        if buckets:
+            cand = buckets[-1] + [name]
+            mean = sum(lengths[m] for m in cand) / len(cand)
+            # The placebo gets the bucket mean; it must be within +-tolerance of every member.
+            if all(abs(mean / lengths[m] - 1) <= tolerance for m in cand):
+                buckets[-1] = cand
+                continue
+        buckets.append([name])
+    return buckets

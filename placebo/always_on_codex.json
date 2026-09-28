@@ -1,0 +1,56 @@
+{
+ "superpowers": {
+  "listing_chars": 2615,
+  "hook_chars": 0,
+  "memory_chars": 0,
+  "listed_skills": 15,
+  "listed_agents": 0,
+  "total_chars": 2615,
+  "mean_body_chars": 11080
+ },
+ "mattpocock": {
+  "listing_chars": 4106,
+  "hook_chars": 0,
+  "memory_chars": 0,
+  "listed_skills": 25,
+  "listed_agents": 0,
+  "total_chars": 4106,
+  "mean_body_chars": 4400
+ },
+ "ponytail": {
+  "listing_chars": 2646,
+  "hook_chars": 5701,
+  "memory_chars": 0,
+  "listed_skills": 6,
+  "listed_agents": 0,
+  "total_chars": 8347,
+  "mean_body_chars": 2331
+ },
+ "agent-skills": {
+  "listing_chars": 9266,
+  "hook_chars": 0,
+  "memory_chars": 0,
+  "listed_skills": 25,
+  "listed_agents": 0,
+  "total_chars": 9266,
+  "mean_body_chars": 10196
+ },
+ "planning-with-files": {
+  "listing_chars": 625,
+  "hook_chars": 0,
+  "memory_chars": 0,
+  "listed_skills": 1,
+  "listed_agents": 0,
+  "total_chars": 625,
+  "mean_body_chars": 3351
+ },
+ "compound-engineering": {
+  "listing_chars": 7943,
+  "hook_chars": 0,
+  "memory_chars": 0,
+  "listed_skills": 36,
+  "listed_agents": 0,
+  "total_chars": 7943,
+  "mean_body_chars": 6597
+ }
+}

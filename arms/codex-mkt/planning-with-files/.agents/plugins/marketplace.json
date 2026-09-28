@@ -1,0 +1,17 @@
+{
+  "name": "planning-with-files-pinned",
+  "plugins": [
+    {
+      "name": "planning-with-files",
+      "source": {
+        "source": "url",
+        "url": "/opt/plugins/planning-with-files"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 {
- "cc-a": {
+ "cc-1": {
   "bucket": {
-   "id": "cc-a",
+   "id": "cc-1",
    "members": [
     "karpathy",
     "planning-with-files"
@@ -11,7 +11,7 @@
    "n_skills": 7,
    "body_chars": 1676
   },
-  "plugin_name": "session-notes-cc-a",
+  "plugin_name": "session-notes-cc-1",
   "listing_chars": 1323,
   "hook_chars": 1172,
   "total_chars": 2495,
@@ -28,9 +28,9 @@
    }
   }
  },
- "cc-b": {
+ "cc-2": {
   "bucket": {
-   "id": "cc-b",
+   "id": "cc-2",
    "members": [
     "mattpocock"
    ],
@@ -39,7 +39,7 @@
    "n_skills": 25,
    "body_chars": 4400
   },
-  "plugin_name": "session-notes-cc-b",
+  "plugin_name": "session-notes-cc-2",
   "listing_chars": 4106,
   "hook_chars": 0,
   "total_chars": 4106,
@@ -51,9 +51,9 @@
    }
   }
  },
- "cc-c": {
+ "cc-3": {
   "bucket": {
-   "id": "cc-c",
+   "id": "cc-3",
    "members": [
     "superpowers"
    ],
@@ -62,7 +62,7 @@
    "n_skills": 15,
    "body_chars": 11080
   },
-  "plugin_name": "session-notes-cc-c",
+  "plugin_name": "session-notes-cc-3",
   "listing_chars": 2615,
   "hook_chars": 3405,
   "total_chars": 6020,
@@ -74,9 +74,9 @@
    }
   }
  },
- "cc-d": {
+ "cc-4": {
   "bucket": {
-   "id": "cc-d",
+   "id": "cc-4",
    "members": [
     "i-have-adhd",
     "ponytail",
@@ -87,7 +87,7 @@
    "n_skills": 14,
    "body_chars": 5238
   },
-  "plugin_name": "session-notes-cc-d",
+  "plugin_name": "session-notes-cc-4",
   "listing_chars": 3614,
   "hook_chars": 4089,
   "total_chars": 7703,
@@ -109,9 +109,9 @@
    }
   }
  },
- "cc-e": {
+ "cc-5": {
   "bucket": {
-   "id": "cc-e",
+   "id": "cc-5",
    "members": [
     "caveman",
     "agent-skills"
@@ -121,7 +121,7 @@
    "n_skills": 31,
    "body_chars": 6624
   },
-  "plugin_name": "session-notes-cc-e",
+  "plugin_name": "session-notes-cc-5",
   "listing_chars": 7906,
   "hook_chars": 2602,
   "total_chars": 10508,
@@ -135,6 +135,110 @@
     "skill_chars": 10973,
     "placebo_chars": 10508,
     "deviation": -0.0424
+   }
+  }
+ },
+ "cx-1": {
+  "bucket": {
+   "id": "cx-1",
+   "members": [
+    "planning-with-files"
+   ],
+   "listing_chars": 625,
+   "hook_chars": 0,
+   "n_skills": 1,
+   "body_chars": 3351
+  },
+  "plugin_name": "session-notes-cx-1",
+  "listing_chars": 625,
+  "hook_chars": 0,
+  "total_chars": 625,
+  "members": {
+   "planning-with-files": {
+    "skill_chars": 625,
+    "placebo_chars": 625,
+    "deviation": 0.0
+   }
+  }
+ },
+ "cx-2": {
+  "bucket": {
+   "id": "cx-2",
+   "members": [
+    "superpowers"
+   ],
+   "listing_chars": 2615,
+   "hook_chars": 0,
+   "n_skills": 15,
+   "body_chars": 11080
+  },
+  "plugin_name": "session-notes-cx-2",
+  "listing_chars": 2615,
+  "hook_chars": 0,
+  "total_chars": 2615,
+  "members": {
+   "superpowers": {
+    "skill_chars": 2615,
+    "placebo_chars": 2615,
+    "deviation": 0.0
+   }
+  }
+ },
+ "cx-3": {
+  "bucket": {
+   "id": "cx-3",
+   "members": [
+    "mattpocock"
+   ],
+   "listing_chars": 4106,
+   "hook_chars": 0,
+   "n_skills": 25,
+   "body_chars": 4400
+  },
+  "plugin_name": "session-notes-cx-3",
+  "listing_chars": 4106,
+  "hook_chars": 0,
+  "total_chars": 4106,
+  "members": {
+   "mattpocock": {
+    "skill_chars": 4106,
+    "placebo_chars": 4106,
+    "deviation": 0.0
+   }
+  }
+ },
+ "cx-4": {
+  "bucket": {
+   "id": "cx-4",
+   "members": [
+    "compound-engineering",
+    "ponytail",
+    "agent-skills"
+   ],
+   "listing_chars": 6618,
+   "hook_chars": 1900,
+   "n_skills": 22,
+   "body_chars": 6375
+  },
+  "plugin_name": "session-notes-cx-4",
+  "listing_chars": 6618,
+  "hook_chars": 1900,
+  "total_chars": 8518,
+  "members": {
+   "compound-engineering": {
+    "skill_chars": 7943,
+    "placebo_chars": 8518,
+    "deviation": 0.0724
+   },
+   "ponytail": {
+    "skill_chars": 8347,
+    "placebo_chars": 8518,
+    "deviation": 0.0205
+   },
+   "agent-skills": {
+    "skill_chars": 9266,
+    "placebo_chars": 8518,
+    "deviation": -0.0807
    }
   }
  }

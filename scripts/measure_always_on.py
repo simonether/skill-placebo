@@ -34,6 +34,17 @@ INSTALL = {
     "caveman": {"plugin": ".", "home_files": [".claude/.caveman-nudge-shown"]},
 }
 
+# How each Codex-eligible skill installs on Codex, per its author (census). Codex does not support
+# `disable-model-invocation` (its own migration guide), so every SKILL.md in the plugin is listed.
+CODEX_INSTALL = {
+    "superpowers": {"skills": "skills"},
+    "mattpocock": {"skills_from_claude_manifest": True},
+    "ponytail": {"skills": "skills", "hooks": "hooks/claude-codex-hooks.json"},
+    "agent-skills": {"skills": "skills"},
+    "planning-with-files": {"skills": ".agents/skills", "hooks": "hooks/codex-hooks.json"},
+    "compound-engineering": {"skills": "skills"},
+}
+
 FM = re.compile(r"^---\s*\n(.*?)\n---", re.S)
 
 
@@ -146,7 +157,48 @@ def run_session_start_hooks(plugin_dir: Path, home: Path, cfg: Path) -> str:
     return "\n".join(t for t in texts if t)
 
 
+def codex_row(sid: str, how: dict) -> dict:
+    d = VENDOR / sid
+    if how.get("skills_from_claude_manifest"):
+        files = [d / p / "SKILL.md" for p in json.loads((d / ".claude-plugin" / "plugin.json").read_text())["skills"]]
+    else:
+        files = sorted((d / how["skills"]).glob("*/SKILL.md"))
+    listing = 0
+    for f in files:
+        fm = frontmatter(f)
+        listing += len(str(fm.get("name") or f.parent.name)) + len(str(fm.get("description", "")))
+    hook = 0
+    if how.get("hooks"):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            (home / "app").mkdir()
+            spec = json.loads((d / how["hooks"]).read_text()).get("hooks", {})
+            for group in spec.get("SessionStart", []):
+                for hk in group.get("hooks", []):
+                    cmd = hk["command"].replace("${CLAUDE_PLUGIN_ROOT}", str(d))
+                    env = {"PATH": os.environ["PATH"], "HOME": str(home), "CODEX_HOME": str(home / ".codex"),
+                           "CLAUDE_PLUGIN_ROOT": str(d.resolve())}
+                    r = subprocess.run(cmd, shell=True, input="{}", env=env, capture_output=True, text=True, cwd=home / "app", timeout=60)
+                    out = r.stdout.strip()
+                    try:
+                        j = json.loads(out)
+                        out = ((j.get("hookSpecificOutput") or {}).get("additionalContext")) or j.get("additionalContext") or ""
+                    except json.JSONDecodeError:
+                        pass
+                    hook += len(out)
+    return {"listing_chars": listing, "hook_chars": hook, "memory_chars": 0, "listed_skills": len(files),
+            "listed_agents": 0, "total_chars": listing + hook}
+
+
 def main():
+    if sys.argv[1:] == ["--codex"]:
+        res = {sid: codex_row(sid, how) for sid, how in CODEX_INSTALL.items()}
+        always_on = json.loads((ROOT / "placebo" / "always_on.json").read_text())
+        for sid, row in res.items():
+            row["mean_body_chars"] = always_on[sid]["mean_body_chars"]
+            print(f"{sid:22s} codex listing={row['listing_chars']:6d} hook={row['hook_chars']:6d} total={row['total_chars']:6d}")
+        (ROOT / "placebo" / "always_on_codex.json").write_text(json.dumps(res, indent=1) + "\n")
+        return
     targets = dict(INSTALL)
     extra = {Path(a).name: {"plugin": ".", "dir": Path(a).resolve()} for a in sys.argv[1:]}
     if extra:
