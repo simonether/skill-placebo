@@ -62,7 +62,7 @@ def test_run_batch_refuses_placeholders(tmp_path):
     from skill_placebo.runner import run_batch
     h = Harness("claude-code", "claude-code", "m", kwargs={"reasoning_effort": "EFFORT_TBD"})
     with pytest.raises(SystemExit):
-        run_batch([], h, {}, tmp_path, usd_budget=1.0)
+        run_batch([], h, {}, tmp_path, units_budget=1.0)
 
 
 def test_real_run_requires_usd_budget(tmp_path):
@@ -77,7 +77,25 @@ def test_ledger_window(tmp_path, monkeypatch):
     import skill_placebo.runner as r
     monkeypatch.setattr(r, "ledger_path", lambda h: tmp_path / f"ledger-{h}.jsonl")
     (tmp_path / "ledger-cc.jsonl").write_text(
-        json.dumps({"ts": "2026-09-28T10:00:00+0300", "cost_est_usd": 1.5}) + "\n"
-        + json.dumps({"ts": "2026-09-30T10:00:00+0300", "cost_est_usd": 2.0}) + "\n")
-    assert r.ledger_spent("cc", None) == 3.5
-    assert r.ledger_spent("cc", "2026-09-29T00:00:00+0300") == 2.0
+        json.dumps({"ts": "2026-09-28T10:00:00Z", "units": 1.5e6}) + "\n"
+        + json.dumps({"ts": "2026-09-30T10:00:00Z", "units": 2.0e6}) + "\n")
+    assert r.ledger_spent("cc", None) == 3.5e6
+    assert r.ledger_spent("cc", "2026-09-29T00:00:00Z") == 2.0e6
+
+
+def test_pace_wait(tmp_path, monkeypatch):
+    import time as _t
+    import skill_placebo.runner as r
+    monkeypatch.setattr(r, "ledger_path", lambda h: tmp_path / f"ledger-{h}.jsonl")
+    now = _t.time()
+    rows = [(now - 4 * 3600, 50e6), (now - 1 * 3600, 30e6)]  # 80M in the last 5 h
+    (tmp_path / "ledger-cc.jsonl").write_text("".join(json.dumps({"ts": r.utc_iso(t), "units": u}) + "\n" for t, u in rows))
+    w = r.pace_wait_seconds("cc", 75e6, now=now)
+    assert 3500 < w < 3700  # the 50M entry leaves the window in ~1 h
+    assert r.pace_wait_seconds("cc", 100e6, now=now) == 0.0
+
+
+def test_units_formula():
+    from skill_placebo.collect import units_from_tokens
+    # 1000 total input of which 600 cache read and 100 cache write -> 300 uncached; 50 output
+    assert units_from_tokens(1000, 600, 100, 50) == 300 + 125 + 60 + 250

@@ -6,8 +6,9 @@
   scripts/pilot.py selection   --harness codex         pool tasks x 1 in the baseline arm
   scripts/pilot.py kill        --harness claude-code   kill-test skills and their placebos (section 11)
   scripts/pilot.py collect                             jobs/pilot -> results/pilot/trials.csv
-Add --dry-run to print the Harbor commands without running anything. Real runs need --usd-budget
-(the $-equivalent threshold for 25% of the weekly limit; METHOD.md amendment 1).
+Add --dry-run to print the Harbor commands without running anything. Real runs need --units-budget
+(the threshold for 25% of the weekly limit, METHOD.md amendment 2), plus --window-start,
+--pace-units-5h and, at checkpoints, --stop-after.
 """
 import argparse
 import json
@@ -46,8 +47,11 @@ def main():
     ap.add_argument("--harness", choices=list(HARNESSES), default="claude-code")
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--concurrency", type=int, default=2)
-    ap.add_argument("--usd-budget", type=float, help="stop when the ledger's $ equivalent since --window-start exceeds this (the threshold)")
-    ap.add_argument("--window-start", help="ISO time of the plan's weekly reset, e.g. 2026-09-29T10:00:00+0300")
+    ap.add_argument("--units-budget", type=float, help="stop when the ledger's limit units since --window-start reach this (the 25%%-of-week threshold)")
+    ap.add_argument("--window-start", help="UTC time of the plan's last weekly reset, e.g. 2026-09-28T10:00:00Z")
+    ap.add_argument("--pace-units-5h", type=float, help="never start a trial while the trailing 5 hours hold this many units")
+    ap.add_argument("--stop-after", type=int, help="stop after this many trials complete (checkpoint)")
+    ap.add_argument("--codex-weekly-start", type=float, help="Codex plan's weekly used %% before the benchmark (owner's reading)")
     a = ap.parse_args()
 
     if a.step == "collect":
@@ -80,7 +84,9 @@ def main():
     print(f"{a.harness} {a.step}: {len(trials)} trials, arms: {', '.join(x.name for x in arms)}")
     state = run_batch(trials, h, {x.name: x for x in arms}, jobs_dir, mounts=mounts(),
                       concurrency=a.concurrency, dry_run=a.dry_run,
-                      usd_budget=a.usd_budget, window_start=a.window_start)
+                      units_budget=a.units_budget, window_start=a.window_start,
+                      pace_units_5h=a.pace_units_5h, stop_after=a.stop_after,
+                      codex_weekly_start=a.codex_weekly_start)
     if state.stopped:
         print(f"STOPPED: {state.stopped}")
         sys.exit(2)

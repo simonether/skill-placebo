@@ -46,6 +46,13 @@ def skill_fired(trial_dir: Path) -> int:
     return n
 
 
+def units_from_tokens(n_input: int, n_cached: int, n_cache_write: int, n_output: int) -> float:
+    """Limit units (METHOD.md amendment 2): uncached input x1 + cache write x1.25 + cache read x0.1 +
+    output x5. The same formula used on the owner's own logs to calibrate % of the week per unit."""
+    uncached = max(0, n_input - n_cached - n_cache_write)
+    return uncached * 1.0 + n_cache_write * 1.25 + n_cached * 0.1 + n_output * 5.0
+
+
 def cost_from_tokens(model: str, n_input: int, n_cached: int, n_cache_write: int, n_output: int) -> float | None:
     p = PRICES.get(model.split("/")[-1])
     if not p:
@@ -84,6 +91,7 @@ def trial_row(res: Path) -> dict | None:
         "exception": (r.get("exception_info") or {}).get("exception_type"),
         "n_input": n_in, "n_cached": n_c, "n_cache_write": cw, "n_output": n_out,
         "cost_est_usd": cost_from_tokens(model, n_in, n_c, cw, n_out),
+        "units": units_from_tokens(n_in, n_c, cw, n_out),
         "cost_harbor_usd": a.get("cost_usd"),
         "skill_fired": skill_fired(tdir),
         "approval_turns": int(turns_file.read_text().strip() or 0) if turns_file.exists() else None,

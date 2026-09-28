@@ -454,3 +454,30 @@ measure the benchmark's share (owner, 2026-09-29, via the hub).
    active.
 
 **Runs affected:** all (no run has happened yet).
+
+### Amendment 2 (2026-09-29, before any benchmark run): limit units, pace and checkpoints
+
+**Reason.** The hub calibrated the owner's Claude plan against his own session logs in *units*
+rather than dollars, so the benchmark must be metered in the same units (hub, 2026-09-29: one
+reading of the usage page, Max 20x, 4% of the week used, reset Mon 2026-10-05 10:00 UTC).
+
+**Change** (refines amendment 1; the $ equivalent stays as the cost outcome of section 8):
+
+1. **Units** per trial = uncached input x 1 + cache write x 1.25 + cache read x 0.1 + output x 5,
+   in tokens (`collect.units_from_tokens`), the same formula the hub applied to the owner's logs.
+   The runner logs units per trial and in total per limit week.
+2. **Claude Code stop:** 145 million units in the limit week (the hub's conservative translation of
+   25%), or any limit warning, rate-limit error or authentication failure.
+3. **Claude Code pace:** no trial starts while the trailing 5 hours hold 75 million units or more
+   (about 40% of a 5-hour window), so the owner keeps room for other work; the runner waits.
+4. **Design thresholds of section 11.3 in units**, scaled to 150 pilot runs: at most 17 million
+   units (about 3% of the week) → Full; 17-35 million → Reduced; more → Minimal.
+5. **Checkpoint:** after the first 10 task trials the runner stops and the median and maximum units
+   per trial go to the hub before the pilot continues.
+6. **Codex** (owner, 2026-09-29: ChatGPT Plus, weekly limit 12% used, no parallel Codex use): the
+   weekly `used_percent` from Codex's own rate-limit events is the measure; stop at +25 percentage
+   points over 12%; pause while the 5-hour window is 40% full or more. Units are logged too.
+7. Before the main run the owner gives a new usage reading and the hub recalculates the ratio.
+
+**Runs affected:** all (no run has happened yet).
+
