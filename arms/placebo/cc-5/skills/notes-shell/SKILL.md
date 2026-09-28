@@ -1,6 +1,6 @@
 ---
 name: notes-shell
-description: "Background notes about shell in this environment. The session ends when the agent stops working on the task. The agent works inside a computer environment. The environment has a file system, a shell and a set of installed programs. The....."
+description: "Background notes about shell in this environment. The session ends when the agent stops working on the task. The agent works inside a computer environment. The environment has a file system, a shell and a set of installed programs. The agent interacts with the environment through the tools that."
 ---
 
 ## The session

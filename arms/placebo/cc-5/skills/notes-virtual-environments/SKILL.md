@@ -1,6 +1,6 @@
 ---
 name: notes-virtual-environments
-description: "Background notes about virtual environments in this environment. **Compiler.** A program that translates source code into another form, usually machine code or bytecode. **Configuration.** Settings that control how a program behaves......."
+description: "Background notes about virtual environments in this environment. **Compiler.** A program that translates source code into another form, usually machine code or bytecode. **Configuration.** Settings that control how a program behaves. Configuration is often stored in files or environment........."
 ---
 
 ## Glossary

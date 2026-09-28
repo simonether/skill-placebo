@@ -1,6 +1,6 @@
 ---
 name: notes-processes
-description: "Background notes about processes in this environment. Binary files contain bytes that are not meant to be read as text. Tools exist for reading and.."
+description: "Background notes about processes in this environment. Binary files contain bytes that are not meant to be read as text. Tools exist for........"
 ---
 
 The shell runs commands. A command has a name and arguments. When a command finishes, it returns an
@@ -42,56 +42,4 @@ be part of a repository.
 
 ## Text and data formats
 
-Files come in many formats. Plain text files contain characters arranged in lines. Structured
-formats such as JSON, YAML, TOML, CSV and XML follow rules about how data is written. Binary files
-contain bytes that are not meant to be read as text. Tools exist for reading and writing each
-format.
-
-Line endings, character encodings and trailing whitespace are properties of text files. Different
-systems use different conventions for them. A file keeps the conventions it was written with unless
-something changes them.
-
-## Networks
-
-Some environments have network access and some do not. When network access is available, programs
-can download files, call remote services and install packages from remote sources. When it is not
-available, such operations fail with an error.
-
-## Results
-
-The outcome of the session is the state of the environment when the session ends, together with
-anything the agent writes in its final message. The task description says what outcome is wanted.
-
-## Glossary
-
-**Argument.** A value passed to a command, a function or a program when it starts.
-
-**Binary.** A file that contains machine code or other non-text data. Also used for an executable
-program.
-
-**Build.** The process of turning source files into a form that can be run, such as an executable,
-a library or a package.
-
-**Cache.** Stored data kept so that later requests for the same data are answered faster.
-
-**Command line.** A text interface where commands are typed and their output is shown.
-
-**Compiler.** A program that translates source code into another form, usually machine code or
-bytecode.
-
-**Configuration.** Settings that control how a program behaves. Configuration is often stored in
-files or environment variables.
-
-**Container.** An isolated environment that has its own file system and processes but shares the
-kernel of the host machine.
-
-**Dependency.** A package, library or program that another piece of software needs in order to
-work.
-
-**Directory.** A container for files and other directories in a file system. Also called a
-folder.
-
-**Environment variable.** A named value available to a process and inherited by the processes it
-starts.
-
-**Exception.** An event that interrupts the    
+Files   

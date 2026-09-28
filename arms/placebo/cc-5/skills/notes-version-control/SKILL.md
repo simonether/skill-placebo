@@ -1,6 +1,6 @@
 ---
 name: notes-version-control
-description: "Background notes about version control in this environment. Both kinds of output appear in the tool result. Some commands finish quickly and some take longer. Long-running commands may be stopped by a time limit. Commands can read........."
+description: "Background notes about version control in this environment. Both kinds of output appear in the tool result. Some commands finish quickly and some take longer. Long-running commands may be stopped by a time limit. Commands can read environment variables. Environment variables are set for the....."
 ---
 
 ## The working directory

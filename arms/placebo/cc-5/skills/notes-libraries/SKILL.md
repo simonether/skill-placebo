@@ -1,6 +1,6 @@
 ---
 name: notes-libraries
-description: "Background notes about libraries in this environment. Long-running commands may be stopped by a time limit. Commands can read environment variables. Environment variables are set for the process and the processes it starts. The current...."
+description: "Background notes about libraries in this environment. Long-running commands may be stopped by a time limit. Commands can read environment variables. Environment variables are set for the process and the processes it starts. The current directory of the shell can change when a command changes...."
 ---
 
 Files come in many formats. Plain text files contain characters arranged in lines. Structured

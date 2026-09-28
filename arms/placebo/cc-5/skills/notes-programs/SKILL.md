@@ -1,6 +1,6 @@
 ---
 name: notes-programs
-description: "Background notes about programs in this environment. Relative paths are resolved against it. The working directory usually contains the files that the task refers to. It may contain source code, configuration files, data files,............."
+description: "Background notes about programs in this environment. Relative paths are resolved against it. The working directory usually contains the files that the task refers to. It may contain source code, configuration files, data files, documentation, build scripts or other material. Some files may be..."
 ---
 
 A session starts with a message that describes a task. The message is written in plain language.

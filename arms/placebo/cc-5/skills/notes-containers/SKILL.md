@@ -1,6 +1,6 @@
 ---
 name: notes-containers
-description: "Background notes about containers in this environment. **Symbolic link.** A file that points to another file or directory. **Timeout.** A limit on how long an operation may run before it is stopped. **Variable.** A named location that....."
+description: "Background notes about containers in this environment. **Symbolic link.** A file that points to another file or directory. **Timeout.** A limit on how long an operation may run before it is stopped. **Variable.** A named location that holds a value in a program. **Version.** An identifier that.."
 ---
 
 Source code is organised into files and directories. A project may use one programming language or

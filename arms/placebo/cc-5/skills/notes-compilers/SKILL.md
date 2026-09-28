@@ -1,6 +1,6 @@
 ---
 name: notes-compilers
-description: "Background notes about compilers in this environment. **Variable.** A named location that holds a value in a program. **Version.** An identifier that distinguishes one release of software from another. **Virtual environment.** An isolated."
+description: "Background notes about compilers in this environment. **Variable.** A named location that holds a value in a program. **Version.** An identifier that distinguishes one release of software from another. **Virtual environment.** An isolated set of installed packages for a programming language...."
 ---
 
 **Cache.** Stored data kept so that later requests for the same data are answered faster.

@@ -58,4 +58,13 @@ results appear as output when they run.
 
 ## Version control
 
-Many projects are stored in a version control system. Version control keeps a       
+Many projects are stored in a version control system. Version control keeps a history of changes.
+The current state of the files can be compared with earlier states. The history can show who
+changed a file, when it was changed and what the change was. The working directory may or may not
+be part of a repository.
+
+## Text and data formats
+
+Files come in many formats. Plain text files contain characters arranged in lines. Structured
+formats such as JSON, YAML, TOML, CSV and XML follow rules about how data is written. Binary files
+contain bytes that are not meant to be read as text. Tools exist    

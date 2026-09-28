@@ -1,6 +1,6 @@
 ---
 name: notes-interpreters
-description: "Background notes about interpreters in this environment. **Repository.** A storage location for a project's files and their history. **Script.** A file containing commands or code that is run by an interpreter. **Standard error.** An......"
+description: "Background notes about interpreters in this environment. **Repository.** A storage location for a project's files and their history. **Script.** A file containing commands or code that is run by an interpreter. **Standard error.** An output stream where programs usually write error messages....."
 ---
 
 **Build.** The process of turning source files into a form that can be run, such as an executable,

@@ -1,23 +1,7 @@
 ---
-name: notes-processes
-description: "Background notes about processes in this environment. Binary files contain bytes that are not meant to be read as text. Tools exist for reading and writing each format. Line endings, character encodings and trailing whitespace are properties.."
+name: notes-encodings
+description: "Background notes about encodings in this environment. **Function.** A named block of code that can be called with.."
 ---
-
-The shell runs commands. A command has a name and arguments. When a command finishes, it returns an
-exit code. An exit code of zero usually means that the command succeeded. Other exit codes usually
-mean that something did not work as expected. Commands can print text to standard output and to
-standard error. Both kinds of output appear in the tool result.
-
-Some commands finish quickly and some take longer. Long-running commands may be stopped by a time
-limit. Commands can read environment variables. Environment variables are set for the process and
-the processes it starts. The current directory of the shell can change when a command changes it.
-
-## Programs and packages
-
-The environment contains programs that were installed before the session began. Programming
-language interpreters, compilers, package managers and command-line utilities may be present.
-Which versions are installed depends on the environment. The installed programs can be listed
-and their versions can be printed with the usual commands.
 
 Packages for a programming language are usually installed through that language's package manager.
 Installed packages are available to programs that use the same interpreter or environment.
@@ -94,25 +78,4 @@ folder.
 **Environment variable.** A named value available to a process and inherited by the processes it
 starts.
 
-**Exception.** An event that interrupts the normal flow of a program, usually because of an error.
-
-**Exit code.** A number returned by a process when it finishes. Zero usually means success.
-
-**File system.** The structure that stores files and directories on a disk or in memory.
-
-**Function.** A named block of code that can be called with arguments and may return a value.
-
-**Interpreter.** A program that runs source code directly, without a separate compilation step.
-
-**Library.** A collection of code that other programs can use.
-
-**Log.** A record of events written by a program while it runs.
-
-**Module.** A file or unit of code that groups related definitions.
-
-**Package manager.** A program that installs, updates and removes packages and their
-dependencies.
-
-**Path.** The location of a file or directory, written as a sequence of directory names.
-
-**Permission.** A     
+**Exception.** An  

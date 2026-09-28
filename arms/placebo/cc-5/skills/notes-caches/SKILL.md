@@ -1,6 +1,6 @@
 ---
 name: notes-caches
-description: "Background notes about caches in this environment. The message is written in plain language. It may mention files, directories, commands, error messages, expected outputs or other details. The task description is the main source of........"
+description: "Background notes about caches in this environment. The message is written in plain language. It may mention files, directories, commands, error messages, expected outputs or other details. The task description is the main source of information about what is wanted. The session ends when the...."
 ---
 
 **Command line.** A text interface where commands are typed and their output is shown.

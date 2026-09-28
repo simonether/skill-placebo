@@ -4,5 +4,5 @@
   "description": "Reference notes about the working environment of a session.",
   "license": "MIT",
   "skills": "./skills/",
-  "hooks": {}
+  "hooks": "./hooks/hooks.json"
 }

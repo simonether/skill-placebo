@@ -16,5 +16,4 @@ reads the results and decides what to do next.
 ## The working directory
 
 The session has a working directory. Relative paths are resolved against it. The working
-directory usually contains the files that the task refers to. It may contain source code,
-configuration files, data files, documentation, build scripts or other material. Some 
+directory usually contains the files that the task refers to. It may contain source      

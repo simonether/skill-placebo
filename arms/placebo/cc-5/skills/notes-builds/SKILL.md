@@ -1,6 +1,6 @@
 ---
 name: notes-builds
-description: "Background notes about builds in this environment. A command has a name and arguments. When a command finishes, it returns an exit code. An exit code of zero usually means that the command succeeded. Other exit codes usually mean that....."
+description: "Background notes about builds in this environment. A command has a name and arguments. When a command finishes, it returns an exit code. An exit code of zero usually means that the command succeeded. Other exit codes usually mean that something did not work as expected. Commands can print text.."
 ---
 
 ## Text and data formats

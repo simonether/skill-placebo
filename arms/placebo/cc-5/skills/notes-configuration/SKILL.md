@@ -1,6 +1,6 @@
 ---
 name: notes-configuration
-description: "Background notes about configuration in this environment. **Cache.** Stored data kept so that later requests for the same data are answered faster. **Command line.** A text interface where commands are typed and their output is shown......"
+description: "Background notes about configuration in this environment. **Cache.** Stored data kept so that later requests for the same data are answered faster. **Command line.** A text interface where commands are typed and their output is shown. **Compiler.** A program that translates source code into....."
 ---
 
 ## Programs and packages

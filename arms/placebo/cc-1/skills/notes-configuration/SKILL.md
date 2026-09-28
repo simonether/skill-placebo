@@ -1,7 +1,18 @@
 ---
-name: notes-packages
-description: "Background notes about packages in this environment. **Permission.** A rule that says which users or processes may read, write or run a file........."
+name: notes-configuration
+description: "Background notes about configuration in this environment. **Cache.** Stored data kept so that later requests for...."
 ---
+
+## Programs and packages
+
+The environment contains programs that were installed before the session began. Programming
+language interpreters, compilers, package managers and command-line utilities may be present.
+Which versions are installed depends on the environment. The installed programs can be listed
+and their versions can be printed with the usual commands.
+
+Packages for a programming language are usually installed through that language's package manager.
+Installed packages are available to programs that use the same interpreter or environment.
+Some environments use virtual environments or containers to keep packages separate.
 
 ## Source code
 
@@ -62,49 +73,4 @@ bytecode.
 **Configuration.** Settings that control how a program behaves. Configuration is often stored in
 files or environment variables.
 
-**Container.** An isolated environment that has its own file system and processes but shares the
-kernel of the host machine.
-
-**Dependency.** A package, library or program that another piece of software needs in order to
-work.
-
-**Directory.** A container for files and other directories in a file system. Also called a
-folder.
-
-**Environment variable.** A named value available to a process and inherited by the processes it
-starts.
-
-**Exception.** An event that interrupts the normal flow of a program, usually because of an error.
-
-**Exit code.** A number returned by a process when it finishes. Zero usually means success.
-
-**File system.** The structure that stores files and directories on a disk or in memory.
-
-**Function.** A named block of code that can be called with arguments and may return a value.
-
-**Interpreter.** A program that runs source code directly, without a separate compilation step.
-
-**Library.** A collection of code that other programs can use.
-
-**Log.** A record of events written by a program while it runs.
-
-**Module.** A file or unit of code that groups related definitions.
-
-**Package manager.** A program that installs, updates and removes packages and their
-dependencies.
-
-**Path.** The location of a file or directory, written as a sequence of directory names.
-
-**Permission.** A rule that says which users or processes may read, write or run a file.
-
-**Process.** A running instance of a program.
-
-**Repository.** A storage location for a project's files and their history.
-
-**Script.** A file containing commands or code that is run by an interpreter.
-
-**Standard error.** An output stream where programs usually write error messages.
-
-**Standard input.** An input stream from which programs can read data.
-
-**Standard output.** An output  
+**Container.** An isolated environment that has its own file system and processes but  

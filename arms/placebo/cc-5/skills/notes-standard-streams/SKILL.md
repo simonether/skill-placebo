@@ -1,6 +1,6 @@
 ---
 name: notes-standard-streams
-description: "Background notes about standard streams in this environment. The history can show who changed a file, when it was changed and what the change was. The working directory may or may not be part of a repository. Files come in many formats...."
+description: "Background notes about standard streams in this environment. The history can show who changed a file, when it was changed and what the change was. The working directory may or may not be part of a repository. Files come in many formats. Plain text files contain characters arranged in lines......"
 ---
 
 Some environments have network access and some do not. When network access is available, programs

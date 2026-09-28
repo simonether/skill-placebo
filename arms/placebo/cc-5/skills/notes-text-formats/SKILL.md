@@ -1,6 +1,6 @@
 ---
 name: notes-text-formats
-description: "Background notes about text formats in this environment. Programming language interpreters, compilers, package managers and command-line utilities may be present. Which versions are installed depends on the environment. The installed......"
+description: "Background notes about text formats in this environment. Programming language interpreters, compilers, package managers and command-line utilities may be present. Which versions are installed depends on the environment. The installed programs can be listed and their versions can be printed with."
 ---
 
 The session has a working directory. Relative paths are resolved against it. The working

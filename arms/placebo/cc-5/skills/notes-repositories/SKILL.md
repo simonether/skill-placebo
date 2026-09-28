@@ -1,6 +1,6 @@
 ---
 name: notes-repositories
-description: "Background notes about repositories in this environment. **Environment variable.** A named value available to a process and inherited by the processes it starts. **Exception.** An event that interrupts the normal flow of a program,........"
+description: "Background notes about repositories in this environment. **Environment variable.** A named value available to a process and inherited by the processes it starts. **Exception.** An event that interrupts the normal flow of a program, usually because of an error. **Exit code.** A number returned..."
 ---
 
 **Argument.** A value passed to a command, a function or a program when it starts.

@@ -2,6 +2,7 @@
 """Pilot steps (METHOD.md section 11). One step per call, so each can be checked before the next.
 
   scripts/pilot.py token-check --harness claude-code   one trivial prompt per arm (section 4.1)
+  scripts/pilot.py token-recheck --harness claude-code one trivial prompt per rescaled placebo
   scripts/pilot.py selection   --harness claude-code   pool tasks x 2 in the baseline arm (section 6)
   scripts/pilot.py selection   --harness codex         pool tasks x 1 in the baseline arm
   scripts/pilot.py kill        --harness claude-code   kill-test skills and their placebos (section 11)
@@ -43,7 +44,7 @@ def arms_for(harness: str):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("step", choices=["token-check", "selection", "kill", "collect"])
+    ap.add_argument("step", choices=["token-check", "token-recheck", "selection", "kill", "collect"])
     ap.add_argument("--harness", choices=list(HARNESSES), default="claude-code")
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--concurrency", type=int, default=2)
@@ -69,6 +70,9 @@ def main():
     all_arms = arms_for(a.harness)
     if a.step == "token-check":
         arms = list(all_arms.values())
+        trials = plan(["calibration/say-ok"], arms, a.harness, n=1, seed=SEED)
+    elif a.step == "token-recheck":  # rescaled placebos only (METHOD.md 4.1)
+        arms = [x for n, x in all_arms.items() if n.startswith("placebo-")]
         trials = plan(["calibration/say-ok"], arms, a.harness, n=1, seed=SEED)
     elif a.step == "selection":
         arms = [all_arms["baseline"]]

@@ -1,6 +1,6 @@
 ---
 name: notes-packages
-description: "Background notes about packages in this environment. **Permission.** A rule that says which users or processes may read, write or run a file. **Process.** A running instance of a program. **Repository.** A storage location for a project's."
+description: "Background notes about packages in this environment. **Permission.** A rule that says which users or processes may read, write or run a file. **Process.** A running instance of a program. **Repository.** A storage location for a project's files and their history. **Script.** A file containing..."
 ---
 
 ## Source code

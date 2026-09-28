@@ -1,0 +1,95 @@
+{
+ "harness": "claude-code",
+ "baseline_first_prompt_tokens": 14916,
+ "always_on_tokens": {
+  "placebo-cc-4": 2232,
+  "skill-i-have-adhd": 2473,
+  "skill-ponytail": 2854,
+  "placebo-cc-5": 3202,
+  "skill-superpowers": 2168,
+  "placebo-cc-1": 745,
+  "skill-agent-skills": 3751,
+  "skill-caveman": 3917,
+  "skill-planning-with-files": 666,
+  "skill-mattpocock": 906,
+  "skill-compound-engineering": 2383,
+  "skill-karpathy": 986,
+  "placebo-cc-3": 1787,
+  "placebo-cc-2": 1416
+ },
+ "buckets": [
+  {
+   "bucket": "cc-1",
+   "members": [
+    "planning-with-files"
+   ],
+   "target_tokens": 666,
+   "member_tokens": {
+    "planning-with-files": 666
+   },
+   "from_placebo": "cc-1",
+   "placebo_tokens_now": 745,
+   "scale": 0.894
+  },
+  {
+   "bucket": "cc-2",
+   "members": [
+    "mattpocock",
+    "karpathy"
+   ],
+   "target_tokens": 946,
+   "member_tokens": {
+    "mattpocock": 906,
+    "karpathy": 986
+   },
+   "from_placebo": "cc-1",
+   "placebo_tokens_now": 745,
+   "scale": 1.2698
+  },
+  {
+   "bucket": "cc-3",
+   "members": [
+    "superpowers",
+    "compound-engineering",
+    "i-have-adhd"
+   ],
+   "target_tokens": 2341,
+   "member_tokens": {
+    "superpowers": 2168,
+    "compound-engineering": 2383,
+    "i-have-adhd": 2473
+   },
+   "from_placebo": "cc-4",
+   "placebo_tokens_now": 2232,
+   "scale": 1.049
+  },
+  {
+   "bucket": "cc-4",
+   "members": [
+    "ponytail"
+   ],
+   "target_tokens": 2854,
+   "member_tokens": {
+    "ponytail": 2854
+   },
+   "from_placebo": "cc-4",
+   "placebo_tokens_now": 2232,
+   "scale": 1.2787
+  },
+  {
+   "bucket": "cc-5",
+   "members": [
+    "agent-skills",
+    "caveman"
+   ],
+   "target_tokens": 3834,
+   "member_tokens": {
+    "agent-skills": 3751,
+    "caveman": 3917
+   },
+   "from_placebo": "cc-5",
+   "placebo_tokens_now": 3202,
+   "scale": 1.1974
+  }
+ ]
+}

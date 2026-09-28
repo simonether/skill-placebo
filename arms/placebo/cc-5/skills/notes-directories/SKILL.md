@@ -1,6 +1,6 @@
 ---
 name: notes-directories
-description: "Background notes about directories in this environment. **Library.** A collection of code that other programs can use. **Log.** A record of events written by a program while it runs. **Module.** A file or unit of code that groups related.."
+description: "Background notes about directories in this environment. **Library.** A collection of code that other programs can use. **Log.** A record of events written by a program while it runs. **Module.** A file or unit of code that groups related definitions. **Package manager.** A program that.........."
 ---
 
 **Binary.** A file that contains machine code or other non-text data. Also used for an executable

@@ -43,4 +43,14 @@ Which versions are installed depends on the environment. The installed programs 
 and their versions can be printed with the usual commands.
 
 Packages for a programming language are usually installed through that language's package manager.
-Installed   
+Installed packages are available to programs that use the same interpreter or environment.
+Some environments use virtual environments or containers to keep packages separate.
+
+## Source code
+
+Source code is organised into files and directories. A project may use one programming language or
+several. Code in one file can refer to code in another file. Projects often include a configuration
+file that names the project, lists its dependencies and describes how it is built or run.
+
+Projects may contain automated checks such as unit tests, integration tests, linters or type
+checkers. These  

@@ -1,6 +1,6 @@
 ---
 name: notes-modules
-description: "Background notes about modules in this environment. The installed programs can be listed and their versions can be printed with the usual commands. Packages for a programming language are usually installed through that language's package.."
+description: "Background notes about modules in this environment. The installed programs can be listed and their versions can be printed with the usual commands. Packages for a programming language are usually installed through that language's package manager. Installed packages are available to programs....."
 ---
 
 Line endings, character encodings and trailing whitespace are properties of text files. Different

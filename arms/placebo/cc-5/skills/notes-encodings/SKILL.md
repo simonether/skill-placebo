@@ -1,6 +1,6 @@
 ---
 name: notes-encodings
-description: "Background notes about encodings in this environment. **Function.** A named block of code that can be called with arguments and may return a value. **Interpreter.** A program that runs source code directly, without a separate compilation.."
+description: "Background notes about encodings in this environment. **Function.** A named block of code that can be called with arguments and may return a value. **Interpreter.** A program that runs source code directly, without a separate compilation step. **Library.** A collection of code that other........"
 ---
 
 Packages for a programming language are usually installed through that language's package manager.

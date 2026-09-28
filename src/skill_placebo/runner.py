@@ -317,6 +317,17 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
     +weekly_budget_pp of it (account-wide, so conservative). claude_five_hour_pause: pause while the
     account's 5-hour window is this full, to leave the owner room."""
     jobs_dir.mkdir(parents=True, exist_ok=True)
+    lock = jobs_dir / ".lock"
+    if not dry_run:
+        # One process per batch: resuming while a stopped run still waits for in-flight trials
+        # would start those trials a second time (happened once in the 29.09 calibration).
+        if lock.exists():
+            try:
+                os.kill(int(lock.read_text().strip()), 0)
+                raise SystemExit(f"batch {jobs_dir} is still running (pid {lock.read_text().strip()})")
+            except (ProcessLookupError, ValueError):
+                pass
+        lock.write_text(str(os.getpid()))
     state_path = jobs_dir / "batch-state.json"
     state = BatchState(**json.loads(state_path.read_text())) if state_path.exists() else BatchState()
     (jobs_dir / "plan.json").write_text(json.dumps([asdict(t) for t in trials], indent=1))
@@ -437,4 +448,6 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
             if t_next and not state.stopped:
                 running[pool.submit(one, t_next)] = t_next
     save()
+    if not dry_run and lock.exists():
+        lock.unlink()
     return state

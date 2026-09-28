@@ -33,10 +33,35 @@ def first_prompt_tokens(trial_dir: Path) -> int | None:
     return None
 
 
+def recheck(harness: str):
+    first = json.loads((ROOT / "results" / "pilot" / f"token-check-{harness}.json").read_text())
+    b0 = first["baseline_first_prompt_tokens"]
+    buckets = json.loads((ROOT / "placebo" / "buckets.json").read_text())
+    base = ROOT / "jobs" / "pilot" / harness / "token-recheck"
+    out, ok = {}, True
+    for res in base.glob("*/*/result.json"):
+        m = JOB_ARM.match(res.parent.parent.name)
+        if not m:
+            continue
+        bid = m.group("arm").removeprefix("placebo-")
+        tok = first_prompt_tokens(res.parent)
+        delta = tok - b0 if tok is not None else None
+        members = buckets[bid]["bucket"]["members"]
+        devs = {s: round(delta / first["always_on_tokens"][f"skill-{s}"] - 1, 4) for s in members} if delta else {}
+        ok &= bool(devs) and all(abs(d) <= 0.10 for d in devs.values())
+        out[bid] = {"placebo_tokens": delta, "member_tokens": {s: first["always_on_tokens"][f"skill-{s}"] for s in members}, "deviation": devs}
+        print(f"{bid}: placebo +{delta} tok; " + ", ".join(f"{s} {d:+.1%}" for s, d in devs.items()))
+    (ROOT / "results" / "pilot" / f"token-recheck-{harness}.json").write_text(json.dumps({"all_within_10pct": ok, "buckets": out}, indent=1) + "\n")
+    print("all placebos within +-10% of every member:", ok)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--harness", default="claude-code")
+    ap.add_argument("--recheck", action="store_true", help="compare rescaled placebos (token-recheck) with the members measured in token-check")
     a = ap.parse_args()
+    if a.recheck:
+        return recheck(a.harness)
     base = ROOT / "jobs" / "pilot" / a.harness / "token-check"
     per_arm = {}
     for res in base.glob("*/*/result.json"):
