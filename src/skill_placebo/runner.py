@@ -146,6 +146,13 @@ def limit_hits(trial_dir: Path) -> list[str]:
             typ = str(ev.get("type", ""))
             if typ in ("assistant", "user") or typ.startswith("item."):
                 continue
+            if typ == "rate_limit_event":
+                # Claude Code reports the plan's windows on every run; only a non-"allowed" status or
+                # overage use is a limit signal.
+                info = ev.get("rate_limit_info") or {}
+                if info.get("status") != "allowed" or info.get("isUsingOverage"):
+                    hits.append(f"{p.name}: rate_limit_event status={info.get('status')} overage={info.get('isUsingOverage')}")
+                continue
             if typ == "result" and not ev.get("is_error") and not ev.get("api_error_status"):
                 continue
             check(p.name, line)
@@ -172,6 +179,27 @@ def codex_rate_limits(trial_dir: Path) -> dict:
                 for k in ("resets_in_seconds", "resets_after_seconds"):
                     if isinstance(prim.get(k), (int, float)):
                         out["five_hour_resets_s"] = float(prim[k])
+    return out
+
+
+def claude_windows(trial_dir: Path) -> dict:
+    """Last plan-window utilization Claude Code reported in a trial (account-wide, as on the usage
+    page): {'five_hour': 0.13, 'seven_day': 0.04, 'seven_day_resets': epoch}."""
+    out = {}
+    for p in trial_dir.rglob("claude-code.txt"):
+        for line in p.read_text(errors="replace").splitlines():
+            if '"rate_limit_event"' not in line:
+                continue
+            try:
+                info = json.loads(line).get("rate_limit_info") or {}
+            except json.JSONDecodeError:
+                continue
+            w = info.get("unifiedWindows") or {}
+            for k in ("five_hour", "seven_day"):
+                if isinstance((w.get(k) or {}).get("utilization"), (int, float)):
+                    out[k] = float(w[k]["utilization"])
+            if (w.get("seven_day") or {}).get("resetsAt"):
+                out["seven_day_resets"] = w["seven_day"]["resetsAt"]
     return out
 
 
@@ -211,8 +239,9 @@ def utc_iso(t: float) -> str:
     return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(t))
 
 
-def pace_wait_seconds(harness: str, pace_units: float, window_s: int = 5 * 3600, now: float | None = None) -> float:
-    """Seconds to wait until the units logged in the trailing window drop below pace_units (0 = go)."""
+def pace_wait_seconds(harness: str, pace_units: float, window_s: int = 5 * 3600, now: float | None = None,
+                      field_name: str = "units") -> float:
+    """Seconds to wait until `field_name` logged in the trailing window drops below pace_units (0 = go)."""
     now = time.time() if now is None else now
     p = ledger_path(harness)
     if not p.exists():
@@ -222,7 +251,7 @@ def pace_wait_seconds(harness: str, pace_units: float, window_s: int = 5 * 3600,
         r = json.loads(line)
         t = time.mktime(time.strptime(r["ts"], "%Y-%m-%dT%H:%M:%SZ")) - time.timezone
         if t >= now - window_s:
-            rows.append((t, r.get("units") or 0.0))
+            rows.append((t, r.get(field_name) or 0.0))
     total = sum(u for _, u in rows)
     if total < pace_units:
         return 0.0
@@ -235,10 +264,12 @@ def pace_wait_seconds(harness: str, pace_units: float, window_s: int = 5 * 3600,
 
 
 def ledger_add(harness: str, trial_dir: Path) -> float:
-    """Append every trial found under trial_dir's job to the ledger; returns their $ equivalent."""
+    """Append every trial found under trial_dir's job to the ledger; returns their units."""
     from .collect import trial_row  # local import: collect imports nothing from runner
 
     added = 0.0
+    windows = claude_windows(trial_dir) if harness == "claude-code" else {}
+    rl = codex_rate_limits(trial_dir) if harness == "codex" else {}
     with open(ledger_path(harness), "a") as f:
         for res in sorted(trial_dir.glob("*/result.json")):
             row = trial_row(res)
@@ -247,7 +278,9 @@ def ledger_add(harness: str, trial_dir: Path) -> float:
             rec = {"ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "job": trial_dir.name, "trial": row["trial"],
                    "arm": row["arm"], "model": row["model"], "exception": row["exception"],
                    "n_input": row["n_input"], "n_cached": row["n_cached"], "n_cache_write": row["n_cache_write"],
-                   "n_output": row["n_output"], "cost_est_usd": row["cost_est_usd"], "units": row["units"]}
+                   "n_output": row["n_output"], "cost_est_usd": row["cost_est_usd"], "units": row["units"],
+                   "plan_five_hour": windows.get("five_hour", rl.get("five_hour")),
+                   "plan_week": windows.get("seven_day", rl.get("weekly"))}
             f.write(json.dumps(rec) + "\n")
             added += row["units"] or 0.0
     return added
@@ -258,13 +291,21 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
               weekly_budget_pp: float = 25.0, dry_run: bool = False,
               units_budget: float | None = None, window_start: str | None = None,
               pace_units_5h: float | None = None, stop_after: int | None = None,
-              codex_weekly_start: float | None = None, codex_pace_pct: float = 40.0) -> BatchState:
+              codex_weekly_start: float | None = None, codex_pace_pct: float = 40.0,
+              codex_weekly_cap: float = 80.0,
+              usd_budget: float | None = None, pace_usd_5h: float | None = None,
+              claude_week_start: float | None = None, claude_five_hour_pause: float = 0.80) -> BatchState:
     """units_budget: stop once the ledger's limit units since window_start (the plan's weekly reset,
     UTC) reach it - the translation of 25% of the week (METHOD.md amendment 2). Required for
     real runs. pace_units_5h: never start a trial while the trailing 5 hours hold that many units.
     stop_after: stop after that many trials complete in this call (checkpoints).
-    codex_weekly_start: the plan's weekly used % before the benchmark (owner's reading); the batch
-    stops at +weekly_budget_pp. codex_pace_pct: pause while Codex's 5-hour window is this full."""
+    codex_weekly_start: the plan's weekly used % before the benchmark; the batch stops at
+    +weekly_budget_pp or at codex_weekly_cap absolute. codex_pace_pct: pause while Codex's 5-hour
+    window is this full. usd_budget / pace_usd_5h: the same stop and pace in the token-based $
+    equivalent (2026-09-29); when both units and $ limits are given, whichever binds first.
+    claude_week_start: the plan's 7-day utilization (0-1) before the benchmark; the batch stops at
+    +weekly_budget_pp of it (account-wide, so conservative). claude_five_hour_pause: pause while the
+    account's 5-hour window is this full, to leave the owner room."""
     jobs_dir.mkdir(parents=True, exist_ok=True)
     state_path = jobs_dir / "batch-state.json"
     state = BatchState(**json.loads(state_path.read_text())) if state_path.exists() else BatchState()
@@ -272,15 +313,23 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
     unresolved = [k for k, v in harness.kwargs.items() if "TBD" in json.dumps(v)]
     if unresolved and not dry_run:
         raise SystemExit(f"{harness.name}: unresolved placeholders in {', '.join(unresolved)}")
-    if not dry_run and units_budget is None:
-        raise SystemExit("units_budget is required for real runs (METHOD.md amendment 2)")
+    if not dry_run and units_budget is None and usd_budget is None and harness.name != "codex":
+        raise SystemExit("units_budget or usd_budget is required for real runs (METHOD.md amendments 1-2)")
+    units_budget = float("inf") if units_budget is None else units_budget
+    usd_budget = float("inf") if usd_budget is None else usd_budget
     env = None if dry_run else clean_env(harness, load_secrets())
+    if not dry_run:
+        for t in trials:  # a trial that finished after a stop was recorded: adopt it, don't rerun
+            if t.job_name not in state.done and list((jobs_dir / t.job_name).glob("*/result.json")):
+                state.done.append(t.job_name)
+                ledger_add(harness.name, jobs_dir / t.job_name)
     todo = [t for t in trials if t.job_name not in state.done]
     if not dry_run:
         state.stopped = None
         state.usd_spent_window = ledger_spent(harness.name, window_start)
-        if state.usd_spent_window >= units_budget:
-            state.stopped = f"units budget already used: {state.usd_spent_window/1e6:.1f}M >= {units_budget/1e6:.1f}M"
+        dollars = ledger_spent(harness.name, window_start, "cost_est_usd")
+        if state.usd_spent_window >= units_budget or dollars >= usd_budget:
+            state.stopped = f"budget already used: {state.usd_spent_window/1e6:.1f}M units, ${dollars:.2f}"
             state_path.write_text(json.dumps(asdict(state), indent=1))
             print(f"STOP: {state.stopped}")
             return state
@@ -306,10 +355,11 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
         t = next(pending, None)
         if t is not None and not dry_run and codex_pause["until"] > time.time():
             w = codex_pause["until"] - time.time()
-            print(f"{time.strftime('%H:%M:%S')} pace: Codex 5-hour window >= {codex_pace_pct}%, waiting {w/60:.0f} min")
+            print(f"{time.strftime('%H:%M:%S')} pace: plan 5-hour window full enough, waiting {w/60:.0f} min", flush=True)
             time.sleep(w)
-        if t is not None and pace_units_5h and not dry_run:
-            while (w := pace_wait_seconds(harness.name, pace_units_5h)) > 0:
+        if t is not None and (pace_units_5h or pace_usd_5h) and not dry_run:
+            while (w := max(pace_wait_seconds(harness.name, pace_units_5h) if pace_units_5h else 0.0,
+                            pace_wait_seconds(harness.name, pace_usd_5h, field_name="cost_est_usd") if pace_usd_5h else 0.0)) > 0:
                 print(f"{time.strftime('%H:%M:%S')} pace: 5-hour window full, waiting {w/60:.0f} min")
                 time.sleep(min(w, 600))
         return t
@@ -332,6 +382,13 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
                 hits = limit_hits(tdir)
                 rl = codex_rate_limits(tdir) if harness.name == "codex" else {}
                 wk = rl.get("weekly")
+                cw = claude_windows(tdir) if harness.name == "claude-code" else {}
+                if cw.get("five_hour") is not None and cw["five_hour"] >= claude_five_hour_pause:
+                    codex_pause["until"] = time.time() + 1800  # re-check in 30 min
+                if cw.get("seven_day") is not None:
+                    if claude_week_start is None:
+                        claude_week_start = cw["seven_day"]
+                    state.codex_weekly_last = cw["seven_day"] * 100
                 if rl.get("five_hour") is not None and rl["five_hour"] >= codex_pace_pct:
                     codex_pause["until"] = time.time() + rl.get("five_hour_resets_s", 3600)
                 if wk is not None:
@@ -340,15 +397,22 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
                     state.codex_weekly_last = wk
                 state.done.append(t.job_name)
                 state.usd_spent_window += ledger_add(harness.name, tdir)
+                dollars = ledger_spent(harness.name, window_start, "cost_est_usd")
                 completed_here += 1
-                print(f"{time.strftime('%H:%M:%S')} {t.job_name} rc={rc} week={state.usd_spent_window/1e6:.1f}M/{units_budget/1e6:.0f}M units"
-                      + (f" codex-weekly={wk}%" if wk is not None else ""))
+                print(f"{time.strftime('%H:%M:%S')} {t.job_name} rc={rc} week={state.usd_spent_window/1e6:.1f}M units ${dollars:.2f}"
+                      + (f" codex-weekly={wk}%" if wk is not None else ""), flush=True)
                 if hits:
                     state.stopped = "limit marker: " + hits[0][:300]
                 elif wk is not None and state.codex_weekly_start is not None and wk - state.codex_weekly_start > weekly_budget_pp:
                     state.stopped = f"codex weekly usage +{wk - state.codex_weekly_start:.1f} pp > {weekly_budget_pp} pp"
+                elif cw.get("seven_day") is not None and (cw["seven_day"] - claude_week_start) * 100 >= weekly_budget_pp:
+                    state.stopped = f"claude plan week utilization {cw['seven_day']:.0%} (+{(cw['seven_day']-claude_week_start)*100:.0f} pp)"
+                elif wk is not None and wk >= codex_weekly_cap:
+                    state.stopped = f"codex weekly usage {wk}% >= cap {codex_weekly_cap}%"
                 elif state.usd_spent_window >= units_budget:
                     state.stopped = f"week units {state.usd_spent_window/1e6:.1f}M >= budget {units_budget/1e6:.1f}M"
+                elif dollars >= usd_budget:
+                    state.stopped = f"week $ equivalent {dollars:.2f} >= budget {usd_budget:.2f}"
                 elif stop_after is not None and completed_here >= stop_after:
                     state.stopped = f"checkpoint after {completed_here} trials"
                 save()

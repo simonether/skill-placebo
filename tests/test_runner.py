@@ -99,3 +99,17 @@ def test_units_formula():
     from skill_placebo.collect import units_from_tokens
     # 1000 total input of which 600 cache read and 100 cache write -> 300 uncached; 50 output
     assert units_from_tokens(1000, 600, 100, 50) == 300 + 125 + 60 + 250
+
+
+def test_rate_limit_event_allowed_is_not_a_stop(tmp_path):
+    d = tmp_path / "trial" / "agent"
+    d.mkdir(parents=True)
+    ok = {"type": "rate_limit_event", "rate_limit_info": {"status": "allowed", "isUsingOverage": False,
+          "unifiedWindows": {"five_hour": {"utilization": 0.13}, "seven_day": {"utilization": 0.04, "resetsAt": 1}}}}
+    (d / "claude-code.txt").write_text(json.dumps(ok))
+    assert limit_hits(tmp_path / "trial") == []
+    from skill_placebo.runner import claude_windows
+    assert claude_windows(tmp_path / "trial") == {"five_hour": 0.13, "seven_day": 0.04, "seven_day_resets": 1}
+    warn = dict(ok, rate_limit_info=dict(ok["rate_limit_info"], status="allowed_warning"))
+    (d / "claude-code.txt").write_text(json.dumps(warn))
+    assert limit_hits(tmp_path / "trial")

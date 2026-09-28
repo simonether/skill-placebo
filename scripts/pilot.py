@@ -51,7 +51,10 @@ def main():
     ap.add_argument("--window-start", help="UTC time of the plan's last weekly reset, e.g. 2026-09-28T10:00:00Z")
     ap.add_argument("--pace-units-5h", type=float, help="never start a trial while the trailing 5 hours hold this many units")
     ap.add_argument("--stop-after", type=int, help="stop after this many trials complete (checkpoint)")
-    ap.add_argument("--codex-weekly-start", type=float, help="Codex plan's weekly used %% before the benchmark (owner's reading)")
+    ap.add_argument("--codex-weekly-start", type=float, help="Codex plan's weekly used %% before the benchmark")
+    ap.add_argument("--usd-budget", type=float, help="stop when the ledger's $ equivalent since --window-start reaches this")
+    ap.add_argument("--pace-usd-5h", type=float, help="never start a trial while the trailing 5 hours hold this many $")
+    ap.add_argument("--claude-week-start", type=float, help="plan 7-day utilization before the benchmark, 0-1 (from Claude Code's rate_limit_event)")
     a = ap.parse_args()
 
     if a.step == "collect":
@@ -86,7 +89,9 @@ def main():
                       concurrency=a.concurrency, dry_run=a.dry_run,
                       units_budget=a.units_budget, window_start=a.window_start,
                       pace_units_5h=a.pace_units_5h, stop_after=a.stop_after,
-                      codex_weekly_start=a.codex_weekly_start)
+                      codex_weekly_start=a.codex_weekly_start,
+                      usd_budget=a.usd_budget, pace_usd_5h=a.pace_usd_5h,
+                      claude_week_start=a.claude_week_start)
     if state.stopped:
         print(f"STOPPED: {state.stopped}")
         sys.exit(2)
