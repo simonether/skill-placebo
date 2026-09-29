@@ -1,0 +1,241 @@
+{
+ "rule": "METHOD.md section 6 rules 1-4 and amendment 6: tasks with some but not all baseline passes qualify; fewer than 15 qualify, so the set is filled to 15 with tasks that passed every trial, in the seeded order (round robin over sources), flagged ceiling",
+ "seed": 20260928,
+ "qualified": [
+  "openthoughts-tblite/application-debug",
+  "swebench-verified/sympy__sympy-17630",
+  "swebench-verified/django__django-13512"
+ ],
+ "ceiling_fill": [
+  "swebench-verified/django__django-15957",
+  "terminal-bench-2-1/largest-eigenval",
+  "openthoughts-tblite/fix_async_worker_queue",
+  "swebench-verified/pytest-dev__pytest-7490",
+  "terminal-bench-2-1/extract-elf",
+  "openthoughts-tblite/pandas-etl",
+  "swebench-verified/django__django-11265",
+  "terminal-bench-2-1/sparql-university",
+  "openthoughts-tblite/api-endpoint-permission-canonicalizer",
+  "swebench-verified/mwaskom__seaborn-3069",
+  "terminal-bench-2-1/financial-document-processor",
+  "swebench-verified/django__django-10973"
+ ],
+ "selected": [
+  "openthoughts-tblite/application-debug",
+  "swebench-verified/sympy__sympy-17630",
+  "swebench-verified/django__django-13512",
+  "swebench-verified/django__django-15957",
+  "terminal-bench-2-1/largest-eigenval",
+  "openthoughts-tblite/fix_async_worker_queue",
+  "swebench-verified/pytest-dev__pytest-7490",
+  "terminal-bench-2-1/extract-elf",
+  "openthoughts-tblite/pandas-etl",
+  "swebench-verified/django__django-11265",
+  "terminal-bench-2-1/sparql-university",
+  "openthoughts-tblite/api-endpoint-permission-canonicalizer",
+  "swebench-verified/mwaskom__seaborn-3069",
+  "terminal-bench-2-1/financial-document-processor",
+  "swebench-verified/django__django-10973"
+ ],
+ "baseline_outcomes": {
+  "swebench-verified/django__django-15957": [
+   1,
+   1,
+   1
+  ],
+  "terminal-bench-2-1/largest-eigenval": [
+   1,
+   1,
+   1
+  ],
+  "openthoughts-tblite/fix_async_worker_queue": [
+   1,
+   1,
+   1
+  ],
+  "swebench-verified/pytest-dev__pytest-7490": [
+   1,
+   1,
+   1
+  ],
+  "terminal-bench-2-1/extract-elf": [
+   1,
+   1,
+   1
+  ],
+  "openthoughts-tblite/pandas-etl": [
+   1,
+   1
+  ],
+  "swebench-verified/django__django-11265": [
+   1,
+   1
+  ],
+  "terminal-bench-2-1/sparql-university": [
+   1,
+   1
+  ],
+  "openthoughts-tblite/api-endpoint-permission-canonicalizer": [
+   1,
+   1
+  ],
+  "swebench-verified/mwaskom__seaborn-3069": [
+   1,
+   1
+  ],
+  "terminal-bench-2-1/financial-document-processor": [
+   1,
+   1
+  ],
+  "openthoughts-tblite/application-debug": [
+   0,
+   1
+  ],
+  "swebench-verified/django__django-10973": [
+   1,
+   1
+  ],
+  "terminal-bench-2-1/sqlite-with-gcov": [
+   1,
+   1
+  ],
+  "openthoughts-tblite/python-api-rate-limit": [
+   1,
+   1
+  ],
+  "swebench-verified/django__django-13925": [
+   1,
+   1
+  ],
+  "terminal-bench-2-1/cancel-async-tasks": [
+   1,
+   1
+  ],
+  "openthoughts-tblite/todos-api": [
+   1,
+   1
+  ],
+  "swebench-verified/sympy__sympy-18211": [
+   1,
+   1
+  ],
+  "terminal-bench-2-1/adaptive-rejection-sampler": null,
+  "openthoughts-tblite/build-merkle-tree-cli-sha512": [
+   1,
+   1
+  ],
+  "swebench-verified/django__django-15973": [
+   1,
+   1
+  ],
+  "terminal-bench-2-1/openssl-selfsigned-cert": [
+   1,
+   1
+  ],
+  "openthoughts-tblite/build-system-task-ordering": [
+   1,
+   1
+  ],
+  "swebench-verified/django__django-14404": [
+   1,
+   1
+  ],
+  "terminal-bench-2-1/headless-terminal": [
+   1,
+   1
+  ],
+  "swebench-verified/django__django-16950": [
+   1,
+   1
+  ],
+  "terminal-bench-2-1/query-optimize": [
+   1,
+   1
+  ],
+  "swebench-verified/django__django-15563": [
+   1,
+   1
+  ],
+  "terminal-bench-2-1/sanitize-git-repo": [
+   1,
+   1
+  ],
+  "swebench-verified/django__django-14725": [
+   1,
+   1
+  ],
+  "terminal-bench-2-1/write-compressor": [
+   1,
+   1
+  ],
+  "swebench-verified/sympy__sympy-13031": [
+   1,
+   1
+  ],
+  "terminal-bench-2-1/video-processing": [
+   0,
+   0
+  ],
+  "swebench-verified/pylint-dev__pylint-7080": [
+   1,
+   1
+  ],
+  "swebench-verified/django__django-14534": [
+   1,
+   1
+  ],
+  "swebench-verified/django__django-11885": [
+   1,
+   1
+  ],
+  "swebench-verified/django__django-16454": [
+   1,
+   1
+  ],
+  "swebench-verified/django__django-13401": [
+   1,
+   1
+  ],
+  "swebench-verified/django__django-14376": [
+   1,
+   1
+  ],
+  "swebench-verified/sympy__sympy-14976": [
+   1,
+   1
+  ],
+  "swebench-verified/django__django-11734": [
+   0,
+   0
+  ],
+  "swebench-verified/sympy__sympy-17630": [
+   1,
+   0
+  ],
+  "swebench-verified/django__django-14140": [
+   1,
+   1
+  ],
+  "swebench-verified/django__django-11141": [
+   0,
+   0
+  ],
+  "swebench-verified/django__django-13512": [
+   0,
+   1
+  ],
+  "swebench-verified/django__django-16256": [
+   1,
+   1
+  ],
+  "swebench-verified/sphinx-doc__sphinx-10435": [
+   1,
+   1
+  ]
+ },
+ "floor_0_of_n": [
+  "terminal-bench-2-1/video-processing",
+  "swebench-verified/django__django-11734",
+  "swebench-verified/django__django-11141"
+ ]
+}
