@@ -27,4 +27,4 @@ def test_codex_arms():
                       "skill-ponytail", "skill-superpowers"]
     assert "SP_CODEX_PLUGINS=ponytail@ponytail-pinned" in arms["skill-ponytail"].harbor_args
     assert arms["skill-mattpocock"].harbor_args.count("--skill") == 25
-    assert sum(a.startswith("placebo-") for a in arms) == 4
+    assert sum(a.startswith("placebo-") for a in arms) == 5  # amendment 8

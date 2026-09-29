@@ -17,6 +17,13 @@ def sh(*cmd, cwd=None):
     subprocess.run(cmd, cwd=cwd, check=True, capture_output=True, text=True)
 
 
+def _frozen_guard():
+    import sys as _sys
+    _sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+    from skill_placebo.runner import assert_frozen_ok
+    assert_frozen_ok("vendor_skills")
+
+
 def main(ids=None):
     lock = json.loads((ROOT / "skills.lock.json").read_text())
     VENDOR.mkdir(exist_ok=True)
@@ -39,4 +46,5 @@ def main(ids=None):
 
 
 if __name__ == "__main__":
+    _frozen_guard()
     main(sys.argv[1:] or None)

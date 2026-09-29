@@ -60,6 +60,13 @@ def build_codex_from_plan(out_root: Path, always_on: dict) -> dict:
     return report
 
 
+def _frozen_guard():
+    import sys as _sys
+    _sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+    from skill_placebo.runner import assert_frozen_ok
+    assert_frozen_ok("build_placebos")
+
+
 def main():
     if "--codex-plan" in sys.argv:
         # Only the Codex placebos change; Claude Code placebos are never touched here (a run may be using them).
@@ -129,4 +136,5 @@ def main():
 
 
 if __name__ == "__main__":
+    _frozen_guard()
     main()

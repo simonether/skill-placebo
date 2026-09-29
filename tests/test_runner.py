@@ -154,3 +154,17 @@ def test_arm_not_applied_detects_missing_plugin(tmp_path):
     (t / "agent" / "claude-code.txt").write_text(json.dumps(init))
     assert arm_not_applied(job, arm) is None
     assert arm_not_applied(job, Arm("baseline")) is None
+
+
+def test_arm_hash_dirs_and_change(tmp_path):
+    from skill_placebo.runner import Arm, arm_host_dirs, tree_hash
+    d = tmp_path / "placebo-cc-5"
+    d.mkdir()
+    (d / "a.txt").write_text("x")
+    mounts = json.dumps([{"type": "bind", "source": str(d), "target": "/opt/plugins/placebo-cc-5", "read_only": True}])
+    arm = Arm("placebo-cc-5", ("--ae", "CLAUDE_CODE_PLUGIN_DIRS=/opt/plugins/placebo-cc-5"))
+    assert arm_host_dirs(arm, mounts) == [d]
+    h1 = tree_hash([d])
+    (d / "a.txt").write_text("y")
+    assert tree_hash([d]) != h1
+    assert tree_hash(arm_host_dirs(Arm("baseline"), mounts)) is None

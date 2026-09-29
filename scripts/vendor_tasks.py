@@ -114,6 +114,13 @@ EXTRA_SOURCES = {
 }
 
 
+def _frozen_guard():
+    import sys as _sys
+    _sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+    from skill_placebo.runner import assert_frozen_ok
+    assert_frozen_ok("vendor_tasks")
+
+
 def main():
     global POOL, SOURCES
     if "--extra" in sys.argv:
@@ -166,4 +173,5 @@ def main():
 
 
 if __name__ == "__main__":
+    _frozen_guard()
     main()

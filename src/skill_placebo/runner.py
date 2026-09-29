@@ -121,6 +121,66 @@ def infra_failure(job_dir: Path) -> str | None:
     return None
 
 
+def running_batches() -> list[Path]:
+    """Batch directories whose runner process is alive (their .lock holds a live pid)."""
+    live = []
+    for lock in (ROOT / "jobs").rglob(".lock"):
+        try:
+            os.kill(int(lock.read_text().strip()), 0)
+            live.append(lock.parent)
+        except (ProcessLookupError, ValueError, OSError):
+            pass
+    return live
+
+
+def assert_frozen_ok(what: str) -> None:
+    """arms/ and vendor/ are frozen while any trial runs (after a rebuild during a run, 2026-09-29)."""
+    live = running_batches()
+    if live:
+        raise SystemExit(f"{what}: refused, arms/ and vendor/ are frozen while batches run: {', '.join(str(p) for p in live)}")
+
+
+def arm_host_dirs(arm: Arm, mounts: str | None) -> list[Path]:
+    """Host directories whose content defines the arm: its plugin, memory file, marketplace and the
+    plugin that marketplace installs, or its --skill directories."""
+    targets = {m["target"]: Path(m["source"]) for m in (json.loads(mounts) if mounts else [])}
+    args, dirs = list(arm.harbor_args), []
+    for i, a in enumerate(args):
+        nxt = args[i + 1] if i + 1 < len(args) else ""
+        if a == "--skill":
+            dirs.append(Path(nxt))
+        elif a == "--ae" and "=" in nxt:
+            k, v = nxt.split("=", 1)
+            paths = []
+            if k in ("CLAUDE_CODE_PLUGIN_DIRS", "SP_CODEX_MARKETPLACES"):
+                paths = v.split(":")
+            elif k == "SP_CLAUDE_MD":
+                paths = [str(Path(v).parent)]
+            for c in paths:
+                if c in targets:
+                    dirs.append(targets[c])
+                    name = Path(c).name
+                    if name.startswith("mkt-") and f"/opt/plugins/{name[4:]}" in targets:
+                        dirs.append(targets[f"/opt/plugins/{name[4:]}"])
+    return dirs
+
+
+def tree_hash(dirs: list[Path]) -> str | None:
+    """sha256 over relative paths and file contents (without .git); None when there is nothing to hash."""
+    import hashlib
+
+    if not dirs:
+        return None
+    h = hashlib.sha256()
+    for d in dirs:
+        files = sorted(p for p in Path(d).rglob("*") if p.is_file() and ".git" not in p.relative_to(d).parts)
+        h.update(f"#{len(files)}".encode())
+        for f in files:
+            h.update(str(f.relative_to(d)).encode())
+            h.update(f.read_bytes())
+    return h.hexdigest()
+
+
 def arm_not_applied(job_dir: Path, arm: Arm) -> str | None:
     """Manipulation check: the arm's plugin or memory file actually reached the agent. A trial where
     it did not is an infrastructure failure, not data (e.g. a placebo directory rebuilt while a
@@ -332,7 +392,7 @@ def pace_wait_seconds(harness: str, pace_units: float, window_s: int = 5 * 3600,
     return float(window_s)
 
 
-def ledger_add(harness: str, trial_dir: Path) -> float:
+def ledger_add(harness: str, trial_dir: Path, arm_hash: str | None = None) -> float:
     """Append every trial found under trial_dir's job to the ledger; returns their units."""
     from .collect import trial_row  # local import: collect imports nothing from runner
 
@@ -349,6 +409,7 @@ def ledger_add(harness: str, trial_dir: Path) -> float:
                    "attempt": row["attempt"], "infra_failure": row["infra_failure"],
                    "n_input": row["n_input"], "n_cached": row["n_cached"], "n_cache_write": row["n_cache_write"],
                    "n_output": row["n_output"], "cost_est_usd": row["cost_est_usd"], "units": row["units"],
+                   "arm_hash": arm_hash,
                    "plan_five_hour": windows.get("five_hour", rl.get("five_hour")),
                    "plan_week": windows.get("seven_day", rl.get("weekly"))}
             f.write(json.dumps(rec) + "\n")
@@ -435,16 +496,25 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
         name = t.job_name
         for attempt in range(len(attempts_so_far(t)), MAX_INFRA_RETRIES + 1):
             name = t.job_name if attempt == 0 else f"{t.job_name}__r{attempt}"
+            dirs = arm_host_dirs(arms[t.arm], mounts)
+            h_start = tree_hash(dirs)
             with open(jobs_dir / f"{name}.runner.log", "w") as f:
                 rc = subprocess.run(harbor_cmd(t, harness, arms[t.arm], jobs_dir, mounts, name),
                                     cwd=ROOT, env=env, stdout=f, stderr=subprocess.STDOUT).returncode
-            why = infra_failure(jobs_dir / name) or arm_not_applied(jobs_dir / name, arms[t.arm])
+            h_end = tree_hash(dirs)
+            trial_hash[name] = h_start
+            changed = None
+            if h_start != arm_ref.get(t.arm) or h_end != arm_ref.get(t.arm):
+                changed = "arm directory content changed or differs from the batch reference"
+            why = infra_failure(jobs_dir / name) or changed or arm_not_applied(jobs_dir / name, arms[t.arm])
             if not why:
                 break
             print(f"{msk_now()} {name}: infrastructure failure {why}, retry {attempt + 1}/{MAX_INFRA_RETRIES}", flush=True)
         return t, rc, name
 
     completed_here = 0
+    arm_ref = {} if dry_run else {name: tree_hash(arm_host_dirs(a, mounts)) for name, a in arms.items()}
+    trial_hash: dict[str, str | None] = {}
     if codex_weekly_start is not None:
         state.codex_weekly_start = codex_weekly_start
     codex_pause = {"until": 0.0}
@@ -496,8 +566,8 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
                 state.done.append(t.job_name)
                 for prev in sorted(jobs_dir.glob(f"{t.job_name}__r*")) + [jobs_dir / t.job_name]:
                     if prev.is_dir() and prev != tdir:
-                        state.usd_spent_window += ledger_add(harness.name, prev)  # failed attempts (usually 0 tokens)
-                state.usd_spent_window += ledger_add(harness.name, tdir)
+                        state.usd_spent_window += ledger_add(harness.name, prev, trial_hash.get(prev.name))  # failed attempts
+                state.usd_spent_window += ledger_add(harness.name, tdir, trial_hash.get(tdir.name))
                 dollars = ledger_spent(harness.name, window_start, "cost_est_usd")
                 completed_here += 1
                 print(f"{msk_now()} {t.job_name} rc={rc} week={state.usd_spent_window/1e6:.1f}M units ${dollars:.2f}"
