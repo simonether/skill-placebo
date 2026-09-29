@@ -299,6 +299,11 @@ def ledger_spent(harness: str, window_start: str | None, field_name: str = "unit
     return total
 
 
+def msk_now() -> str:
+    """Wall clock for runner output in Moscow time (UTC+3), whatever the machine's zone (UTC+5)."""
+    return time.strftime("%H:%M:%S", time.gmtime(time.time() + 3 * 3600)) + " MSK"
+
+
 def utc_iso(t: float) -> str:
     return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(t))
 
@@ -436,7 +441,7 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
             why = infra_failure(jobs_dir / name) or arm_not_applied(jobs_dir / name, arms[t.arm])
             if not why:
                 break
-            print(f"{time.strftime('%H:%M:%S')} {name}: infrastructure failure {why}, retry {attempt + 1}/{MAX_INFRA_RETRIES}", flush=True)
+            print(f"{msk_now()} {name}: infrastructure failure {why}, retry {attempt + 1}/{MAX_INFRA_RETRIES}", flush=True)
         return t, rc, name
 
     completed_here = 0
@@ -448,12 +453,12 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
         t = next(pending, None)
         if t is not None and not dry_run and codex_pause["until"] > time.time():
             w = codex_pause["until"] - time.time()
-            print(f"{time.strftime('%H:%M:%S')} pace: plan 5-hour window full enough, waiting {w/60:.0f} min", flush=True)
+            print(f"{msk_now()} pace: plan 5-hour window full enough, waiting {w/60:.0f} min", flush=True)
             time.sleep(w)
         if t is not None and (pace_units_5h or pace_usd_5h) and not dry_run:
             while (w := max(pace_wait_seconds(harness.name, pace_units_5h) if pace_units_5h else 0.0,
                             pace_wait_seconds(harness.name, pace_usd_5h, field_name="cost_est_usd") if pace_usd_5h else 0.0)) > 0:
-                print(f"{time.strftime('%H:%M:%S')} pace: 5-hour window full, waiting {w/60:.0f} min")
+                print(f"{msk_now()} pace: 5-hour window full, waiting {w/60:.0f} min")
                 time.sleep(min(w, 600))
         return t
 
@@ -495,7 +500,7 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
                 state.usd_spent_window += ledger_add(harness.name, tdir)
                 dollars = ledger_spent(harness.name, window_start, "cost_est_usd")
                 completed_here += 1
-                print(f"{time.strftime('%H:%M:%S')} {t.job_name} rc={rc} week={state.usd_spent_window/1e6:.1f}M units ${dollars:.2f}"
+                print(f"{msk_now()} {t.job_name} rc={rc} week={state.usd_spent_window/1e6:.1f}M units ${dollars:.2f}"
                       + (f" codex-weekly={wk}%" if wk is not None else ""), flush=True)
                 if hits:
                     state.stopped = "limit marker: " + hits[0][:300]
