@@ -99,7 +99,25 @@ def patch_timeout(toml: Path) -> str | None:
     return f"agent timeout {old:g} -> {AGENT_TIMEOUT_CAP}"
 
 
+# Harder candidates for Opus 5.5 (docs/research/2026-09-29-harder-tasks-2.md), staged outside the pool
+# until an amendment admits them (METHOD.md section 6).
+EXTRA_SOURCES = {
+    "swebench-verified": {
+        **SOURCES["swebench-verified"],
+        "tasks": ["django__django-13512", "django__django-14140", "django__django-11141", "sphinx-doc__sphinx-10435",
+                  "django__django-16256", "sympy__sympy-17630", "django__django-11734"],
+    },
+    "terminal-bench-2-1": {
+        **SOURCES["terminal-bench-2-1"],
+        "tasks": ["make-doom-for-mips", "video-processing"],
+    },
+}
+
+
 def main():
+    global POOL, SOURCES
+    if "--extra" in sys.argv:
+        POOL, SOURCES = ROOT / "tasks" / "pool-extra", EXTRA_SOURCES
     POOL.mkdir(parents=True, exist_ok=True)
     manifest = {"sources": {}, "tasks": []}
     patches = [(ROOT / "tasks" / "PATCHES_HEADER.md").read_text().rstrip("\n"), "", f"Agent timeout cap: {AGENT_TIMEOUT_CAP} s.", ""]
@@ -140,7 +158,7 @@ def main():
                 note = patch_timeout(d / "task.toml")
                 if note:
                     notes.append(note)
-                manifest["tasks"].append({"source": src, "name": t, "path": f"tasks/pool/{src}/{t}", "patches": notes})
+                manifest["tasks"].append({"source": src, "name": t, "path": f"tasks/{POOL.name}/{src}/{t}", "patches": notes})
                 patches.append(f"- `{src}/{t}`: " + ("; ".join(notes) if notes else "none"))
                 print(f"{src}/{t}: {'; '.join(notes) or 'as is'}")
     (POOL / "manifest.json").write_text(json.dumps(manifest, indent=1) + "\n")
