@@ -35,6 +35,7 @@ CLAUDE_GUARDS = dict(
     claude_week_cap=0.80, claude_week_cap_action="pause",  # account 7-day window: pause, not stop
     claude_week_relative_stop=False,       # the pilot's +25 points on the account window is replaced
 )
+DISK_GUARDS = dict(disk_pause_gib=10.0, disk_stop_gib=6.0)  # host volume, checked before each trial
 CODEX_TOPUP_SKILLS = ["ponytail", "agent-skills", "compound-engineering"]
 CODEX_TOPUP_TASKS = 10
 CODEX_TOPUP_N = 2
@@ -86,7 +87,7 @@ def main():
     jobs_dir = ROOT / "jobs" / "main" / harness
     print(f"{harness} main: {len(trials)} trials, {len(arms)} arms: {', '.join(x.name for x in arms)}")
     state = run_batch(trials, HARNESSES[harness], {x.name: x for x in arms}, jobs_dir, mounts=mounts(),
-                      concurrency=2, dry_run=a.dry_run, stop_after=a.stop_after, **guards)
+                      concurrency=2, dry_run=a.dry_run, stop_after=a.stop_after, **guards, **DISK_GUARDS)
     if state.stopped:
         print(f"STOPPED: {state.stopped}")
         sys.exit(2)

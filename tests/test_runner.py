@@ -222,3 +222,42 @@ def test_harbor_cmd_uses_launcher_only_with_snapshot():
     snap = harbor_cmd(t, h, Arm("baseline"), Path("/tmp/j"), None, snapshot=True)
     assert "harbor" in plain and "skill_placebo.harbor_launch" not in plain
     assert snap[snap.index("-m") + 1] == "skill_placebo.harbor_launch" and snap[snap.index("-m") + 2] == "run"
+
+
+def test_disk_state_thresholds():
+    from skill_placebo.runner import disk_state
+
+    assert disk_state(23.0, 10, 6) == "go"
+    assert disk_state(9.9, 10, 6) == "pause"
+    assert disk_state(5.9, 10, 6) == "stop"
+    assert disk_state(1.0, None, None) == "go"
+
+
+def test_running_batches_can_exclude_own(tmp_path, monkeypatch):
+    import os
+    from skill_placebo import runner
+
+    monkeypatch.setattr(runner, "ROOT", tmp_path)
+    own = tmp_path / "jobs" / "main" / "claude-code"
+    own.mkdir(parents=True)
+    (own / ".lock").write_text(str(os.getpid()))
+    assert runner.running_batches() == [own]
+    assert runner.running_batches(exclude=own) == []
+
+
+def test_run_batch_pauses_then_stops_on_low_disk(tmp_path, monkeypatch, capsys):
+    from skill_placebo import runner
+
+    monkeypatch.setattr(runner, "ROOT", tmp_path)
+    monkeypatch.setattr(runner, "sweep_snapshots", lambda own=None: None)
+    free = iter([8.0, 8.0, 3.0])
+    monkeypatch.setattr(runner, "host_free_gib", lambda path="/": next(free))
+    started = []
+    monkeypatch.setattr(runner.subprocess, "run", lambda *a, **k: started.append(a))
+    trials = runner.plan(["t1"], [runner.Arm("baseline")], "test-h", n=1, seed=1)
+    state = runner.run_batch(trials, runner.Harness("test-h", "a", "m"), {"baseline": runner.Arm("baseline")},
+                             tmp_path / "jobs" / "b", units_budget=1e9, concurrency=1,
+                             disk_pause_gib=10, disk_stop_gib=6, disk_check_s=0)
+    out = capsys.readouterr().out
+    assert "disk pause" in out and state.stopped.startswith("host disk free 3.0 GiB")
+    assert started == []  # no trial started

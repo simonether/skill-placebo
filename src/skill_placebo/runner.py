@@ -121,10 +121,12 @@ def infra_failure(job_dir: Path) -> str | None:
     return None
 
 
-def running_batches() -> list[Path]:
+def running_batches(exclude: Path | None = None) -> list[Path]:
     """Batch directories whose runner process is alive (their .lock holds a live pid)."""
     live = []
     for lock in (ROOT / "jobs").rglob(".lock"):
+        if exclude is not None and lock.parent == exclude:
+            continue
         try:
             os.kill(int(lock.read_text().strip()), 0)
             live.append(lock.parent)
@@ -251,11 +253,27 @@ def remove_snapshots(job_dir: Path) -> None:
             _docker("rmi", "-f", tag)
 
 
-def sweep_snapshots() -> None:
-    """Remove snapshot images left by an interrupted run; only when no batch is running."""
+def host_free_gib(path: str = "/") -> float:
+    """Free space on the host volume that holds Docker Desktop's disk, as `df` reports it."""
+    import shutil
+
+    return shutil.disk_usage(path).free / 2**30
+
+
+def disk_state(free_gib: float, pause_gib: float | None, stop_gib: float | None) -> str:
+    """'stop' below stop_gib, 'pause' below pause_gib, else 'go'."""
+    if stop_gib is not None and free_gib < stop_gib:
+        return "stop"
+    if pause_gib is not None and free_gib < pause_gib:
+        return "pause"
+    return "go"
+
+
+def sweep_snapshots(own: Path | None = None) -> None:
+    """Remove snapshot images left by an interrupted run; only when no other batch is running."""
     from .harbor_launch import SNAPSHOT_REPO
 
-    if running_batches():
+    if running_batches(exclude=own):
         return
     out = _docker("images", "-q", SNAPSHOT_REPO).stdout.split()
     if out:
@@ -535,7 +553,8 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
               claude_week_start: float | None = None, claude_five_hour_pause: float = 0.80,
               claude_week_cap: float = 0.80, claude_week_cap_action: str = "stop",
               claude_week_relative_stop: bool = True, rolling_week: bool = False,
-              week_pause_probe_s: int = 3600) -> BatchState:
+              week_pause_probe_s: int = 3600, disk_pause_gib: float | None = None,
+              disk_stop_gib: float | None = None, disk_check_s: int = 60) -> BatchState:
     """units_budget: stop once the ledger's limit units since window_start (the plan's weekly reset,
     UTC) reach it - the translation of 25% of the week (METHOD.md amendment 2). Required for
     real runs. pace_units_5h: never start a trial while the trailing 5 hours hold that many units.
@@ -552,7 +571,9 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
     comes first, and the next trial reads the window again (main run, METHOD.md amendment 9).
     rolling_week: window_start follows the plan's weekly reset reported by Claude Code, so the
     ledger budget applies per limit week. Every trial whose verifier times out is verified once
-    more on its snapshot (amendment 9)."""
+    more on its snapshot (amendment 9). disk_pause_gib / disk_stop_gib: before each trial starts,
+    pause while the host volume has less free space than the first, stop below the second (Docker
+    Desktop's disk can share the host volume with other projects)."""
     jobs_dir.mkdir(parents=True, exist_ok=True)
     lock = jobs_dir / ".lock"
     if not dry_run:
@@ -579,6 +600,11 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
     if not dry_run:
         for t in trials:  # a trial that finished after a stop was recorded: adopt it, don't rerun
             if t.job_name not in state.done and list((jobs_dir / t.job_name).glob("*/result.json")):
+                # Finished while no runner was alive: its verifier rerun and snapshot cleanup are due.
+                for d in [jobs_dir / t.job_name] + sorted(jobs_dir.glob(f"{t.job_name}__r*")):
+                    if d.is_dir():
+                        verifier_rerun(d, ROOT / "tasks" / t.task, env)
+                        remove_snapshots(d)
                 state.done.append(t.job_name)
                 ledger_add(harness.name, jobs_dir / t.job_name)
     def attempts_so_far(t: Trial) -> list[Path]:
@@ -634,7 +660,7 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
         return t, rc, name
 
     if not dry_run:
-        sweep_snapshots()
+        sweep_snapshots(own=jobs_dir)
     completed_here = 0
     arm_ref = {} if dry_run else {name: tree_hash(arm_host_dirs(a, mounts)) for name, a in arms.items()}
     trial_hash: dict[str, str | None] = {}
@@ -653,6 +679,22 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
                             pace_wait_seconds(harness.name, pace_usd_5h, field_name="cost_est_usd") if pace_usd_5h else 0.0)) > 0:
                 print(f"{msk_now()} pace: 5-hour window full, waiting {w/60:.0f} min")
                 time.sleep(min(w, 600))
+        announced = False
+        while t is not None and not dry_run and (disk_pause_gib or disk_stop_gib):
+            free = host_free_gib()
+            ds = disk_state(free, disk_pause_gib, disk_stop_gib)
+            if ds == "stop":
+                state.stopped = f"host disk free {free:.1f} GiB < {disk_stop_gib:g} GiB"
+                print(f"{msk_now()} disk stop: {state.stopped}", flush=True)
+                return None
+            if ds == "go":
+                if announced:
+                    print(f"{msk_now()} disk resume: host disk free {free:.1f} GiB", flush=True)
+                break
+            if not announced:
+                print(f"{msk_now()} disk pause: host disk free {free:.1f} GiB < {disk_pause_gib:g} GiB", flush=True)
+                announced = True
+            time.sleep(disk_check_s)
         return t
 
     with ThreadPoolExecutor(max_workers=concurrency) as pool:
