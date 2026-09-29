@@ -597,3 +597,33 @@ arm would change the method to save that. The real guards are unchanged: stop at
 
 **Runs affected:** the Claude Code kill test.
 
+### Amendment 8 (2026-09-29, before any Codex task trial): final Codex placebo buckets, from tokens
+
+Codex token check (`results/pilot/token-check-codex.json`): the baseline's first request is 11,232
+tokens; always-on tokens over it: planning-with-files 171, mattpocock 657 (as on Claude Code, the
+`disable-model-invocation` skills are not shown to the model), superpowers 791 (no hook on Codex),
+compound-engineering 1,883, ponytail 2,043, agent-skills 2,312. The Codex week stayed at 12%.
+
+Three placebo plugins at first failed to install: their marketplace pointed at `"url": "./"`, which
+Codex clones with git, and placebo directories are not repositories; the source is now
+`{"source": "local", "path": "./"}`. The runner now treats "the arm's plugin or memory file did not
+reach the agent" as an infrastructure failure and retries (checked for every past trial).
+
+Re-bucketing by the rule on tokens gives five Codex buckets. A token model fitted across install
+mechanisms did not predict well (entries listed from a plugin and from `~/.agents/skills` cost
+differently), so each placebo was sized from the measured placebo of the same mechanism and
+measured again (`placebo/codex_plan.json`, `results/pilot/token-recheck-codex.json`):
+
+| Placebo | Members (tokens) | Placebo tokens (measured) | Largest deviation | Iterations |
+|---|---|---:|---:|---:|
+| cx-1 | planning-with-files (171) | 175 | +2.3% | 0 (kept) |
+| cx-2 | mattpocock (657), installed as plain skills like mattpocock | 631 | -4.0% | 1 |
+| cx-3 | superpowers (791) | 822 | +3.9% | 1 |
+| cx-4 | compound-engineering (1,883), ponytail (2,043) | 1,995 | +5.9% | 1 |
+| cx-5 | agent-skills (2,312) | 2,250 | -2.7% | 2 |
+
+**Codex kill test** (section 11.2): ponytail, agent-skills and compound-engineering with their
+placebos cx-4 and cx-5 (5 arms) on the same 5 pre-drawn tasks, 2 trials each = 50. Codex selection
+covers the 47 pool tasks that passed the oracle, 1 trial each. 47 + 50 = 97 task trials, within the
+Codex cap of 100.
+
