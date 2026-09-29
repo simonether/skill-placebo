@@ -61,6 +61,12 @@ def cost_from_tokens(model: str, n_input: int, n_cached: int, n_cache_write: int
     return (uncached * p[0] + n_cached * p[1] + n_cache_write * p[2] + n_output * p[3]) / 1e6
 
 
+def _is_infra(exc: dict) -> bool:
+    t = exc.get("exception_type")
+    return t in {"AgentSetupTimeoutError", "EnvironmentStartTimeoutError", "HealthcheckError", "SandboxBuildFailedError"} \
+        or (t == "RuntimeError" and "docker" in str(exc.get("exception_message", "")).lower())
+
+
 def trial_row(res: Path) -> dict | None:
     """One trial's row from its result.json (jobs/<...>/<job>/<trial>/result.json)."""
     tdir = res.parent
@@ -92,12 +98,12 @@ def trial_row(res: Path) -> dict | None:
         "task_checksum": r.get("task_checksum"),
         "reasoning_effort": (((r.get("config") or {}).get("agent") or {}).get("kwargs") or {}).get("reasoning_effort"),
         "reward": reward,
-        "passed": None if reward is None else int(float(reward) >= 1.0),
+        # No reward: an infrastructure failure is not a trial (excluded, rerun); anything else - agent
+        # timeout, verifier timeout on the agent's code, crash - is a failed trial (METHOD.md section 7).
+        "passed": (None if _is_infra(exc) else 0) if reward is None else int(float(reward) >= 1.0),
         "exception": exc.get("exception_type"),
         "attempt": attempt,
-        "infra_failure": int(exc.get("exception_type") in {"AgentSetupTimeoutError", "EnvironmentStartTimeoutError",
-                                                           "HealthcheckError", "SandboxBuildFailedError"}
-                             or (exc.get("exception_type") == "RuntimeError" and "docker" in str(exc.get("exception_message", "")).lower())),
+        "infra_failure": int(_is_infra(exc)),
         "n_input": n_in, "n_cached": n_c, "n_cache_write": cw, "n_output": n_out,
         "cost_est_usd": cost_from_tokens(model, n_in, n_c, cw, n_out),
         "units": units_from_tokens(n_in, n_c, cw, n_out),

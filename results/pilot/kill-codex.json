@@ -1,0 +1,91 @@
+{
+ "harness": "codex",
+ "comparisons": {
+  "ponytail": {
+   "placebo": "placebo-cx-4",
+   "n_tasks": 5,
+   "n_treat": 10,
+   "n_control": 10,
+   "cost_treat": 0.23269736000000002,
+   "cost_control": 0.21445920000000002,
+   "pass_treat": 0.9,
+   "pass_control": 1.0,
+   "ratio": 1.0850425628744302,
+   "ratio_ci": [
+    0.8951077639499009,
+    1.2282190503098538
+   ],
+   "ratio_p": 0.5995400459954005,
+   "diff_pp": -9.999999999999998,
+   "diff_ci_pp": [
+    -30.000000000000004,
+    0.0
+   ],
+   "diff_p": 0.6561343865613438,
+   "cost_per_solved_treat": 0.25855262222222225,
+   "cost_per_solved_control": 0.21445920000000002,
+   "mean_output_tokens_skill": 4438.4,
+   "mean_output_tokens_placebo": 4755.9
+  },
+  "agent-skills": {
+   "placebo": "placebo-cx-5",
+   "n_tasks": 5,
+   "n_treat": 10,
+   "n_control": 10,
+   "cost_treat": 0.30021408000000005,
+   "cost_control": 0.24260840000000003,
+   "pass_treat": 1.0,
+   "pass_control": 0.8,
+   "ratio": 1.2374430563822194,
+   "ratio_ci": [
+    1.1044225239682144,
+    1.4157601874360501
+   ],
+   "ratio_p": 0.00019998000199980003,
+   "diff_pp": 19.999999999999996,
+   "diff_ci_pp": [
+    0.0,
+    60.0
+   ],
+   "diff_p": 0.6561343865613438,
+   "cost_per_solved_treat": 0.30021408000000005,
+   "cost_per_solved_control": 0.30326050000000004,
+   "mean_output_tokens_skill": 5634.3,
+   "mean_output_tokens_placebo": 4917.2
+  },
+  "compound-engineering": {
+   "placebo": "placebo-cx-4",
+   "n_tasks": 5,
+   "n_treat": 10,
+   "n_control": 10,
+   "cost_treat": 0.30531695999999997,
+   "cost_control": 0.21445920000000002,
+   "pass_treat": 1.0,
+   "pass_control": 1.0,
+   "ratio": 1.4236598849571385,
+   "ratio_ci": [
+    1.23050283354255,
+    1.6353245979322404
+   ],
+   "ratio_p": 0.00039996000399960006,
+   "diff_pp": 0.0,
+   "diff_ci_pp": [
+    0.0,
+    0.0
+   ],
+   "diff_p": 1.0,
+   "cost_per_solved_treat": 0.30531695999999997,
+   "cost_per_solved_control": 0.21445920000000002,
+   "mean_output_tokens_skill": 5650.1,
+   "mean_output_tokens_placebo": 4755.9
+  }
+ },
+ "kill": {
+  "kill": false,
+  "nontrivial": {
+   "agent-skills": 1.2374430563822194,
+   "compound-engineering": 1.4236598849571385
+  }
+ },
+ "excluded": []
+}

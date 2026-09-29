@@ -5,17 +5,17 @@
    "placebo": "placebo-cc-5",
    "n_tasks": 5,
    "n_treat": 10,
-   "n_control": 9,
+   "n_control": 10,
    "cost_treat": 0.23070416,
-   "cost_control": 0.22456753333333335,
+   "cost_control": 0.22605611999999997,
    "pass_treat": 1.0,
    "pass_control": 1.0,
-   "ratio": 1.0273264196991372,
+   "ratio": 1.020561442884183,
    "ratio_ci": [
     0.8322610200365124,
-    1.2628745156347785
+    1.261991147486191
    ],
-   "ratio_p": 0.8305169483051695,
+   "ratio_p": 0.9029097090290971,
    "diff_pp": 0.0,
    "diff_ci_pp": [
     0.0,
@@ -23,35 +23,35 @@
    ],
    "diff_p": 1.0,
    "cost_per_solved_treat": 0.23070416,
-   "cost_per_solved_control": 0.22456753333333335,
+   "cost_per_solved_control": 0.22605611999999997,
    "mean_output_tokens_skill": 5187.0,
-   "mean_output_tokens_placebo": 5460.777777777777
+   "mean_output_tokens_placebo": 5518.8
   },
   "ponytail": {
    "placebo": "placebo-cc-4",
    "n_tasks": 5,
    "n_treat": 10,
-   "n_control": 9,
+   "n_control": 10,
    "cost_treat": 0.16189084,
-   "cost_control": 0.22731193333333335,
+   "cost_control": 0.2158994,
    "pass_treat": 1.0,
-   "pass_control": 1.0,
-   "ratio": 0.7121968372975872,
+   "pass_control": 0.9,
+   "ratio": 0.7498438624655743,
    "ratio_ci": [
-    0.5974531640767347,
-    0.8616105916419481
+    0.6347297198825009,
+    0.8777490061636092
    ],
    "ratio_p": 0.00019998000199980003,
-   "diff_pp": 0.0,
+   "diff_pp": 9.999999999999998,
    "diff_ci_pp": [
     0.0,
-    0.0
+    30.000000000000004
    ],
-   "diff_p": 1.0,
+   "diff_p": 0.6523347665233477,
    "cost_per_solved_treat": 0.16189084,
-   "cost_per_solved_control": 0.22731193333333335,
+   "cost_per_solved_control": 0.2398882222222222,
    "mean_output_tokens_skill": 3004.1,
-   "mean_output_tokens_placebo": 4894.111111111111
+   "mean_output_tokens_placebo": 4749.0
   },
   "i-have-adhd": {
    "placebo": "placebo-cc-3",
@@ -83,7 +83,7 @@
  "kill": {
   "kill": false,
   "nontrivial": {
-   "ponytail": 0.7121968372975872,
+   "ponytail": 0.7498438624655743,
    "i-have-adhd": 0.7215446265319788
   }
  },

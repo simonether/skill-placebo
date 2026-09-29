@@ -38,3 +38,14 @@ def test_retry_job_name_parsed(tmp_path):
         "agent_info": {"model_info": {"name": "claude-opus-5-5"}}, "agent_result": {}, "verifier_result": {"rewards": {"reward": 1.0}}}))
     (r,) = list(rows(tmp_path))
     assert r["arm"] == "placebo-cc-3" and r["task"] == "say-ok" and r["attempt"] == 1 and r["infra_failure"] == 0
+
+
+def test_verifier_timeout_is_a_failed_trial(tmp_path):
+    job = tmp_path / "b00-0001__claude-code__placebo-cc-4__fix_async_worker_queue"
+    t = job / "fix_async_worker_queue__x"
+    (t / "agent").mkdir(parents=True)
+    (t / "result.json").write_text(json.dumps({"task_name": "fix_async_worker_queue", "trial_name": "x",
+        "agent_info": {"model_info": {"name": "claude-opus-5-5"}}, "agent_result": {"n_input_tokens": 10},
+        "exception_info": {"exception_type": "VerifierTimeoutError"}}))
+    (r,) = list(rows(tmp_path))
+    assert r["passed"] == 0 and r["infra_failure"] == 0
