@@ -27,7 +27,7 @@ from skill_placebo.runner import plan, run_batch  # noqa: E402
 SEED = 20260928
 KILL_SKILLS = {"claude-code": ["caveman", "ponytail", "i-have-adhd"],
                "codex": ["ponytail", "agent-skills", "compound-engineering"]}
-PILOT_CAP = {"claude-code": 150, "codex": 100}
+PILOT_CAP = {"claude-code": 160, "codex": 100}  # amendment 7: 160 task trials on Claude Code
 
 
 def pool_tasks() -> list[str]:

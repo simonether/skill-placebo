@@ -579,3 +579,21 @@ Pilot task trials on Claude Code after this: 78 + 16 + 5 + 50 (kill test) = 149 
 
 **Runs affected:** the added selection trials, third trials, kill test and main run.
 
+### Amendment 7 (2026-09-29, before the kill test): kill-test arms follow the token buckets; cap 160
+
+**Reason.** Section 11.1 lists the Claude Code kill test as caveman, ponytail and i-have-adhd with
+placebos cc-5 and cc-4 (5 arms). It was written before the token check. Under amendment 4,
+i-have-adhd's placebo is cc-3, so the three skills have three placebos and the kill test has 6 arms:
+6 x 5 tasks x 2 = 60 trials. With 99 task trials already run, that is 159, above the pilot cap of 150.
+
+**Change.** The kill-test arms follow the buckets of amendment 4: skill-caveman, skill-ponytail,
+skill-i-have-adhd, placebo-cc-5, placebo-cc-4, placebo-cc-3. The five tasks drawn before the pilot
+stay unchanged (django-15957, pytest-7490, django-11265, largest-eigenval, fix_async_worker_queue).
+The Claude Code pilot cap rises to 160 task trials (hub decision, 2026-09-29): the cap was a
+resource guard set before cost was known; measured cost is about 0.8 percentage points of the week
+per 78 trials, so 9 more trials are about 0.1 points ($1.6 equivalent). Dropping a pre-drawn task or
+arm would change the method to save that. The real guards are unchanged: stop at 7-day utilization
+0.29 or 0.80, pause at 5-hour 0.80.
+
+**Runs affected:** the Claude Code kill test.
+
