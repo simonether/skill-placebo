@@ -1,0 +1,91 @@
+{
+ "harness": "claude-code",
+ "comparisons": {
+  "caveman": {
+   "placebo": "placebo-cc-5",
+   "n_tasks": 5,
+   "n_treat": 10,
+   "n_control": 9,
+   "cost_treat": 0.23070416,
+   "cost_control": 0.22456753333333335,
+   "pass_treat": 1.0,
+   "pass_control": 1.0,
+   "ratio": 1.0273264196991372,
+   "ratio_ci": [
+    0.8322610200365124,
+    1.2628745156347785
+   ],
+   "ratio_p": 0.8305169483051695,
+   "diff_pp": 0.0,
+   "diff_ci_pp": [
+    0.0,
+    0.0
+   ],
+   "diff_p": 1.0,
+   "cost_per_solved_treat": 0.23070416,
+   "cost_per_solved_control": 0.22456753333333335,
+   "mean_output_tokens_skill": 5187.0,
+   "mean_output_tokens_placebo": 5460.777777777777
+  },
+  "ponytail": {
+   "placebo": "placebo-cc-4",
+   "n_tasks": 5,
+   "n_treat": 10,
+   "n_control": 9,
+   "cost_treat": 0.16189084,
+   "cost_control": 0.22731193333333335,
+   "pass_treat": 1.0,
+   "pass_control": 1.0,
+   "ratio": 0.7121968372975872,
+   "ratio_ci": [
+    0.5974531640767347,
+    0.8616105916419481
+   ],
+   "ratio_p": 0.00019998000199980003,
+   "diff_pp": 0.0,
+   "diff_ci_pp": [
+    0.0,
+    0.0
+   ],
+   "diff_p": 1.0,
+   "cost_per_solved_treat": 0.16189084,
+   "cost_per_solved_control": 0.22731193333333335,
+   "mean_output_tokens_skill": 3004.1,
+   "mean_output_tokens_placebo": 4894.111111111111
+  },
+  "i-have-adhd": {
+   "placebo": "placebo-cc-3",
+   "n_tasks": 5,
+   "n_treat": 10,
+   "n_control": 10,
+   "cost_treat": 0.19726652,
+   "cost_control": 0.27339476,
+   "pass_treat": 1.0,
+   "pass_control": 1.0,
+   "ratio": 0.7215446265319788,
+   "ratio_ci": [
+    0.5993514625261781,
+    0.9234967426594013
+   ],
+   "ratio_p": 0.012998700129987,
+   "diff_pp": 0.0,
+   "diff_ci_pp": [
+    0.0,
+    0.0
+   ],
+   "diff_p": 1.0,
+   "cost_per_solved_treat": 0.19726652,
+   "cost_per_solved_control": 0.27339476,
+   "mean_output_tokens_skill": 4602.0,
+   "mean_output_tokens_placebo": 6620.3
+  }
+ },
+ "kill": {
+  "kill": false,
+  "nontrivial": {
+   "ponytail": 0.7121968372975872,
+   "i-have-adhd": 0.7215446265319788
+  }
+ },
+ "excluded": []
+}
