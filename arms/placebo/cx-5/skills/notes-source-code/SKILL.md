@@ -1,6 +1,6 @@
 ---
 name: notes-source-code
-description: "Background notes about source code in this environment. Changes to files take effect immediately and remain for the rest of the session. The shell runs commands. A command has a name and arguments. When a command finishes, it returns an exit code. An exit code of zero usually..."
+description: "Background notes about source code in this environment. Changes to files take effect immediately and remain for the rest of the session. The shell runs commands. A command has a name and arguments. When a command finishes, it returns an exit code. An exit code of zero usually means that the command succeeded. Other exit......"
 ---
 
 The agent works inside a computer environment. The environment has a file system, a shell and a set

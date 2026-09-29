@@ -1,6 +1,6 @@
 ---
 name: notes-scripts
-description: "Background notes about scripts in this environment. Projects often include a configuration file that names the project, lists its dependencies and describes how it is built or run. Projects may contain automated checks such as unit tests, integration tests, linters or type....."
+description: "Background notes about scripts in this environment. Projects often include a configuration file that names the project, lists its dependencies and describes how it is built or run. Projects may contain automated checks such as unit tests, integration tests, linters or type checkers. These checks are programs that report....."
 ---
 
 ## Networks

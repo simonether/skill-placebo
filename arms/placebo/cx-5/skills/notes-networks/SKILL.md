@@ -1,6 +1,6 @@
 ---
 name: notes-networks
-description: "Background notes about networks in this environment. A project may use one programming language or several. Code in one file can refer to code in another file. Projects often include a configuration file that names the project, lists its dependencies and describes how it is....."
+description: "Background notes about networks in this environment. A project may use one programming language or several. Code in one file can refer to code in another file. Projects often include a configuration file that names the project, lists its dependencies and describes how it is built or run. Projects may contain automated checks."
 ---
 
 The contents of files can be read with the file tools or with shell commands. Files can be created,

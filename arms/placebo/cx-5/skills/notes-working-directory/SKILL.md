@@ -1,6 +1,6 @@
 ---
 name: notes-working-directory
-description: "Background notes about working directory in this environment. These notes describe the working environment of this session. They restate what the agent already knows from its own instructions and add nothing new. They are provided for reference only. A session starts with a....."
+description: "Background notes about working directory in this environment. These notes describe the working environment of this session. They restate what the agent already knows from its own instructions and add nothing new. They are provided for reference only. A session starts with a message that describes a task. The message is......."
 ---
 
 These notes describe the working environment of this session. They restate what the agent already

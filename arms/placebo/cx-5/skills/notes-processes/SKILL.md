@@ -1,6 +1,6 @@
 ---
 name: notes-processes
-description: "Background notes about processes in this environment. Binary files contain bytes that are not meant to be read as text. Tools exist for reading and writing each format. Line endings, character encodings and trailing whitespace are properties of text files. Different systems use."
+description: "Background notes about processes in this environment. Binary files contain bytes that are not meant to be read as text. Tools exist for reading and writing each format. Line endings, character encodings and trailing whitespace are properties of text files. Different systems use different conventions for them. A file keeps...."
 ---
 
 The shell runs commands. A command has a name and arguments. When a command finishes, it returns an

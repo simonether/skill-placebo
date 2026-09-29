@@ -1,6 +1,6 @@
 ---
 name: notes-symbolic-links
-description: "Background notes about symbolic links in this environment. The task description says what outcome is wanted. **Argument.** A value passed to a command, a function or a program when it starts. **Binary.** A file that contains machine code or other non-text data. Also used for..."
+description: "Background notes about symbolic links in this environment. The task description says what outcome is wanted. **Argument.** A value passed to a command, a function or a program when it starts. **Binary.** A file that contains machine code or other non-text data. Also used for an executable program. **Build.** The process of.."
 ---
 
 The outcome of the session is the state of the environment when the session ends, together with

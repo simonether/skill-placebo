@@ -1,6 +1,6 @@
 ---
 name: notes-exit-codes
-description: "Background notes about exit codes in this environment. Line endings, character encodings and trailing whitespace are properties of text files. Different systems use different conventions for them. A file keeps the conventions it was written with unless something changes them..."
+description: "Background notes about exit codes in this environment. Line endings, character encodings and trailing whitespace are properties of text files. Different systems use different conventions for them. A file keeps the conventions it was written with unless something changes them. Some environments have network access and some..."
 ---
 
 ## Results

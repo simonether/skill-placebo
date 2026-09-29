@@ -43,7 +43,7 @@ def build_codex_from_plan(out_root: Path, always_on: dict) -> dict:
     report = {}
     for bid, spec in plan["buckets"].items():
         d = out_root / bid
-        if spec.get("keep"):
+        if spec.get("keep") or spec.get("keep_after_iteration"):
             report[bid] = json.loads((ROOT / "placebo" / "buckets.json").read_text()).get(bid) or {}
             report[bid]["bucket"] = {**report[bid].get("bucket", {}), "members": spec["members"]}
             report[bid]["members"] = {m: {} for m in spec["members"]}

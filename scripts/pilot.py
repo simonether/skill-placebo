@@ -89,6 +89,7 @@ def main():
     ap.add_argument("--codex-weekly-start", type=float, help="Codex plan's weekly used %% before the benchmark")
     ap.add_argument("--usd-budget", type=float, help="stop when the ledger's $ equivalent since --window-start reaches this")
     ap.add_argument("--pace-usd-5h", type=float, help="never start a trial while the trailing 5 hours hold this many $")
+    ap.add_argument("--arms", help="comma-separated arm names to limit token-recheck to (a later iteration)")
     ap.add_argument("--claude-week-start", type=float, help="plan 7-day utilization before the benchmark, 0-1 (from Claude Code's rate_limit_event)")
     a = ap.parse_args()
 
@@ -106,7 +107,7 @@ def main():
         arms = list(all_arms.values())
         trials = plan(["calibration/say-ok"], arms, a.harness, n=1, seed=SEED)
     elif a.step == "token-recheck":  # rescaled placebos only (METHOD.md 4.1)
-        arms = [x for n, x in all_arms.items() if n.startswith("placebo-")]
+        arms = [x for n, x in all_arms.items() if n.startswith("placebo-") and (not a.arms or n in a.arms.split(","))]
         trials = plan(["calibration/say-ok"], arms, a.harness, n=1, seed=SEED)
     elif a.step == "selection":
         arms = [all_arms["baseline"]]

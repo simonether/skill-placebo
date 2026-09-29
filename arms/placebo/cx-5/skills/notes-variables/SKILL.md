@@ -1,6 +1,6 @@
 ---
 name: notes-variables
-description: "Background notes about variables in this environment. They are provided for reference only. A session starts with a message that describes a task. The message is written in plain language. It may mention files, directories, commands, error messages, expected outputs or other...."
+description: "Background notes about variables in this environment. They are provided for reference only. A session starts with a message that describes a task. The message is written in plain language. It may mention files, directories, commands, error messages, expected outputs or other details. The task description is the main source..."
 ---
 
 Projects may contain automated checks such as unit tests, integration tests, linters or type

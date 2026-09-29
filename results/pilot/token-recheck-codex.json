@@ -1,4 +1,50 @@
 {
- "all_within_10pct": true,
- "buckets": {}
+ "all_within_10pct": false,
+ "buckets": {
+  "cx-1": {
+   "placebo_tokens": null,
+   "member_tokens": {
+    "planning-with-files": 171
+   },
+   "deviation": {}
+  },
+  "cx-5": {
+   "placebo_tokens": 2022,
+   "member_tokens": {
+    "agent-skills": 2312
+   },
+   "deviation": {
+    "agent-skills": -0.1254
+   }
+  },
+  "cx-2": {
+   "placebo_tokens": 631,
+   "member_tokens": {
+    "mattpocock": 657
+   },
+   "deviation": {
+    "mattpocock": -0.0396
+   }
+  },
+  "cx-3": {
+   "placebo_tokens": 822,
+   "member_tokens": {
+    "superpowers": 791
+   },
+   "deviation": {
+    "superpowers": 0.0392
+   }
+  },
+  "cx-4": {
+   "placebo_tokens": 1995,
+   "member_tokens": {
+    "compound-engineering": 1883,
+    "ponytail": 2043
+   },
+   "deviation": {
+    "compound-engineering": 0.0595,
+    "ponytail": -0.0235
+   }
+  }
+ }
 }

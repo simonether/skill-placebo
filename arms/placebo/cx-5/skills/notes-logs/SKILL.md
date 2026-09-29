@@ -1,6 +1,6 @@
 ---
 name: notes-logs
-description: "Background notes about logs in this environment. **Directory.** A container for files and other directories in a file system. Also called a folder. **Environment variable.** A named value available to a process and inherited by the processes it starts. **Exception.** An event..."
+description: "Background notes about logs in this environment. **Directory.** A container for files and other directories in a file system. Also called a folder. **Environment variable.** A named value available to a process and inherited by the processes it starts. **Exception.** An event that interrupts the normal flow of a program,....."
 ---
 
 The environment contains programs that were installed before the session began. Programming

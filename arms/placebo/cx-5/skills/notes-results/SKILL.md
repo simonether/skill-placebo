@@ -1,6 +1,6 @@
 ---
 name: notes-results
-description: "Background notes about results in this environment. Version control keeps a history of changes. The current state of the files can be compared with earlier states. The history can show who changed a file, when it was changed and what the change was. The working directory may or."
+description: "Background notes about results in this environment. Version control keeps a history of changes. The current state of the files can be compared with earlier states. The history can show who changed a file, when it was changed and what the change was. The working directory may or may not be part of a repository. Files come in.."
 ---
 
 ## The shell

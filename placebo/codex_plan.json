@@ -1,11 +1,69 @@
 {
  "note": "Codex placebos rebuilt from the Codex token check (29.09): buckets by the rule on measured tokens; each placebo sized by scaling the measured placebo of the same install mechanism (listing tokens ~ 10 per entry + ~0.28 per character; hook text scaled with the listing). Iterated by measurement (token-recheck) until every member is within +-10%.",
- "iteration": 1,
+ "iteration": 2,
  "buckets": {
-  "cx-1": {"members": ["planning-with-files"], "target_tokens": 171, "keep": true},
-  "cx-2": {"members": ["mattpocock"], "target_tokens": 657, "n_skills": 11, "listing_chars": 2435, "hook_chars": 0, "install": "skills"},
-  "cx-3": {"members": ["superpowers"], "target_tokens": 791, "n_skills": 15, "listing_chars": 2287, "hook_chars": 0, "install": "plugin"},
-  "cx-4": {"members": ["compound-engineering", "ponytail"], "target_tokens": 1963, "n_skills": 22, "listing_chars": 5873, "hook_chars": 1686, "install": "plugin"},
-  "cx-5": {"members": ["agent-skills"], "target_tokens": 2312, "n_skills": 25, "listing_chars": 7356, "hook_chars": 0, "install": "plugin"}
- }
+  "cx-1": {
+   "members": [
+    "planning-with-files"
+   ],
+   "target_tokens": 171,
+   "keep": true
+  },
+  "cx-2": {
+   "members": [
+    "mattpocock"
+   ],
+   "target_tokens": 657,
+   "n_skills": 11,
+   "listing_chars": 2435,
+   "hook_chars": 0,
+   "install": "skills",
+   "keep_after_iteration": 1
+  },
+  "cx-3": {
+   "members": [
+    "superpowers"
+   ],
+   "target_tokens": 791,
+   "n_skills": 15,
+   "listing_chars": 2287,
+   "hook_chars": 0,
+   "install": "plugin",
+   "keep_after_iteration": 1
+  },
+  "cx-4": {
+   "members": [
+    "compound-engineering",
+    "ponytail"
+   ],
+   "target_tokens": 1963,
+   "n_skills": 22,
+   "listing_chars": 5873,
+   "hook_chars": 1686,
+   "install": "plugin",
+   "keep_after_iteration": 1
+  },
+  "cx-5": {
+   "members": [
+    "agent-skills"
+   ],
+   "target_tokens": 2312,
+   "n_skills": 25,
+   "listing_chars": 8559,
+   "hook_chars": 0,
+   "install": "plugin"
+  }
+ },
+ "iterations_log": [
+  {
+   "iteration": 1,
+   "measured": {
+    "cx-1": 175,
+    "cx-2": 631,
+    "cx-3": 822,
+    "cx-4": 1995,
+    "cx-5": 2022
+   }
+  }
+ ]
 }

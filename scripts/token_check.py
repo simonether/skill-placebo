@@ -39,15 +39,17 @@ def recheck(harness: str):
     buckets = json.loads((ROOT / "placebo" / "buckets.json").read_text())
     base = ROOT / "jobs" / "pilot" / harness / "token-recheck"
     out, ok = {}, True
-    for res in base.glob("*/*/result.json"):
+    latest = {}  # per placebo: the latest attempt that has token data
+    files = [p for d in sorted(base.parent.glob("token-recheck*")) for p in d.glob("*/*/result.json")]
+    for res in sorted(files, key=lambda p: p.stat().st_mtime):
         m = JOB_ARM.match(res.parent.parent.name)
-        if not m:
-            continue
-        bid = m.group("arm").removeprefix("placebo-")
-        tok = first_prompt_tokens(res.parent)
-        delta = tok - b0 if tok is not None else None
+        tok = first_prompt_tokens(res.parent) if m else None
+        if m and tok is not None:
+            latest[m.group("arm").removeprefix("placebo-")] = tok
+    for bid, tok in latest.items():
+        delta = tok - b0
         members = buckets[bid]["bucket"]["members"]
-        devs = {s: round(delta / first["always_on_tokens"][f"skill-{s}"] - 1, 4) for s in members} if delta else {}
+        devs = {s: round(delta / first["always_on_tokens"][f"skill-{s}"] - 1, 4) for s in members}
         ok &= bool(devs) and all(abs(d) <= 0.10 for d in devs.values())
         out[bid] = {"placebo_tokens": delta, "member_tokens": {s: first["always_on_tokens"][f"skill-{s}"] for s in members}, "deviation": devs}
         print(f"{bid}: placebo +{delta} tok; " + ", ".join(f"{s} {d:+.1%}" for s, d in devs.items()))

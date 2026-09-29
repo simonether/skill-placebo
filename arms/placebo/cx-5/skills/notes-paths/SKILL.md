@@ -1,6 +1,6 @@
 ---
 name: notes-paths
-description: "Background notes about paths in this environment. When it is not available, such operations fail with an error. The outcome of the session is the state of the environment when the session ends, together with anything the agent writes in its final message. The task description..."
+description: "Background notes about paths in this environment. When it is not available, such operations fail with an error. The outcome of the session is the state of the environment when the session ends, together with anything the agent writes in its final message. The task description says what outcome is wanted. **Argument.** A......"
 ---
 
 Some commands finish quickly and some take longer. Long-running commands may be stopped by a time

@@ -1,6 +1,6 @@
 ---
 name: notes-permissions
-description: "Background notes about permissions in this environment. The environment has a file system, a shell and a set of installed programs. The agent interacts with the environment through the tools that the harness provides. Each tool call produces a result, and the result appears in.."
+description: "Background notes about permissions in this environment. The environment has a file system, a shell and a set of installed programs. The agent interacts with the environment through the tools that the harness provides. Each tool call produces a result, and the result appears in the conversation. The agent reads the results...."
 ---
 
 ## Version control

@@ -1,6 +1,6 @@
 ---
 name: notes-timeouts
-description: "Background notes about timeouts in this environment. It may contain source code, configuration files, data files, documentation, build scripts or other material. Some files may be large and some may be small. Some directories may be deeply nested. The contents of files can be..."
+description: "Background notes about timeouts in this environment. It may contain source code, configuration files, data files, documentation, build scripts or other material. Some files may be large and some may be small. Some directories may be deeply nested. The contents of files can be read with the file tools or with shell commands..."
 ---
 
 Many projects are stored in a version control system. Version control keeps a history of changes.
