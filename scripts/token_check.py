@@ -52,7 +52,9 @@ def recheck(harness: str):
         out[bid] = {"placebo_tokens": delta, "member_tokens": {s: first["always_on_tokens"][f"skill-{s}"] for s in members}, "deviation": devs}
         print(f"{bid}: placebo +{delta} tok; " + ", ".join(f"{s} {d:+.1%}" for s, d in devs.items()))
     (ROOT / "results" / "pilot" / f"token-recheck-{harness}.json").write_text(json.dumps({"all_within_10pct": ok, "buckets": out}, indent=1) + "\n")
-    print("all placebos within +-10% of every member:", ok)
+    expected = [k for k in buckets if k.startswith("cc-" if harness == "claude-code" else "cx-")]
+    ok = ok and set(out) >= set(expected)  # no data for a placebo is not a pass
+    print("all placebos within +-10% of every member:", ok, f"({len(out)}/{len(expected)} measured)")
 
 
 def main():

@@ -46,6 +46,7 @@ def build_codex_from_plan(out_root: Path, always_on: dict) -> dict:
         if spec.get("keep"):
             report[bid] = json.loads((ROOT / "placebo" / "buckets.json").read_text()).get(bid) or {}
             report[bid]["bucket"] = {**report[bid].get("bucket", {}), "members": spec["members"]}
+            report[bid]["members"] = {m: {} for m in spec["members"]}
             continue
         bodies = {k: v["mean_body_chars"] for k, v in always_on.items()}
         b = bucket_from_members(bid, spec["members"], always_on, bodies)
@@ -53,7 +54,8 @@ def build_codex_from_plan(out_root: Path, always_on: dict) -> dict:
         if d.exists():
             shutil.rmtree(d)
         r = build(b, d)
-        report[bid] = {**r, "target_tokens": spec["target_tokens"], "install": spec["install"], "iteration": plan["iteration"]}
+        report[bid] = {**r, "members": {m: {} for m in spec["members"]}, "target_tokens": spec["target_tokens"],
+                       "install": spec["install"], "iteration": plan["iteration"]}
         print(bid, spec["members"], r["listing_chars"], "+", r["hook_chars"], "chars")
     return report
 

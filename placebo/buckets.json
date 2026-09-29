@@ -154,11 +154,7 @@
   "hook_chars": 0,
   "total_chars": 625,
   "members": {
-   "planning-with-files": {
-    "skill_chars": 625,
-    "placebo_chars": 625,
-    "deviation": 0.0
-   }
+   "planning-with-files": {}
   }
  },
  "cx-2": {
@@ -176,6 +172,9 @@
   "listing_chars": 2435,
   "hook_chars": 0,
   "total_chars": 2435,
+  "members": {
+   "mattpocock": {}
+  },
   "target_tokens": 657,
   "install": "skills",
   "iteration": 1
@@ -195,6 +194,9 @@
   "listing_chars": 2287,
   "hook_chars": 0,
   "total_chars": 2287,
+  "members": {
+   "superpowers": {}
+  },
   "target_tokens": 791,
   "install": "plugin",
   "iteration": 1
@@ -215,6 +217,10 @@
   "listing_chars": 5873,
   "hook_chars": 1686,
   "total_chars": 7559,
+  "members": {
+   "compound-engineering": {},
+   "ponytail": {}
+  },
   "target_tokens": 1963,
   "install": "plugin",
   "iteration": 1
@@ -234,6 +240,9 @@
   "listing_chars": 7356,
   "hook_chars": 0,
   "total_chars": 7356,
+  "members": {
+   "agent-skills": {}
+  },
   "target_tokens": 2312,
   "install": "plugin",
   "iteration": 1
