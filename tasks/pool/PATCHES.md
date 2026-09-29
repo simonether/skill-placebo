@@ -56,3 +56,14 @@ Agent timeout cap: 1200 s.
 - `openthoughts-tblite/python-api-rate-limit`: none
 - `openthoughts-tblite/build-system-task-ordering`: none
 - `openthoughts-tblite/application-debug`: none
+
+Added 2026-09-29 (amendment 6):
+
+- `swebench-verified/django__django-13512`: FROM -> ghcr.io/epoch-research/swe-bench.eval.arm64.django__django-13512@sha256:6a272aafc118cce5a8cf69a799a68a4466e6621d583ae160a00929fc332aed30; verifier dependencies pre-installed in the uv cache; agent timeout 3000 -> 1200
+- `swebench-verified/django__django-14140`: FROM -> ghcr.io/epoch-research/swe-bench.eval.arm64.django__django-14140@sha256:1578851fcc2acd92b9f942c13f70d54ee696b64335fa4a82ab8c7cfd56fe6315; verifier dependencies pre-installed in the uv cache; agent timeout 3000 -> 1200
+- `swebench-verified/django__django-11141`: FROM -> ghcr.io/epoch-research/swe-bench.eval.arm64.django__django-11141@sha256:0986d26e380dedb0c9b7515b9a3d734dc1754604d4d744886cd0e9ddfc0a53d5; verifier dependencies pre-installed in the uv cache; agent timeout 3000 -> 1200
+- `swebench-verified/sphinx-doc__sphinx-10435`: FROM -> ghcr.io/epoch-research/swe-bench.eval.arm64.sphinx-doc__sphinx-10435@sha256:c402b674b9ad20fe157b63be3ba86b4ddb98850ec044e75fbcedca9ee252a87c; verifier dependencies pre-installed in the uv cache; agent timeout 3000 -> 1200
+- `swebench-verified/django__django-16256`: FROM -> ghcr.io/epoch-research/swe-bench.eval.arm64.django__django-16256@sha256:4015ab52b068f071ec268f4914bdb3301edc6c170485263a107afbe4d07bb88b; verifier dependencies pre-installed in the uv cache; agent timeout 3000 -> 1200
+- `swebench-verified/sympy__sympy-17630`: FROM -> ghcr.io/epoch-research/swe-bench.eval.arm64.sympy__sympy-17630@sha256:8a73a34820b271dea84bccdc0874709b180b08d040fed7be938c32db92cfb650; verifier dependencies pre-installed in the uv cache; agent timeout 3000 -> 1200
+- `swebench-verified/django__django-11734`: FROM -> ghcr.io/epoch-research/swe-bench.eval.arm64.django__django-11734@sha256:6acc328f952f95c2bfcb0dcc3dedd024923e8e4c343851c3b1d686f5f1753aee; verifier dependencies pre-installed in the uv cache; agent timeout 3000 -> 1200
+- `terminal-bench-2-1/video-processing`: prebuilt docker_image dropped, built from Dockerfile; agent timeout 3600 -> 1200

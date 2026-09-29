@@ -51,3 +51,5 @@ Rule (METHOD.md section 6): a task that does not pass both attempts leaves the p
 | openthoughts-tblite | application-debug | 1.0 1.0 | yes |
 
 39/40 tasks pass both attempts and stay in the pool.
+
+Added 2026-09-29 (amendment 6), oracle 2026-09-29 (`tasks/pool-extra/ORACLE.md`): swebench-verified/django__django-13512, swebench-verified/django__django-14140, swebench-verified/django__django-11141, swebench-verified/sphinx-doc__sphinx-10435, swebench-verified/django__django-16256, swebench-verified/sympy__sympy-17630, swebench-verified/django__django-11734, terminal-bench-2-1/video-processing - all 2/2.

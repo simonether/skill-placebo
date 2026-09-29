@@ -38,13 +38,47 @@ def pool_tasks() -> list[str]:
     return [f"pool/{t['source']}/{t['name']}" for t in manifest["tasks"] if f"{t['source']}/{t['name']}" not in failed]
 
 
+def selection_outcomes(harness: str) -> dict[str, list[int]]:
+    """task name -> pass flags of its baseline selection trials (infrastructure failures excluded)."""
+    from skill_placebo.collect import trial_row
+    out: dict[str, list[int]] = {}
+    for st in ("selection", "selection-extra", "third"):
+        for res in (ROOT / "jobs" / "pilot" / harness / st).glob("*/*/result.json"):
+            r = trial_row(res)
+            if r and not r["infra_failure"] and r["passed"] is not None:
+                out.setdefault(r["task"], []).append(r["passed"])
+    return out
+
+
+def third_trial_tasks(harness: str, limit: int = 5) -> list[str]:
+    """Tasks at 0/2 or 2/2 in the seeded order (round robin over sources: SWE-bench, TB2.1, TBLite),
+    first `limit` of them (METHOD.md section 6 rule 2, section 11.1, amendment 6)."""
+    order = json.loads((ROOT / "tasks" / "pilot_plan.json").read_text())["seeded_order"]
+    outcomes = selection_outcomes(harness)
+    seq, i = [], 0
+    srcs = ["swebench-verified", "terminal-bench-2-1", "openthoughts-tblite"]
+    while any(i < len(order[s]) for s in srcs):
+        for s in srcs:
+            if i < len(order[s]):
+                seq.append(order[s][i])
+        i += 1
+    pick = []
+    for t in seq:
+        o = outcomes.get(t.split("/")[-1], [])
+        if len(o) == 2 and sum(o) in (0, 2):
+            pick.append(f"pool/{t}")
+        if len(pick) == limit:
+            break
+    return pick
+
+
 def arms_for(harness: str):
     return claude_arms(PRIORITY) if harness == "claude-code" else codex_arms(PRIORITY)
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("step", choices=["token-check", "token-recheck", "selection", "kill", "collect"])
+    ap.add_argument("step", choices=["token-check", "token-recheck", "selection", "selection-extra", "third", "kill", "collect"])
     ap.add_argument("--harness", choices=list(HARNESSES), default="claude-code")
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--concurrency", type=int, default=2)
@@ -77,6 +111,13 @@ def main():
     elif a.step == "selection":
         arms = [all_arms["baseline"]]
         trials = plan(pool_tasks(), arms, a.harness, n=2 if a.harness == "claude-code" else 1, seed=SEED)
+    elif a.step == "selection-extra":  # amendment 6: the added harder tasks, same baseline x2
+        added = (ROOT / "tasks" / "pool" / "added-2026-09-29.txt").read_text().split()
+        arms = [all_arms["baseline"]]
+        trials = plan([f"pool/{t}" for t in added], arms, a.harness, n=2 if a.harness == "claude-code" else 1, seed=SEED)
+    elif a.step == "third":  # section 6 rule 2 / 11.1: at most 5 third trials on 0/2 or 2/2 tasks, seeded order
+        arms = [all_arms["baseline"]]
+        trials = plan(third_trial_tasks(a.harness), arms, a.harness, n=1, seed=SEED)
     else:
         kill_tasks = [f"pool/{t}" for t in json.loads((ROOT / "tasks" / "pilot_plan.json").read_text())["kill_test_tasks"]]
         names = [f"skill-{s}" for s in KILL_SKILLS[a.harness]]
@@ -87,10 +128,10 @@ def main():
     jobs_dir = ROOT / "jobs" / "pilot" / a.harness / a.step
     # The cap counts task trials only (METHOD.md amendment 5): calibration runs and infrastructure
     # retries are excluded; a trial is its base job, whatever its number of attempts.
-    task_steps = ("selection", "kill")
+    task_steps = ("selection", "selection-extra", "third", "kill")
     done_before = len({d.name.split("__r")[0] for st in task_steps
                        for d in (ROOT / "jobs" / "pilot" / a.harness / st).glob("b*__*") if d.is_dir()})
-    planned_new = len(trials) if a.step in task_steps else 0
+    planned_new = 0
     if a.step in task_steps:
         already = {d.name.split("__r")[0] for d in jobs_dir.glob("b*__*") if d.is_dir()} if jobs_dir.exists() else set()
         planned_new = len([t for t in trials if t.job_name not in already])

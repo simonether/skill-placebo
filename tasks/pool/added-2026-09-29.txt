@@ -1,0 +1,8 @@
+swebench-verified/django__django-13512
+swebench-verified/django__django-14140
+swebench-verified/django__django-11141
+swebench-verified/sphinx-doc__sphinx-10435
+swebench-verified/django__django-16256
+swebench-verified/sympy__sympy-17630
+swebench-verified/django__django-11734
+terminal-bench-2-1/video-processing

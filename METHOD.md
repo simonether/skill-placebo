@@ -551,3 +551,31 @@ count in the attribution of use to the benchmark and in every stop rule. Decided
 **Runs affected:** the selection step (in progress; its first trials are unaffected) and the kill
 test.
 
+### Amendment 6 (2026-09-29, after the selection step, before the kill test): harder tasks added
+
+**Reason.** Claude Code with Opus 5.5 at medium effort passed 77 of 78 baseline selection trials:
+38 of 39 pool tasks at 2/2, one (application-debug) at 1/2. Only one task qualified for the
+30-70% band, far below 20. As agreed with the hub before the selection step finished (2026-09-29),
+the pool is topped up with harder tasks; the rule "tasks are selected on baseline results only"
+is unchanged, and no skill or placebo arm had run on any task.
+
+**Change.**
+1. Eight harder candidates join the pool, chosen from external data only
+   (`docs/research/2026-09-29-harder-tasks-2.md`): SWE-bench Verified django-11141, django-11734,
+   django-13512, django-14140, django-16256, sphinx-10435, sympy-17630 (0-1 of 6 frontier runs, and
+   the frontier failures read as genuine rather than tests that go beyond the issue text), and
+   Terminal-Bench 2.1 video-processing (upstream timeout 3,600 s, capped at 1,200 s like every
+   task). All eight pass the oracle 2/2; make-doom-for-mips was staged and failed the oracle, so it
+   stays out (`tasks/pool-extra/ORACLE.md`).
+2. They get the same selection: 2 baseline trials each (16).
+3. The at most 5 third trials of section 11.1 go to tasks at 0/2 or 2/2 in the seeded order, taken
+   round-robin over the sources (SWE-bench, Terminal-Bench 2.1, TBLite).
+4. Selection then follows section 6 rules 3-4 over the 48-task pool. If fewer than 15 tasks qualify,
+   the set is filled to 15 with tasks that passed every trial, in the seeded order, flagged
+   "ceiling". The headline stays on cost; pass rate is reported with its CI and the ceiling is
+   listed as a limitation (hub, 2026-09-29).
+
+Pilot task trials on Claude Code after this: 78 + 16 + 5 + 50 (kill test) = 149 of 150.
+
+**Runs affected:** the added selection trials, third trials, kill test and main run.
+
