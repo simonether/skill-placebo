@@ -217,9 +217,13 @@ def arm_not_applied(job_dir: Path, arm: Arm) -> str | None:
     return None
 
 
-def harbor_cmd(trial: Trial, h: Harness, arm: Arm, jobs_dir: Path, mounts: str | None, job_name: str | None = None) -> list[str]:
-    """trial.task is a task directory relative to tasks/ (e.g. pool/swebench-verified/django__django-15957)."""
-    cmd = ["uv", "run", "--project", str(ROOT), "harbor", "run", "-p", str(ROOT / "tasks" / trial.task),
+def harbor_cmd(trial: Trial, h: Harness, arm: Arm, jobs_dir: Path, mounts: str | None, job_name: str | None = None,
+               snapshot: bool = False) -> list[str]:
+    """trial.task is a task directory relative to tasks/ (e.g. pool/swebench-verified/django__django-15957).
+    snapshot: launch through skill_placebo.harbor_launch, which commits the agent's final container
+    state before the verifier starts (METHOD.md amendment 9)."""
+    launcher = ["python", "-m", "skill_placebo.harbor_launch"] if snapshot else ["harbor"]
+    cmd = ["uv", "run", "--project", str(ROOT), *launcher, "run", "-p", str(ROOT / "tasks" / trial.task),
            "-a", h.agent, "-m", h.model, "-k", "1", "-n", "1",
            "-o", str(jobs_dir), "--job-name", job_name or trial.job_name, "--yes",
            # Agent install (apt/npm) is not the agent's work; slow mirrors must not fail trials.
@@ -230,6 +234,109 @@ def harbor_cmd(trial: Trial, h: Harness, arm: Arm, jobs_dir: Path, mounts: str |
         cmd += ["--mounts", mounts]
     cmd += list(arm.harbor_args)
     return cmd
+
+
+def _docker(*args: str, timeout: float = 300) -> subprocess.CompletedProcess:
+    return subprocess.run(["docker", *args], capture_output=True, text=True, timeout=timeout)
+
+
+def remove_snapshots(job_dir: Path) -> None:
+    """Delete the snapshot images of a finished attempt (they are only needed for a rerun)."""
+    for snap in job_dir.glob("*/snapshot.json"):
+        try:
+            tag = json.loads(snap.read_text()).get("image")
+        except (OSError, json.JSONDecodeError):
+            continue
+        if tag:
+            _docker("rmi", "-f", tag)
+
+
+def sweep_snapshots() -> None:
+    """Remove snapshot images left by an interrupted run; only when no batch is running."""
+    from .harbor_launch import SNAPSHOT_REPO
+
+    if running_batches():
+        return
+    out = _docker("images", "-q", SNAPSHOT_REPO).stdout.split()
+    if out:
+        _docker("rmi", "-f", *sorted(set(out)))
+
+
+def derived_task(task_dir: Path, image: str, out: Path) -> Path:
+    """A copy of the task whose environment is the given local image (the verifier and its timeout
+    are the task's own)."""
+    import shutil
+
+    if out.exists():
+        shutil.rmtree(out)
+    shutil.copytree(task_dir, out)
+    toml = out / "task.toml"
+    lines = [ln for ln in toml.read_text().splitlines() if not ln.strip().startswith("docker_image")]
+    idx = next(i for i, ln in enumerate(lines) if ln.strip() == "[environment]")
+    lines.insert(idx + 1, f'docker_image = "{image}"')
+    toml.write_text("\n".join(lines) + "\n")
+    return out
+
+
+def rerun_result(rerun_job: Path) -> dict:
+    """Reward and exception of a rerun job: {'reward': float|None, 'exception': str|None}."""
+    for res in rerun_job.glob("*/result.json"):
+        try:
+            r = json.loads(res.read_text())
+        except (OSError, json.JSONDecodeError):
+            continue
+        if not r.get("task_name"):
+            continue
+        rw = ((r.get("verifier_result") or {}).get("rewards") or {}).get("reward")
+        return {"reward": None if rw is None else float(rw), "exception": (r.get("exception_info") or {}).get("exception_type")}
+    return {"reward": None, "exception": "no result"}
+
+
+def verifier_rerun(job_dir: Path, task_dir: Path, env: dict | None) -> list[dict]:
+    """METHOD.md amendment 9: a trial whose verifier timed out is verified once more, on the image
+    committed before its first verification, with the same verifier and timeout and no agent.
+    Within the timeout, its reward is the trial's result and the episode is flagged as
+    infrastructure; another timeout (or no snapshot) leaves a failed trial. A rerun that itself
+    fails on infrastructure is repeated up to MAX_INFRA_RETRIES times. Writes
+    <trial>/verifier_rerun.json, which collect.trial_row reads."""
+    out = []
+    for tdir in sorted(job_dir.glob("*/")):
+        res = tdir / "result.json"
+        if not res.exists() or (tdir / "verifier_rerun.json").exists():
+            continue
+        info = json.loads(res.read_text()).get("exception_info") or {}
+        if info.get("exception_type") != "VerifierTimeoutError":
+            continue
+        snap = {}
+        if (tdir / "snapshot.json").exists():
+            snap = json.loads((tdir / "snapshot.json").read_text())
+        rec = {"source": "snapshot before the first verification", "snapshot": snap.get("image"),
+               "snapshot_error": snap.get("error"), "attempts": []}
+        if not snap.get("image"):
+            rec["outcome"] = "no snapshot"
+        else:
+            base = job_dir / "verifier-rerun"
+            task = derived_task(task_dir, snap["image"], base / "task" / task_dir.name)
+            for attempt in range(MAX_INFRA_RETRIES + 1):
+                name = f"rerun-{attempt}"
+                cmd = ["uv", "run", "--project", str(ROOT), "harbor", "run", "-p", str(task), "-a", "nop",
+                       "-k", "1", "-n", "1", "-o", str(base), "--job-name", name, "--yes"]
+                with open(base / f"{name}.runner.log", "w") as f:
+                    subprocess.run(cmd, cwd=ROOT, env=env, stdout=f, stderr=subprocess.STDOUT)
+                r = rerun_result(base / name)
+                rec["attempts"].append({"job": f"verifier-rerun/{name}", **r})
+                if r["reward"] is not None or r["exception"] == "VerifierTimeoutError":
+                    break
+            last = rec["attempts"][-1]
+            if last["reward"] is not None:
+                rec.update(outcome="rerun within timeout", reward=last["reward"])
+            elif last["exception"] == "VerifierTimeoutError":
+                rec["outcome"] = "timeout again"
+            else:
+                rec["outcome"] = f"rerun failed: {last['exception']}"
+        (tdir / "verifier_rerun.json").write_text(json.dumps(rec, indent=1) + "\n")
+        out.append(rec)
+    return out
 
 
 def limit_hits(trial_dir: Path) -> list[str]:
@@ -409,7 +516,7 @@ def ledger_add(harness: str, trial_dir: Path, arm_hash: str | None = None) -> fl
                    "attempt": row["attempt"], "infra_failure": row["infra_failure"],
                    "n_input": row["n_input"], "n_cached": row["n_cached"], "n_cache_write": row["n_cache_write"],
                    "n_output": row["n_output"], "cost_est_usd": row["cost_est_usd"], "units": row["units"],
-                   "arm_hash": arm_hash,
+                   "arm_hash": arm_hash, "verifier_rerun": row["verifier_rerun"], "passed": row["passed"],
                    "plan_five_hour": windows.get("five_hour", rl.get("five_hour")),
                    "plan_week": windows.get("seven_day", rl.get("weekly"))}
             f.write(json.dumps(rec) + "\n")
@@ -426,7 +533,9 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
               codex_weekly_cap: float = 80.0,
               usd_budget: float | None = None, pace_usd_5h: float | None = None,
               claude_week_start: float | None = None, claude_five_hour_pause: float = 0.80,
-              claude_week_cap: float = 0.80) -> BatchState:
+              claude_week_cap: float = 0.80, claude_week_cap_action: str = "stop",
+              claude_week_relative_stop: bool = True, rolling_week: bool = False,
+              week_pause_probe_s: int = 3600) -> BatchState:
     """units_budget: stop once the ledger's limit units since window_start (the plan's weekly reset,
     UTC) reach it - the translation of 25% of the week (METHOD.md amendment 2). Required for
     real runs. pace_units_5h: never start a trial while the trailing 5 hours hold that many units.
@@ -436,8 +545,14 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
     window is this full. usd_budget / pace_usd_5h: the same stop and pace in the token-based $
     equivalent (2026-09-29); when both units and $ limits are given, whichever binds first.
     claude_week_start: the plan's 7-day utilization (0-1) before the benchmark; the batch stops at
-    +weekly_budget_pp of it (account-wide, so conservative). claude_five_hour_pause: pause while the
-    account's 5-hour window is this full, to leave the owner room."""
+    +weekly_budget_pp of it (account-wide, so conservative) unless claude_week_relative_stop is
+    False. claude_five_hour_pause: pause while the account's 5-hour window is this full, to leave
+    the owner room. claude_week_cap_action: "stop" or "pause" when the account's 7-day window
+    reaches claude_week_cap; a pause lasts until the weekly reset or week_pause_probe_s, whichever
+    comes first, and the next trial reads the window again (main run, METHOD.md amendment 9).
+    rolling_week: window_start follows the plan's weekly reset reported by Claude Code, so the
+    ledger budget applies per limit week. Every trial whose verifier times out is verified once
+    more on its snapshot (amendment 9)."""
     jobs_dir.mkdir(parents=True, exist_ok=True)
     lock = jobs_dir / ".lock"
     if not dry_run:
@@ -491,7 +606,7 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
 
     def one(t: Trial):
         if dry_run:
-            return t, 0, " ".join(shlex.quote(c) for c in harbor_cmd(t, harness, arms[t.arm], jobs_dir, mounts))
+            return t, 0, " ".join(shlex.quote(c) for c in harbor_cmd(t, harness, arms[t.arm], jobs_dir, mounts, snapshot=True))
         rc = 0
         name = t.job_name
         for attempt in range(len(attempts_so_far(t)), MAX_INFRA_RETRIES + 1):
@@ -499,8 +614,14 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
             dirs = arm_host_dirs(arms[t.arm], mounts)
             h_start = tree_hash(dirs)
             with open(jobs_dir / f"{name}.runner.log", "w") as f:
-                rc = subprocess.run(harbor_cmd(t, harness, arms[t.arm], jobs_dir, mounts, name),
+                rc = subprocess.run(harbor_cmd(t, harness, arms[t.arm], jobs_dir, mounts, name, snapshot=True),
                                     cwd=ROOT, env=env, stdout=f, stderr=subprocess.STDOUT).returncode
+            try:
+                for rec in verifier_rerun(jobs_dir / name, ROOT / "tasks" / t.task, env):
+                    print(f"{msk_now()} {name}: verifier timeout, rerun on snapshot: {rec['outcome']}"
+                          + (f" reward={rec['reward']}" if "reward" in rec else ""), flush=True)
+            finally:
+                remove_snapshots(jobs_dir / name)
             h_end = tree_hash(dirs)
             trial_hash[name] = h_start
             changed = None
@@ -512,6 +633,8 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
             print(f"{msk_now()} {name}: infrastructure failure {why}, retry {attempt + 1}/{MAX_INFRA_RETRIES}", flush=True)
         return t, rc, name
 
+    if not dry_run:
+        sweep_snapshots()
     completed_here = 0
     arm_ref = {} if dry_run else {name: tree_hash(arm_host_dirs(a, mounts)) for name, a in arms.items()}
     trial_hash: dict[str, str | None] = {}
@@ -557,6 +680,13 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
                     if claude_week_start is None:
                         claude_week_start = cw["seven_day"]
                     state.codex_weekly_last = cw["seven_day"] * 100
+                    if claude_week_cap_action == "pause" and cw["seven_day"] >= claude_week_cap:
+                        reset = float(cw.get("seven_day_resets") or 0)
+                        until = min(reset, time.time() + week_pause_probe_s) if reset > time.time() else time.time() + week_pause_probe_s
+                        codex_pause["until"] = max(codex_pause["until"], until)
+                        print(f"{msk_now()} pause: account 7-day window {cw['seven_day']:.0%} >= {claude_week_cap:.0%}", flush=True)
+                if rolling_week and cw.get("seven_day_resets"):
+                    window_start = utc_iso(float(cw["seven_day_resets"]) - 7 * 86400)
                 if rl.get("five_hour") is not None and rl["five_hour"] >= codex_pace_pct:
                     codex_pause["until"] = time.time() + rl.get("five_hour_resets_s", 3600)
                 if wk is not None:
@@ -566,8 +696,10 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
                 state.done.append(t.job_name)
                 for prev in sorted(jobs_dir.glob(f"{t.job_name}__r*")) + [jobs_dir / t.job_name]:
                     if prev.is_dir() and prev != tdir:
-                        state.usd_spent_window += ledger_add(harness.name, prev, trial_hash.get(prev.name))  # failed attempts
-                state.usd_spent_window += ledger_add(harness.name, tdir, trial_hash.get(tdir.name))
+                        ledger_add(harness.name, prev, trial_hash.get(prev.name))  # failed attempts
+                ledger_add(harness.name, tdir, trial_hash.get(tdir.name))
+                # From the ledger, not a running sum: the limit week can roll over during a batch.
+                state.usd_spent_window = ledger_spent(harness.name, window_start)
                 dollars = ledger_spent(harness.name, window_start, "cost_est_usd")
                 completed_here += 1
                 print(f"{msk_now()} {t.job_name} rc={rc} week={state.usd_spent_window/1e6:.1f}M units ${dollars:.2f}"
@@ -576,9 +708,10 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
                     state.stopped = "limit marker: " + hits[0][:300]
                 elif wk is not None and state.codex_weekly_start is not None and wk - state.codex_weekly_start > weekly_budget_pp:
                     state.stopped = f"codex weekly usage +{wk - state.codex_weekly_start:.1f} pp > {weekly_budget_pp} pp"
-                elif cw.get("seven_day") is not None and cw["seven_day"] >= claude_week_cap:
+                elif claude_week_cap_action == "stop" and cw.get("seven_day") is not None and cw["seven_day"] >= claude_week_cap:
                     state.stopped = f"claude plan week utilization {cw['seven_day']:.0%} >= cap {claude_week_cap:.0%}"
-                elif cw.get("seven_day") is not None and (cw["seven_day"] - claude_week_start) * 100 >= weekly_budget_pp:
+                elif claude_week_relative_stop and cw.get("seven_day") is not None \
+                        and (cw["seven_day"] - claude_week_start) * 100 >= weekly_budget_pp:
                     state.stopped = f"claude plan week utilization {cw['seven_day']:.0%} (+{(cw['seven_day']-claude_week_start)*100:.0f} pp)"
                 elif wk is not None and wk >= codex_weekly_cap:
                     state.stopped = f"codex weekly usage {wk}% >= cap {codex_weekly_cap}%"

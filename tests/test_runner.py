@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 
 from skill_placebo.runner import Arm, Harness, clean_env, limit_hits, plan
 
@@ -168,3 +169,56 @@ def test_arm_hash_dirs_and_change(tmp_path):
     (d / "a.txt").write_text("y")
     assert tree_hash([d]) != h1
     assert tree_hash(arm_host_dirs(Arm("baseline"), mounts)) is None
+
+
+def test_derived_task_points_environment_at_snapshot(tmp_path):
+    from skill_placebo.runner import derived_task
+
+    src = tmp_path / "task"
+    (src / "environment").mkdir(parents=True)
+    (src / "environment" / "Dockerfile").write_text("FROM python:3.11-slim\n")
+    (src / "task.toml").write_text('version = "1.0"\n\n[verifier]\ntimeout_sec = 180.0\n\n[environment]\n'
+                                   '# docker_image removed by skill-placebo\ndocker_image = "old"\nbuild_timeout_sec = 600.0\n')
+    out = derived_task(src, "skill-placebo-snapshot:x__env", tmp_path / "d" / "task")
+    toml = (out / "task.toml").read_text()
+    assert 'docker_image = "skill-placebo-snapshot:x__env"' in toml and '"old"' not in toml
+    assert "timeout_sec = 180.0" in toml and (out / "environment" / "Dockerfile").exists()
+    assert (src / "task.toml").read_text().count("docker_image") == 2  # source untouched
+
+
+def test_verifier_rerun_without_snapshot_leaves_a_failed_trial(tmp_path):
+    from skill_placebo.runner import verifier_rerun
+
+    t = tmp_path / "job" / "trial__x"
+    t.mkdir(parents=True)
+    (t / "result.json").write_text(json.dumps({"task_name": "t", "exception_info": {"exception_type": "VerifierTimeoutError"}}))
+    (rec,) = verifier_rerun(tmp_path / "job", tmp_path / "task", None)
+    assert rec["outcome"] == "no snapshot"
+    assert json.loads((t / "verifier_rerun.json").read_text())["outcome"] == "no snapshot"
+
+
+def test_verifier_rerun_ignores_other_trials(tmp_path):
+    from skill_placebo.runner import verifier_rerun
+
+    t = tmp_path / "job" / "trial__x"
+    t.mkdir(parents=True)
+    (t / "result.json").write_text(json.dumps({"task_name": "t", "verifier_result": {"rewards": {"reward": 0.0}}}))
+    assert verifier_rerun(tmp_path / "job", tmp_path / "task", None) == []
+    assert not (t / "verifier_rerun.json").exists()
+
+
+def test_snapshot_tag_matches_compose_project():
+    from skill_placebo.harbor_launch import snapshot_tag
+
+    assert snapshot_tag("fix_async_worker_queue__XfygSNC") == "skill-placebo-snapshot:fix_async_worker_queue__xfygsnc__env"
+
+
+def test_harbor_cmd_uses_launcher_only_with_snapshot():
+    from skill_placebo.runner import Arm, Harness, Trial, harbor_cmd
+
+    t = Trial(0, 0, "claude-code", "baseline", "calibration/say-ok")
+    h = Harness("claude-code", "a", "m")
+    plain = harbor_cmd(t, h, Arm("baseline"), Path("/tmp/j"), None)
+    snap = harbor_cmd(t, h, Arm("baseline"), Path("/tmp/j"), None, snapshot=True)
+    assert "harbor" in plain and "skill_placebo.harbor_launch" not in plain
+    assert snap[snap.index("-m") + 1] == "skill_placebo.harbor_launch" and snap[snap.index("-m") + 2] == "run"

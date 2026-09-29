@@ -21,12 +21,16 @@ Costs are estimates from tokens at public API list prices; the runs used subscri
 | Skill | Placebo | Cost ratio R [95% CI] | Pass skill / placebo | Output tokens skill / placebo |
 |---|---|---|---|---:|
 | caveman | cc-5 | 1.02 [0.83, 1.26] | 100% / 100% | 5,187 / 5,519 |
-| ponytail | cc-4 | 0.75 [0.63, 0.88] | 100% / 90% | 3,004 / 4,749 |
+| ponytail | cc-4 | 0.75 [0.63, 0.88] | 100% / 100% (90% before the verifier rerun) | 3,004 / 4,749 |
 | i-have-adhd | cc-3 | 0.72 [0.60, 0.92] | 100% / 100% | 4,602 / 6,620 |
 
 Kill rule (section 11.3): not killed; ponytail and i-have-adhd show non-trivial cost differences.
 One kill-test trial (placebo-cc-5 x django-15957) ran without its placebo (directory rebuilt during
 the run) and was repeated; see the log of 29.09.
+One kill-test trial (placebo-cc-4 x fix_async_worker_queue) had a verifier timeout. Under amendment 9
+its verifier was rerun on its reconstructed final state and passed (11 of 11 tests in 16 s; the task
+without the agent's changes fails 5 of 11), so it counts as passed and its episode is flagged as
+infrastructure. R is unchanged.
 
 ## Codex (gpt-6-sol, effort medium, Codex CLI 0.157.0, ChatGPT Plus)
 

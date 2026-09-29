@@ -88,6 +88,11 @@ def trial_row(res: Path) -> dict | None:
     model = ((r.get("agent_info") or {}).get("model_info") or {}).get("name", "")
     n_in, n_c, n_out = a.get("n_input_tokens") or 0, a.get("n_cache_tokens") or 0, a.get("n_output_tokens") or 0
     reward = rw.get("reward")
+    # METHOD.md amendment 9: a verifier timeout is verified once more on the agent's final state;
+    # a rerun within the timeout gives the trial's reward, and the episode is flagged.
+    vr = _load(tdir / "verifier_rerun.json")
+    if exc.get("exception_type") == "VerifierTimeoutError" and vr.get("outcome") == "rerun within timeout":
+        reward = vr.get("reward")
     turns_file = tdir / "agent" / "approval_turns.txt"
     return {
         **meta,
@@ -104,6 +109,7 @@ def trial_row(res: Path) -> dict | None:
         "exception": exc.get("exception_type"),
         "attempt": attempt,
         "infra_failure": int(_is_infra(exc)),
+        "verifier_rerun": vr.get("outcome"),
         "n_input": n_in, "n_cached": n_c, "n_cache_write": cw, "n_output": n_out,
         "cost_est_usd": cost_from_tokens(model, n_in, n_c, cw, n_out),
         "units": units_from_tokens(n_in, n_c, cw, n_out),

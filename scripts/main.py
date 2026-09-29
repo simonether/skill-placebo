@@ -1,0 +1,96 @@
+#!/usr/bin/env python3
+"""Main run (METHOD.md section 11.3 and amendment 9). One call per step; a stopped or interrupted
+run resumes by calling the same step again (finished trials are adopted, not rerun).
+
+  scripts/main.py claude-code [--stop-after N]   full design: 15 arms x 15 selected tasks x N=5
+  scripts/main.py codex-topup                     after the Codex weekly reset: 3 skills + 2 placebos
+  scripts/main.py collect                         jobs/main -> results/main/<harness>.csv
+Add --dry-run to print the Harbor commands without running anything. The guards are fixed here, as
+registered in amendment 9, not passed on the command line.
+"""
+import argparse
+import json
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "src"))
+sys.path.insert(0, str(ROOT / "scripts"))
+
+from skill_placebo.arms import PRIORITY, claude_arms, codex_arms, mounts, placebo_bucket_of  # noqa: E402
+from skill_placebo.collect import write_csv  # noqa: E402
+from skill_placebo.harnesses import HARNESSES  # noqa: E402
+from skill_placebo.runner import plan, run_batch  # noqa: E402
+
+SEED = 20260930  # amendment 9
+N = 5
+UNITS_PER_POINT = 5.8e6  # calibration: 1% of the Claude week ~ 5.8 M units
+CLAUDE_GUARDS = dict(
+    units_budget=25 * UNITS_PER_POINT,     # the benchmark's own ledger, per limit week: 25 points
+    usd_budget=370.0,                      # second guard from amendment 3, per limit week
+    window_start="2026-09-28T10:00:00Z",   # current limit week; then follows the reported reset
+    rolling_week=True,
+    pace_units_5h=75e6, pace_usd_5h=200.0,  # amendment 2 pace, unchanged
+    claude_five_hour_pause=0.80,           # account 5-hour window: pause until its reset
+    claude_week_cap=0.80, claude_week_cap_action="pause",  # account 7-day window: pause, not stop
+    claude_week_relative_stop=False,       # the pilot's +25 points on the account window is replaced
+)
+CODEX_TOPUP_SKILLS = ["ponytail", "agent-skills", "compound-engineering"]
+CODEX_TOPUP_TASKS = 10
+CODEX_TOPUP_N = 2
+
+
+def selected_tasks() -> list[str]:
+    return [f"pool/{t}" for t in json.loads((ROOT / "tasks" / "selected.json").read_text())["selected"]]
+
+
+def codex_topup_tasks() -> list[str]:
+    """The selected tasks in their seeded order without those where Codex's baseline selection trial
+    failed (the floor), first CODEX_TOPUP_TASKS of them (amendment 9)."""
+    import pilot
+
+    outcomes = pilot.selection_outcomes("codex")
+    keep = [t for t in selected_tasks() if outcomes.get(t.split("/")[-1]) and all(outcomes[t.split("/")[-1]])]
+    return keep[:CODEX_TOPUP_TASKS]
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("step", choices=["claude-code", "codex-topup", "collect"])
+    ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--stop-after", type=int, help="stop after this many trials complete (report checkpoint)")
+    a = ap.parse_args()
+
+    if a.step == "collect":
+        n = 0
+        for d in sorted((ROOT / "jobs" / "main").glob("*")):
+            if d.is_dir():
+                n += write_csv(d, ROOT / "results" / "main" / f"{d.name}.csv")
+        print(f"{n} trials collected")
+        return
+
+    if a.step == "claude-code":
+        harness, all_arms = "claude-code", claude_arms(PRIORITY)
+        arms = list(all_arms.values())
+        trials = plan(selected_tasks(), arms, harness, n=N, seed=SEED)
+        guards = CLAUDE_GUARDS
+    else:
+        harness, all_arms = "codex", codex_arms(PRIORITY)
+        names = [f"skill-{s}" for s in CODEX_TOPUP_SKILLS]
+        names += sorted({f"placebo-{placebo_bucket_of(s, harness)}" for s in CODEX_TOPUP_SKILLS})
+        arms = [all_arms[n] for n in names]
+        trials = plan(codex_topup_tasks(), arms, harness, n=CODEX_TOPUP_N, seed=SEED)
+        # The start value is the first trial's reading after the weekly reset.
+        guards = dict(codex_pace_pct=40.0, codex_weekly_cap=80.0)
+
+    jobs_dir = ROOT / "jobs" / "main" / harness
+    print(f"{harness} main: {len(trials)} trials, {len(arms)} arms: {', '.join(x.name for x in arms)}")
+    state = run_batch(trials, HARNESSES[harness], {x.name: x for x in arms}, jobs_dir, mounts=mounts(),
+                      concurrency=2, dry_run=a.dry_run, stop_after=a.stop_after, **guards)
+    if state.stopped:
+        print(f"STOPPED: {state.stopped}")
+        sys.exit(2)
+
+
+if __name__ == "__main__":
+    main()

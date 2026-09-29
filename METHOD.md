@@ -627,3 +627,68 @@ placebos cx-4 and cx-5 (5 arms) on the same 5 pre-drawn tasks, 2 trials each = 5
 covers the 47 pool tasks that passed the oracle, 1 trial each. 47 + 50 = 97 task trials, within the
 Codex cap of 100.
 
+
+### Amendment 9 (2026-09-30, after the pilot, before any main-run trial): main-run design, guards, verifier timeouts, Codex
+
+Decided by the hub for the owner on 2026-09-30, from the pilot's resource numbers
+(`results/pilot/SUMMARY.md`); no effect estimate enters the choice.
+
+**1. Claude Code: full design.** 9 skills, the 15 selected tasks (`tasks/selected.json`), N = 5:
+15 arms x 75 = 1,125 trials in 5 randomized blocks, seed 20260930 (`scripts/main.py`). The pilot's
+resource share per 150 runs was below the 3% threshold (9.1 million units, $30). At the pilot's mean
+wall time per trial (4.5 minutes, 164 trials) the design needs about 42 hours at concurrency 2 and
+fits the 2026-10-09 deadline with the 12-hour reserve. The run may cross the plan's weekly reset
+(Mon 2026-10-05 10:00 UTC). Guards (replacing those of amendments 2-3 for the main run):
+- **Main stop: the benchmark's own use by the ledger**, at most 25 points of the plan's week per limit
+  week, at the hub's calibration of 1 point ≈ 5.8 million units: 145 million units. It counts every
+  benchmark run logged in that limit week (the pilot included) and follows the reset time that Claude
+  Code reports. The $370-per-week equivalent of amendment 3 stays as a second guard.
+- **Account 7-day window at 0.80 or more: pause, not stop**, so that the owner keeps room for other
+  work. The pause lasts until the weekly reset or one hour, whichever comes first; the next trial
+  reads the window again (at most 2 trials per hour while it stays at 0.80, at concurrency 2).
+- **Account 5-hour window at 0.80 or more: pause** until it resets, as before. The trailing-5-hour
+  pace of amendment 2 (75 million units, $200) is unchanged.
+- The pilot's stop at +25 points of the account's 7-day window does not apply: the account window
+  mixes the owner's other work (amendment 1); the ledger measures the benchmark itself.
+- Limit, rate-limit and authentication error events stop the batch, as before. Concurrency 2.
+
+**2. Verifier timeouts.** A verifier timeout can come from the agent (its code hangs the tests) or
+from the machine (load, a slow network during grading). Rule, for every run from now on: when a
+trial's verifier times out, the verifier runs once more, with the same tests and timeout and no
+agent, on the agent's final state. If it finishes within the timeout, its reward is the trial's
+result and the episode is flagged as infrastructure (`verifier_rerun` in the data); another timeout
+leaves a failed trial, as before. A rerun that cannot start for infrastructure reasons is repeated up
+to 2 times, like any infrastructure failure (section 7).
+- The final state is a snapshot: right before the first verification starts, outside the agent's
+  and the verifier's timeouts, the container is committed to a local image
+  (`skill_placebo.harbor_launch`); the rerun starts a fresh container from it. Only the file system
+  is kept, not processes the agent left running. Snapshots are deleted after each trial. Checked end
+  to end with a test task whose first verification leaves a marker (absent from the snapshot, so the
+  snapshot precedes verification) and times out: one variant passed on the rerun, one timed out again.
+  A commit took 0.2-0.6 seconds there.
+- **Applied to the pilot retroactively.** One pilot trial had a verifier timeout (Claude Code kill
+  test, placebo-cc-4 x fix_async_worker_queue, 180 seconds; the verifier's output was empty, so it
+  stalled while installing its own tools; this task's verifier otherwise took a median 18 seconds
+  over 26 runs). Its container no longer existed, so its final state was reconstructed: the task
+  image, the packages Claude Code's setup installs, and the agent's 4 shell commands replayed in order
+  from its session log (the agent changed files only through Bash; `scripts/pilot_verifier_rerun.py`).
+  The rerun passed 11 of 11 tests in 16 seconds; as a control, the same task without the agent's
+  changes fails 5 of 11. The pilot table changes only there: placebo-cc-4 passes 10 of 10 (was 9 of
+  10); ponytail vs cc-4 D = 0 (was +10 points); R and its CI are unchanged (0.75 [0.63, 0.88]); the
+  kill rule's result is unchanged. No other pilot trial had a verifier timeout.
+
+**3. Codex.** Codex is not in the main run: at the pilot's rate even the minimal design needs about
+76 points of the Plus week (section 11.3). The Codex pilot is published as a secondary result with
+its actual n. After the Codex weekly reset (about 2026-10-04), a Codex top-up runs within +25 points
+of that week (the first trial's reading is the start value; stop at +25 points or 80% absolute; pause
+at 40% of the 5-hour window): ponytail, agent-skills and compound-engineering with placebos cx-4 and
+cx-5 (5 arms, no baseline), on the selected tasks in their seeded order without those where Codex's
+baseline selection trial failed (the floor: application-debug, sympy-17630, extract-elf,
+seaborn-3069), the first 10 of them, N = 2 in 2 randomized blocks, seed 20260930: 100 trials. If the
+limit stops it early, the completed block is balanced and the partial one is reported as is. If the
+owner buys ChatGPT Pro, Codex is extended by a separate amendment.
+
+**4. Pilot guards.** The pilot cap of 160 task trials (amendment 7) and the Codex stop at +25 points
+(amendments 2-3) were pilot guards. Pilot data do not enter the main run (section 11.3).
+
+**Runs affected:** the main run, the Codex top-up, and the pilot's one verifier-timeout trial.
