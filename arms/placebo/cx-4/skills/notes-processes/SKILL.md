@@ -1,6 +1,6 @@
 ---
 name: notes-processes
-description: "Background notes about processes in this environment. Binary files contain bytes that are not meant to be read as text. Tools exist for reading and writing each format. Line endings, character encodings and trailing whitespace are properties of text files. Different systems use........"
+description: "Background notes about processes in this environment. Binary files contain bytes that are not meant to be read as text. Tools exist for reading and writing each format. Line endings, character encodings and trailing whitespace are properties of text..."
 ---
 
 The shell runs commands. A command has a name and arguments. When a command finishes, it returns an
@@ -96,52 +96,4 @@ starts.
 
 **Exception.** An event that interrupts the normal flow of a program, usually because of an error.
 
-**Exit code.** A number returned by a process when it finishes. Zero usually means success.
-
-**File system.** The structure that stores files and directories on a disk or in memory.
-
-**Function.** A named block of code that can be called with arguments and may return a value.
-
-**Interpreter.** A program that runs source code directly, without a separate compilation step.
-
-**Library.** A collection of code that other programs can use.
-
-**Log.** A record of events written by a program while it runs.
-
-**Module.** A file or unit of code that groups related definitions.
-
-**Package manager.** A program that installs, updates and removes packages and their
-dependencies.
-
-**Path.** The location of a file or directory, written as a sequence of directory names.
-
-**Permission.** A rule that says which users or processes may read, write or run a file.
-
-**Process.** A running instance of a program.
-
-**Repository.** A storage location for a project's files and their history.
-
-**Script.** A file containing commands or code that is run by an interpreter.
-
-**Standard error.** An output stream where programs usually write error messages.
-
-**Standard input.** An input stream from which programs can read data.
-
-**Standard output.** An output stream where programs usually write their normal output.
-
-**Symbolic link.** A file that points to another file or directory.
-
-**Timeout.** A limit on how long an operation may run before it is stopped.
-
-**Variable.** A named location that holds a value in a program.
-
-**Version.** An identifier that distinguishes one release of software from another.
-
-**Virtual environment.** An isolated set of installed packages for a programming language.
-
-These notes describe the working environment of this session. They restate what the agent already
-knows from its own instructions and add nothing new. They are provided for reference only.
-
-## The session
-
-A session starts with a     
+**Exit     

@@ -1,6 +1,6 @@
 ---
 name: notes-paths
-description: "Background notes about paths in this environment. When it is not available, such operations fail with an error. The outcome of the session is the state of the environment when the session ends, together with anything the agent writes in its final message. The task description says....."
+description: "Background notes about paths in this environment. When it is not available, such operations fail with an error. The outcome of the session is the state of the environment when the session ends, together with anything the agent writes in its final......"
 ---
 
 Some commands finish quickly and some take longer. Long-running commands may be stopped by a time
@@ -97,51 +97,4 @@ starts.
 
 **Function.** A named block of code that can be called with arguments and may return a value.
 
-**Interpreter.** A program that runs source code directly, without a separate compilation step.
-
-**Library.** A collection of code that other programs can use.
-
-**Log.** A record of events written by a program while it runs.
-
-**Module.** A file or unit of code that groups related definitions.
-
-**Package manager.** A program that installs, updates and removes packages and their
-dependencies.
-
-**Path.** The location of a file or directory, written as a sequence of directory names.
-
-**Permission.** A rule that says which users or processes may read, write or run a file.
-
-**Process.** A running instance of a program.
-
-**Repository.** A storage location for a project's files and their history.
-
-**Script.** A file containing commands or code that is run by an interpreter.
-
-**Standard error.** An output stream where programs usually write error messages.
-
-**Standard input.** An input stream from which programs can read data.
-
-**Standard output.** An output stream where programs usually write their normal output.
-
-**Symbolic link.** A file that points to another file or directory.
-
-**Timeout.** A limit on how long an operation may run before it is stopped.
-
-**Variable.** A named location that holds a value in a program.
-
-**Version.** An identifier that distinguishes one release of software from another.
-
-**Virtual environment.** An isolated set of installed packages for a programming language.
-
-These notes describe the working environment of this session. They restate what the agent already
-knows from its own instructions and add nothing new. They are provided for reference only.
-
-## The session
-
-A session starts with a message that describes a task. The message is written in plain language.
-It may mention files, directories, commands, error messages, expected outputs or other details.
-The task description is the main source of information about what is wanted. The session ends when
-the agent stops working on the task.
-
-The agent works inside a computer environment. The        
+**Interpreter.** A program that runs source code directly, without a separate compilation    

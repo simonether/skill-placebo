@@ -37,7 +37,37 @@ def token_targets(harness_prefix: str) -> list[tuple[str, list[str], float]] | N
     return [(b["bucket"], b["members"], b["target_tokens"]) for b in tc["buckets"]]
 
 
+def build_codex_from_plan(out_root: Path, always_on: dict) -> dict:
+    """Codex placebos from placebo/codex_plan.json (measured-token iteration), see that file's note."""
+    plan = json.loads((ROOT / "placebo" / "codex_plan.json").read_text())
+    report = {}
+    for bid, spec in plan["buckets"].items():
+        d = out_root / bid
+        if spec.get("keep"):
+            report[bid] = json.loads((ROOT / "placebo" / "buckets.json").read_text()).get(bid) or {}
+            report[bid]["bucket"] = {**report[bid].get("bucket", {}), "members": spec["members"]}
+            continue
+        bodies = {k: v["mean_body_chars"] for k, v in always_on.items()}
+        b = bucket_from_members(bid, spec["members"], always_on, bodies)
+        b.n_skills, b.listing_chars, b.hook_chars = spec["n_skills"], spec["listing_chars"], spec["hook_chars"]
+        if d.exists():
+            shutil.rmtree(d)
+        r = build(b, d)
+        report[bid] = {**r, "target_tokens": spec["target_tokens"], "install": spec["install"], "iteration": plan["iteration"]}
+        print(bid, spec["members"], r["listing_chars"], "+", r["hook_chars"], "chars")
+    return report
+
+
 def main():
+    if "--codex-plan" in sys.argv:
+        # Only the Codex placebos change; Claude Code placebos are never touched here (a run may be using them).
+        always_on = json.loads((ROOT / "placebo" / "always_on_codex.json").read_text())
+        buckets = json.loads((ROOT / "placebo" / "buckets.json").read_text())
+        for k in [k for k in buckets if k.startswith("cx-")]:
+            del buckets[k]
+        buckets.update(build_codex_from_plan(ROOT / "arms" / "placebo", always_on))
+        (ROOT / "placebo" / "buckets.json").write_text(json.dumps(buckets, indent=1) + "\n")
+        return
     out_root = ROOT / "arms" / "placebo"
     if out_root.exists():
         shutil.rmtree(out_root)

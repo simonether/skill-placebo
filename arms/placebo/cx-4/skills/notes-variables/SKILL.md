@@ -1,6 +1,6 @@
 ---
 name: notes-variables
-description: "Background notes about variables in this environment. They are provided for reference only. A session starts with a message that describes a task. The message is written in plain language. It may mention files, directories, commands, error messages, expected outputs or other details..."
+description: "Background notes about variables in this environment. They are provided for reference only. A session starts with a message that describes a task. The message is written in plain language. It may mention files, directories, commands, error messages,..."
 ---
 
 Projects may contain automated checks such as unit tests, integration tests, linters or type
@@ -111,39 +111,4 @@ dependencies.
 
 **Version.** An identifier that distinguishes one release of software from another.
 
-**Virtual environment.** An isolated set of installed packages for a programming language.
-
-These notes describe the working environment of this session. They restate what the agent already
-knows from its own instructions and add nothing new. They are provided for reference only.
-
-## The session
-
-A session starts with a message that describes a task. The message is written in plain language.
-It may mention files, directories, commands, error messages, expected outputs or other details.
-The task description is the main source of information about what is wanted. The session ends when
-the agent stops working on the task.
-
-The agent works inside a computer environment. The environment has a file system, a shell and a set
-of installed programs. The agent interacts with the environment through the tools that the harness
-provides. Each tool call produces a result, and the result appears in the conversation. The agent
-reads the results and decides what to do next.
-
-## The working directory
-
-The session has a working directory. Relative paths are resolved against it. The working
-directory usually contains the files that the task refers to. It may contain source code,
-configuration files, data files, documentation, build scripts or other material. Some files may be
-large and some may be small. Some directories may be deeply nested.
-
-The contents of files can be read with the file tools or with shell commands. Files can be created,
-changed or removed. Changes to files take effect immediately and remain for the rest of the
-session.
-
-## The shell
-
-The shell runs commands. A command has a name and arguments. When a command finishes, it returns an
-exit code. An exit code of zero usually means that the command succeeded. Other exit codes usually
-mean that something did not work as expected. Commands can print text to standard output and to
-standard error. Both kinds of output appear in the tool result.
-
-Some  
+**Virtual        

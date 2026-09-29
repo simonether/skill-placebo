@@ -1,6 +1,6 @@
 ---
 name: notes-networks
-description: "Background notes about networks in this environment. A project may use one programming language or several. Code in one file can refer to code in another file. Projects often include a configuration file that names the project, lists its dependencies and describes how it is built or..."
+description: "Background notes about networks in this environment. A project may use one programming language or several. Code in one file can refer to code in another file. Projects often include a configuration file that names the project, lists its dependencies.."
 ---
 
 The contents of files can be read with the file tools or with shell commands. Files can be created,
@@ -94,55 +94,4 @@ kernel of the host machine.
 **Dependency.** A package, library or program that another piece of software needs in order to
 work.
 
-**Directory.** A container for files and other directories in a file system. Also called a
-folder.
-
-**Environment variable.** A named value available to a process and inherited by the processes it
-starts.
-
-**Exception.** An event that interrupts the normal flow of a program, usually because of an error.
-
-**Exit code.** A number returned by a process when it finishes. Zero usually means success.
-
-**File system.** The structure that stores files and directories on a disk or in memory.
-
-**Function.** A named block of code that can be called with arguments and may return a value.
-
-**Interpreter.** A program that runs source code directly, without a separate compilation step.
-
-**Library.** A collection of code that other programs can use.
-
-**Log.** A record of events written by a program while it runs.
-
-**Module.** A file or unit of code that groups related definitions.
-
-**Package manager.** A program that installs, updates and removes packages and their
-dependencies.
-
-**Path.** The location of a file or directory, written as a sequence of directory names.
-
-**Permission.** A rule that says which users or processes may read, write or run a file.
-
-**Process.** A running instance of a program.
-
-**Repository.** A storage location for a project's files and their history.
-
-**Script.** A file containing commands or code that is run by an interpreter.
-
-**Standard error.** An output stream where programs usually write error messages.
-
-**Standard input.** An input stream from which programs can read data.
-
-**Standard output.** An output stream where programs usually write their normal output.
-
-**Symbolic link.** A file that points to another file or directory.
-
-**Timeout.** A limit on how long an operation may run before it is stopped.
-
-**Variable.** A named location that holds a value in a program.
-
-**Version.** An identifier that distinguishes one release of software from another.
-
-**Virtual environment.** An isolated set of installed packages for a programming language.
-
-These notes       
+**Directory.** A container for files and other directories in a file system. Also called             

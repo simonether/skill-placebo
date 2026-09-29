@@ -1,6 +1,6 @@
 ---
 name: notes-logs
-description: "Background notes about logs in this environment. **Directory.** A container for files and other directories in a file system. Also called a folder. **Environment variable.** A named value available to a process and inherited by the processes it starts. **Exception.** An event that....."
+description: "Background notes about logs in this environment. **Directory.** A container for files and other directories in a file system. Also called a folder. **Environment variable.** A named value available to a process and inherited by the processes it........"
 ---
 
 The environment contains programs that were installed before the session began. Programming
@@ -102,47 +102,4 @@ starts.
 **Package manager.** A program that installs, updates and removes packages and their
 dependencies.
 
-**Path.** The location of a file or directory, written as a sequence of directory names.
-
-**Permission.** A rule that says which users or processes may read, write or run a file.
-
-**Process.** A running instance of a program.
-
-**Repository.** A storage location for a project's files and their history.
-
-**Script.** A file containing commands or code that is run by an interpreter.
-
-**Standard error.** An output stream where programs usually write error messages.
-
-**Standard input.** An input stream from which programs can read data.
-
-**Standard output.** An output stream where programs usually write their normal output.
-
-**Symbolic link.** A file that points to another file or directory.
-
-**Timeout.** A limit on how long an operation may run before it is stopped.
-
-**Variable.** A named location that holds a value in a program.
-
-**Version.** An identifier that distinguishes one release of software from another.
-
-**Virtual environment.** An isolated set of installed packages for a programming language.
-
-These notes describe the working environment of this session. They restate what the agent already
-knows from its own instructions and add nothing new. They are provided for reference only.
-
-## The session
-
-A session starts with a message that describes a task. The message is written in plain language.
-It may mention files, directories, commands, error messages, expected outputs or other details.
-The task description is the main source of information about what is wanted. The session ends when
-the agent stops working on the task.
-
-The agent works inside a computer environment. The environment has a file system, a shell and a set
-of installed programs. The agent interacts with the environment through the tools that the harness
-provides. Each tool call produces a result, and the result appears in the conversation. The agent
-reads the results and decides what to do next.
-
-## The working directory
-
-The     
+**Path.** The      

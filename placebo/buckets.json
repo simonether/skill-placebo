@@ -165,81 +165,77 @@
   "bucket": {
    "id": "cx-2",
    "members": [
-    "superpowers"
+    "mattpocock"
    ],
-   "listing_chars": 2615,
+   "listing_chars": 2435,
    "hook_chars": 0,
-   "n_skills": 15,
-   "body_chars": 11080
+   "n_skills": 11,
+   "body_chars": 4400
   },
   "plugin_name": "session-notes-cx-2",
-  "listing_chars": 2615,
+  "listing_chars": 2435,
   "hook_chars": 0,
-  "total_chars": 2615,
-  "members": {
-   "superpowers": {
-    "skill_chars": 2615,
-    "placebo_chars": 2615,
-    "deviation": 0.0
-   }
-  }
+  "total_chars": 2435,
+  "target_tokens": 657,
+  "install": "skills",
+  "iteration": 1
  },
  "cx-3": {
   "bucket": {
    "id": "cx-3",
    "members": [
-    "mattpocock"
+    "superpowers"
    ],
-   "listing_chars": 4106,
+   "listing_chars": 2287,
    "hook_chars": 0,
-   "n_skills": 25,
-   "body_chars": 4400
+   "n_skills": 15,
+   "body_chars": 11080
   },
   "plugin_name": "session-notes-cx-3",
-  "listing_chars": 4106,
+  "listing_chars": 2287,
   "hook_chars": 0,
-  "total_chars": 4106,
-  "members": {
-   "mattpocock": {
-    "skill_chars": 4106,
-    "placebo_chars": 4106,
-    "deviation": 0.0
-   }
-  }
+  "total_chars": 2287,
+  "target_tokens": 791,
+  "install": "plugin",
+  "iteration": 1
  },
  "cx-4": {
   "bucket": {
    "id": "cx-4",
    "members": [
     "compound-engineering",
-    "ponytail",
-    "agent-skills"
+    "ponytail"
    ],
-   "listing_chars": 6618,
-   "hook_chars": 1900,
+   "listing_chars": 5873,
+   "hook_chars": 1686,
    "n_skills": 22,
-   "body_chars": 6375
+   "body_chars": 4464
   },
   "plugin_name": "session-notes-cx-4",
-  "listing_chars": 6618,
-  "hook_chars": 1900,
-  "total_chars": 8518,
-  "members": {
-   "compound-engineering": {
-    "skill_chars": 7943,
-    "placebo_chars": 8518,
-    "deviation": 0.0724
-   },
-   "ponytail": {
-    "skill_chars": 8347,
-    "placebo_chars": 8518,
-    "deviation": 0.0205
-   },
-   "agent-skills": {
-    "skill_chars": 9266,
-    "placebo_chars": 8518,
-    "deviation": -0.0807
-   }
-  }
+  "listing_chars": 5873,
+  "hook_chars": 1686,
+  "total_chars": 7559,
+  "target_tokens": 1963,
+  "install": "plugin",
+  "iteration": 1
+ },
+ "cx-5": {
+  "bucket": {
+   "id": "cx-5",
+   "members": [
+    "agent-skills"
+   ],
+   "listing_chars": 7356,
+   "hook_chars": 0,
+   "n_skills": 25,
+   "body_chars": 10196
+  },
+  "plugin_name": "session-notes-cx-5",
+  "listing_chars": 7356,
+  "hook_chars": 0,
+  "total_chars": 7356,
+  "target_tokens": 2312,
+  "install": "plugin",
+  "iteration": 1
  }
 }

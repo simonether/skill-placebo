@@ -1,6 +1,6 @@
 ---
 name: notes-encodings
-description: "Background notes about encodings in this environment. **Function.** A named block of code that can be called with arguments and may return a value. **Interpreter.** A program that runs source code directly, without a separate compilation step. **Library.** A collection of code that...."
+description: "Background notes about encodings in this environment. **Function.** A named block of code that can be called with arguments and may return a value. **Interpreter.** A program that runs source code directly, without a separate compilation step.........."
 ---
 
 Packages for a programming language are usually installed through that language's package manager.
@@ -105,42 +105,4 @@ dependencies.
 
 **Repository.** A storage location for a project's files and their history.
 
-**Script.** A file containing commands or code that is run by an interpreter.
-
-**Standard error.** An output stream where programs usually write error messages.
-
-**Standard input.** An input stream from which programs can read data.
-
-**Standard output.** An output stream where programs usually write their normal output.
-
-**Symbolic link.** A file that points to another file or directory.
-
-**Timeout.** A limit on how long an operation may run before it is stopped.
-
-**Variable.** A named location that holds a value in a program.
-
-**Version.** An identifier that distinguishes one release of software from another.
-
-**Virtual environment.** An isolated set of installed packages for a programming language.
-
-These notes describe the working environment of this session. They restate what the agent already
-knows from its own instructions and add nothing new. They are provided for reference only.
-
-## The session
-
-A session starts with a message that describes a task. The message is written in plain language.
-It may mention files, directories, commands, error messages, expected outputs or other details.
-The task description is the main source of information about what is wanted. The session ends when
-the agent stops working on the task.
-
-The agent works inside a computer environment. The environment has a file system, a shell and a set
-of installed programs. The agent interacts with the environment through the tools that the harness
-provides. Each tool call produces a result, and the result appears in the conversation. The agent
-reads the results and decides what to do next.
-
-## The working directory
-
-The session has a working directory. Relative paths are resolved against it. The working
-directory usually contains the files that the task refers to. It may contain source code,
-configuration files, data files, documentation, build scripts or other material. Some files may be
-large and some may be small. Some directories may be deeply           
+**Script.** A file containing commands or code that is 
