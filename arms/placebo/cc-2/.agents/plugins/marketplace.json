@@ -7,8 +7,8 @@
     {
       "name": "session-notes-cc-2",
       "source": {
-        "source": "url",
-        "url": "./"
+        "source": "local",
+        "path": "./"
       },
       "policy": {
         "installation": "AVAILABLE",

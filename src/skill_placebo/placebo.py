@@ -110,7 +110,9 @@ def build(bucket: Bucket, out_dir: Path) -> dict:
          "hooks": "./hooks/hooks.json" if bucket.hook_chars else {}}, indent=2) + "\n")
     (out_dir / ".agents" / "plugins" / "marketplace.json").write_text(json.dumps(
         {"name": f"{name}-dev", "interface": {"displayName": "Session notes"},
-         "plugins": [{"name": name, "source": {"source": "url", "url": "./"},
+         # "local" source: Codex copies the directory; a "url" source would try to `git clone` it,
+         # and placebo directories are not git repositories (Codex pilot, 29.09).
+         "plugins": [{"name": name, "source": {"source": "local", "path": "./"},
                       "policy": {"installation": "AVAILABLE", "authentication": "ON_INSTALL"},
                       "category": "Developer Tools"}]}, indent=2) + "\n")
     # Skills: names from TOPICS; descriptions sized so that sum(len(name) + len(description)) == listing_chars.

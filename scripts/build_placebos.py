@@ -47,7 +47,11 @@ def main():
         data = json.loads((ROOT / "placebo" / fname).read_text())
         if prefix == "cx":
             data = {k: v for k, v in data.items() if k in CODEX_SKILLS}
-        tt = token_targets(prefix) if "--tokens" in sys.argv else None
+        # Token targets per harness, each with its own fitted model: --tokens (Claude Code, TOKEN_MODEL)
+        # and --tokens-codex (Codex, CODEX_TOKEN_MODEL once fitted). Without a flag a harness keeps its
+        # committed character-based build.
+        flag = "--tokens" if prefix == "cc" else "--tokens-codex"
+        tt = token_targets(prefix) if flag in sys.argv else None
         if tt:
             for bid, members, target in tt:
                 plan.append((bid, members, data, target))

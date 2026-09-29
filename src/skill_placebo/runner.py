@@ -121,6 +121,42 @@ def infra_failure(job_dir: Path) -> str | None:
     return None
 
 
+def arm_not_applied(job_dir: Path, arm: Arm) -> str | None:
+    """Manipulation check: the arm's plugin or memory file actually reached the agent. A trial where
+    it did not is an infrastructure failure, not data (e.g. a placebo directory rebuilt while a
+    container was running, or a Codex plugin install that failed during setup)."""
+    args = list(arm.harbor_args)
+    env = {}
+    for i, a in enumerate(args):
+        if a == "--ae" and i + 1 < len(args) and "=" in args[i + 1]:
+            k, v = args[i + 1].split("=", 1)
+            env[k] = v
+    for tdir in job_dir.glob("*/"):
+        if not (tdir / "result.json").exists():
+            continue
+        if "CLAUDE_CODE_PLUGIN_DIRS" in env:
+            want = env["CLAUDE_CODE_PLUGIN_DIRS"]
+            loaded = []
+            for p in tdir.rglob("claude-code.txt"):
+                for line in p.read_text(errors="replace").splitlines():
+                    if '"subtype":"init"' in line or '"subtype": "init"' in line:
+                        try:
+                            loaded = [x.get("path") for x in json.loads(line).get("plugins") or []]
+                        except json.JSONDecodeError:
+                            pass
+                        break
+            if want not in loaded:
+                return f"plugin {want} not loaded (init plugins: {loaded})"
+        if "SP_CLAUDE_MD" in env and not (tdir / "agent" / "sessions" / "CLAUDE.md").exists():
+            return "user CLAUDE.md not installed"
+        if "SP_CODEX_PLUGINS" in env:
+            info = json.loads((tdir / "result.json").read_text()).get("exception_info") or {}
+            msg = str(info.get("exception_message") or "")
+            if info.get("exception_type") == "NonZeroAgentExitCodeError" and ("codex plugin" in msg or "marketplace" in msg):
+                return "codex plugin install failed during setup"
+    return None
+
+
 def harbor_cmd(trial: Trial, h: Harness, arm: Arm, jobs_dir: Path, mounts: str | None, job_name: str | None = None) -> list[str]:
     """trial.task is a task directory relative to tasks/ (e.g. pool/swebench-verified/django__django-15957)."""
     cmd = ["uv", "run", "--project", str(ROOT), "harbor", "run", "-p", str(ROOT / "tasks" / trial.task),
@@ -370,7 +406,8 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
     if not dry_run:  # a trial whose last attempt failed on infrastructure gets its remaining retries
         for t in trials:
             tries = attempts_so_far(t)
-            if t.job_name in state.done and tries and infra_failure(tries[-1]) and len(tries) <= MAX_INFRA_RETRIES:
+            if t.job_name in state.done and tries and (infra_failure(tries[-1]) or arm_not_applied(tries[-1], arms[t.arm])) \
+                    and len(tries) <= MAX_INFRA_RETRIES:
                 state.done.remove(t.job_name)
     todo = [t for t in trials if t.job_name not in state.done]
     if not dry_run:
@@ -396,7 +433,7 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
             with open(jobs_dir / f"{name}.runner.log", "w") as f:
                 rc = subprocess.run(harbor_cmd(t, harness, arms[t.arm], jobs_dir, mounts, name),
                                     cwd=ROOT, env=env, stdout=f, stderr=subprocess.STDOUT).returncode
-            why = infra_failure(jobs_dir / name)
+            why = infra_failure(jobs_dir / name) or arm_not_applied(jobs_dir / name, arms[t.arm])
             if not why:
                 break
             print(f"{time.strftime('%H:%M:%S')} {name}: infrastructure failure {why}, retry {attempt + 1}/{MAX_INFRA_RETRIES}", flush=True)

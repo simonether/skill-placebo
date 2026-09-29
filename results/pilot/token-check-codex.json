@@ -1,0 +1,85 @@
+{
+ "harness": "codex",
+ "baseline_first_prompt_tokens": 11232,
+ "always_on_tokens": {
+  "skill-ponytail": 2043,
+  "placebo-cx-3": 1172,
+  "placebo-cx-2": null,
+  "skill-mattpocock": 657,
+  "skill-agent-skills": 2312,
+  "skill-planning-with-files": 171,
+  "skill-superpowers": 791,
+  "placebo-cx-1": null,
+  "skill-compound-engineering": 1883,
+  "placebo-cx-4": null
+ },
+ "buckets": [
+  {
+   "bucket": "cx-1",
+   "members": [
+    "planning-with-files"
+   ],
+   "target_tokens": 171,
+   "member_tokens": {
+    "planning-with-files": 171
+   },
+   "from_placebo": "cx-1",
+   "placebo_tokens_now": null,
+   "scale": null
+  },
+  {
+   "bucket": "cx-2",
+   "members": [
+    "mattpocock"
+   ],
+   "target_tokens": 657,
+   "member_tokens": {
+    "mattpocock": 657
+   },
+   "from_placebo": "cx-3",
+   "placebo_tokens_now": 1172,
+   "scale": 0.5606
+  },
+  {
+   "bucket": "cx-3",
+   "members": [
+    "superpowers"
+   ],
+   "target_tokens": 791,
+   "member_tokens": {
+    "superpowers": 791
+   },
+   "from_placebo": "cx-2",
+   "placebo_tokens_now": null,
+   "scale": null
+  },
+  {
+   "bucket": "cx-4",
+   "members": [
+    "compound-engineering",
+    "ponytail"
+   ],
+   "target_tokens": 1963,
+   "member_tokens": {
+    "compound-engineering": 1883,
+    "ponytail": 2043
+   },
+   "from_placebo": "cx-4",
+   "placebo_tokens_now": null,
+   "scale": null
+  },
+  {
+   "bucket": "cx-5",
+   "members": [
+    "agent-skills"
+   ],
+   "target_tokens": 2312,
+   "member_tokens": {
+    "agent-skills": 2312
+   },
+   "from_placebo": "cx-4",
+   "placebo_tokens_now": null,
+   "scale": null
+  }
+ ]
+}

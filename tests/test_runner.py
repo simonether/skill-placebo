@@ -138,3 +138,19 @@ def test_infra_failure_classification(tmp_path):
     assert infra_failure(j) is None
     (j / "t1" / "result.json").write_text(json.dumps({"exception_info": {"exception_type": "RuntimeError", "exception_message": "Docker compose command failed ... 429"}}))
     assert infra_failure(j) == "RuntimeError"
+
+
+def test_arm_not_applied_detects_missing_plugin(tmp_path):
+    from skill_placebo.runner import Arm, arm_not_applied
+    job = tmp_path / "job"
+    t = job / "trial"
+    (t / "agent").mkdir(parents=True)
+    (t / "result.json").write_text("{}")
+    arm = Arm("placebo-cc-5", ("--ae", "CLAUDE_CODE_PLUGIN_DIRS=/opt/plugins/placebo-cc-5"))
+    init = {"type": "system", "subtype": "init", "plugins": [{"name": "agents-md", "path": "builtin"}]}
+    (t / "agent" / "claude-code.txt").write_text(json.dumps(init))
+    assert arm_not_applied(job, arm)
+    init["plugins"].append({"name": "session-notes-cc-5", "path": "/opt/plugins/placebo-cc-5"})
+    (t / "agent" / "claude-code.txt").write_text(json.dumps(init))
+    assert arm_not_applied(job, arm) is None
+    assert arm_not_applied(job, Arm("baseline")) is None
