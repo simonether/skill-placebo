@@ -1,6 +1,6 @@
 #!/bin/bash
 # After the running Claude Code kill test: resume it (retries), then Codex selection and kill test.
-cd $HOME/projects/skill-placebo || exit 1
+cd "$(dirname "$0")/.." || exit 1
 while pgrep -f "scripts/[p]ilot.py kill --harness claude-code" >/dev/null; do sleep 30; done
 echo "$(date) CC kill process gone"
 uv run python -u scripts/pilot.py kill --harness claude-code --units-budget 145e6 --usd-budget 370 \
