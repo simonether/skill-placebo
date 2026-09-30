@@ -74,3 +74,14 @@ def test_verifier_rerun_timeout_again_is_a_failed_trial(tmp_path):
     (t / "verifier_rerun.json").write_text(json.dumps({"outcome": "timeout again"}))
     (r,) = list(rows(tmp_path))
     assert r["passed"] == 0 and r["verifier_rerun"] == "timeout again"
+
+
+def test_add_tests_dir_error_is_infrastructure(tmp_path):
+    job = tmp_path / "b00-0106__claude-code__skill-karpathy__pandas-etl"
+    t = job / "pandas-etl__x"
+    (t / "agent").mkdir(parents=True)
+    (t / "result.json").write_text(json.dumps({"task_name": "pandas-etl", "trial_name": "x",
+        "agent_info": {"model_info": {"name": "claude-opus-5-5"}}, "agent_result": {},
+        "exception_info": {"exception_type": "AddTestsDirError"}}))
+    (r,) = list(rows(tmp_path))
+    assert r["passed"] is None and r["infra_failure"] == 1

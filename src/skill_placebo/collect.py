@@ -63,7 +63,8 @@ def cost_from_tokens(model: str, n_input: int, n_cached: int, n_cache_write: int
 
 def _is_infra(exc: dict) -> bool:
     t = exc.get("exception_type")
-    return t in {"AgentSetupTimeoutError", "EnvironmentStartTimeoutError", "HealthcheckError", "SandboxBuildFailedError"} \
+    return t in {"AgentSetupTimeoutError", "EnvironmentStartTimeoutError", "HealthcheckError", "SandboxBuildFailedError",
+                 "AddTestsDirError"} \
         or (t == "RuntimeError" and "docker" in str(exc.get("exception_message", "")).lower())
 
 
