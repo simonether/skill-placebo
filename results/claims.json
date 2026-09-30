@@ -36,7 +36,7 @@
       {
        "claim": "~54% less code",
        "claimed_change": -0.54,
-       "our_measure": "final diff size vs baseline",
+       "our_measure": "final diff size vs baseline: lines added + deleted + untracked, SWE-bench tasks only, trials after the measure was switched on (METHOD.md amendment 12a)",
        "our_key": "diff_lines_vs_baseline"
       },
       {

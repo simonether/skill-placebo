@@ -121,6 +121,53 @@ def session_pins(trial_dir: Path) -> dict:
     return {"cli_versions": sorted(v for v in ver if v), "models": sorted(m for m in models if m)}
 
 
+EDIT_TOOLS = {"Edit", "MultiEdit", "Write", "NotebookEdit"}
+
+
+def _nlines(text) -> int:
+    return (text.count("\n") + (0 if text.endswith("\n") else 1)) if isinstance(text, str) and text else 0
+
+
+def edit_tool_lines(trial_dir: Path) -> dict:
+    """Amendment 12(b), exploratory: lines written and replaced by Claude Code's edit tools in calls that
+    succeeded. Edits made through shell commands are not seen, so this is not the final diff."""
+    calls: dict[str, tuple[str, dict]] = {}
+    failed: set[str] = set()
+    for p in trial_dir.rglob("claude-code.txt"):
+        for line in p.read_text(errors="replace").splitlines():
+            try:
+                ev = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if not isinstance(ev, dict):
+                continue
+            content = (ev.get("message") or {}).get("content")
+            if not isinstance(content, list):
+                continue
+            for c in content:
+                if c.get("type") == "tool_use" and c.get("name") in EDIT_TOOLS:
+                    calls[c.get("id")] = (c["name"], c.get("input") or {})
+                elif c.get("type") == "tool_result" and c.get("is_error"):
+                    failed.add(c.get("tool_use_id"))
+    written = replaced = n = 0
+    for cid, (name, inp) in calls.items():
+        if cid in failed:
+            continue
+        n += 1
+        if name == "Write":
+            written += _nlines(inp.get("content"))
+        elif name == "Edit":
+            written += _nlines(inp.get("new_string"))
+            replaced += _nlines(inp.get("old_string"))
+        elif name == "MultiEdit":
+            for e in inp.get("edits") or []:
+                written += _nlines(e.get("new_string"))
+                replaced += _nlines(e.get("old_string"))
+        elif name == "NotebookEdit":
+            written += _nlines(inp.get("new_source"))
+    return {"edit_calls": n, "edit_lines_written": written, "edit_lines_replaced": replaced}
+
+
 def trial_row(res: Path) -> dict | None:
     """One trial's row from its result.json (jobs/<...>/<job>/<trial>/result.json)."""
     tdir = res.parent
@@ -149,6 +196,7 @@ def trial_row(res: Path) -> dict | None:
         reward = vr.get("reward")
     turns_file = tdir / "agent" / "approval_turns.txt"
     pins = session_pins(tdir)
+    diffrec = _load(tdir / "diff.json")
     return {
         **meta,
         "trial": r.get("trial_name"),
@@ -165,6 +213,14 @@ def trial_row(res: Path) -> dict | None:
         "attempt": attempt,
         "infra_failure": int(_is_infra(exc)),
         "verifier_rerun": vr.get("outcome"),
+        # Amendment 12: (a) exact final diff on SWE-bench tasks from switch-on; (b) edit-tool lines, all trials.
+        "diff_method": diffrec.get("method"),
+        "diff_lines_changed": diffrec.get("lines_changed"),
+        "diff_tracked_added": diffrec.get("tracked_added"),
+        "diff_tracked_deleted": diffrec.get("tracked_deleted"),
+        "diff_untracked_lines": diffrec.get("untracked_lines"),
+        "diff_error": diffrec.get("error"),
+        **edit_tool_lines(tdir),
         "cli_version": ",".join(pins["cli_versions"]),
         "session_model": ",".join(pins["models"]),
         "n_input": n_in, "n_cached": n_c, "n_cache_write": cw, "n_output": n_out,

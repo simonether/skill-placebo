@@ -29,6 +29,9 @@ METRICS = {
     "tokens": lambda r: (r["n_input"] or 0) + (r["n_output"] or 0),
     "output_tokens": lambda r: r["n_output"] or 0,
     "agent_seconds": lambda r: r.get("agent_seconds"),
+    # Amendment 12: (a) exact, SWE-bench tasks from switch-on only; (b) exploratory, every trial.
+    "diff_lines": lambda r: r.get("diff_lines_changed") if (r.get("diff_method") or "").startswith("git") else None,
+    "edit_lines": lambda r: r.get("edit_lines_written"),
 }
 
 
@@ -100,8 +103,12 @@ def main():
         for arm in sorted(present - {"baseline"}):
             m = {}
             for metric in METRICS:
-                c = compare(arm_data(rows, arm, metric), arm_data(rows, "baseline", metric))
-                m[f"{metric}_vs_baseline"] = {"ratio": c.ratio, "ratio_ci": c.ratio_ci, "ratio_p": c.ratio_p}
+                try:
+                    c = compare(arm_data(rows, arm, metric), arm_data(rows, "baseline", metric))
+                except ValueError:  # no task with this metric in both arms (e.g. diff before amendment 12a)
+                    continue
+                m[f"{metric}_vs_baseline"] = {"ratio": c.ratio, "ratio_ci": c.ratio_ci, "ratio_p": c.ratio_p,
+                                              "n_tasks": c.n_tasks, "n_treat": c.n_treat, "n_control": c.n_control}
                 if metric == "cost":
                     m["pass_vs_baseline"] = {"diff_pp": c.diff_pp, "diff_ci_pp": c.diff_ci_pp, "diff_p": c.diff_p,
                                              "pass_arm": c.pass_treat, "pass_baseline": c.pass_control}
