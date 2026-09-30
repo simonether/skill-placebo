@@ -29,11 +29,12 @@ HARNESS_LABEL = {"claude-code": "Claude Code", "codex": "Codex"}
 def rows_from(paths: list[str]) -> list[dict]:
     rows = []
     for p in paths:
+        p, _, label = p.partition("::")  # "results.json::Codex (pilot)" overrides the group label
         d = json.loads(Path(p).read_text())
         h = d.get("harness", "")
         comps = d["comparisons"]
         for skill, c in sorted(comps.items(), key=lambda kv: kv[1]["ratio"]):
-            rows.append({"harness": HARNESS_LABEL.get(h, h), "skill": skill, "r": c["ratio"], "lo": c["ratio_ci"][0],
+            rows.append({"harness": label or HARNESS_LABEL.get(h, h), "skill": skill, "r": c["ratio"], "lo": c["ratio_ci"][0],
                          "hi": c["ratio_ci"][1], "placebo": c.get("placebo", "").replace("placebo-", ""),
                          "verdict": c.get("verdict"), "n": f"{c.get('n_treat')}/{c.get('n_control')}"})
     return rows

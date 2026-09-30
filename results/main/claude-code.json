@@ -1,0 +1,1479 @@
+{
+ "harness": "claude-code",
+ "meta": {
+  "harness": "claude-code",
+  "model": "claude-opus-5-5",
+  "cli_version": "2.1.282",
+  "n_trials": 450,
+  "n_tasks": 15,
+  "n_per_arm": 30,
+  "trials_per_arm": {
+   "baseline": 30,
+   "placebo-cc-1": 30,
+   "placebo-cc-2": 30,
+   "placebo-cc-3": 30,
+   "placebo-cc-4": 30,
+   "placebo-cc-5": 30,
+   "skill-agent-skills": 30,
+   "skill-caveman": 30,
+   "skill-compound-engineering": 30,
+   "skill-i-have-adhd": 30,
+   "skill-karpathy": 30,
+   "skill-mattpocock": 30,
+   "skill-planning-with-files": 30,
+   "skill-ponytail": 30,
+   "skill-superpowers": 30
+  },
+  "excluded": {},
+  "verifier_reruns": 0,
+  "infra_attempts": {
+   "AddTestsDirError": [
+    "2026-09-30T02:08:26.122267Z",
+    "2026-09-30T02:08:26.125246Z"
+   ],
+   "AgentSetupTimeoutError": [
+    "2026-09-30T02:08:26.121282Z"
+   ]
+  },
+  "pins_seen": [
+   [
+    "2.1.282",
+    "claude-opus-5-5"
+   ]
+  ],
+  "first_trial": "2026-09-29T22:22:38.895518Z",
+  "last_trial": "2026-09-30T12:44:35.814968Z",
+  "date": "2026-09-30",
+  "source": "jobs/main/claude-code",
+  "blocks_analysed": [
+   0,
+   1
+  ],
+  "later_block_trials_not_in_primary": 33,
+  "later_blocks": [
+   2
+  ]
+ },
+ "comparisons": {
+  "superpowers": {
+   "verdict": "no better than placebo",
+   "ratio_p_adj": 1.0,
+   "diff_p_adj": 1.0,
+   "n_tasks": 15,
+   "n_treat": 30,
+   "n_control": 30,
+   "cost_treat": 0.20289456666666672,
+   "cost_control": 0.20701523333333335,
+   "pass_treat": 0.8333333333333334,
+   "pass_control": 0.8666666666666667,
+   "ratio": 0.9800948625841868,
+   "ratio_ci": [
+    0.911923624634898,
+    1.0607180974017283
+   ],
+   "ratio_p": 0.6363363663633637,
+   "diff_pp": -3.3333333333333326,
+   "diff_ci_pp": [
+    -10.000000000000009,
+    0.0
+   ],
+   "diff_p": 0.7219278072192781,
+   "cost_per_solved_treat": 0.24347348000000008,
+   "cost_per_solved_control": 0.2388637307692308,
+   "placebo": "placebo-cc-3",
+   "output_tokens_vs_placebo": {
+    "ratio": 0.9799342245760903,
+    "ratio_ci": [
+     0.8726948270684296,
+     1.1001386100200972
+    ]
+   },
+   "mean_output_tokens_skill": 3823.866666666667,
+   "mean_output_tokens_placebo": 3902.1666666666665
+  },
+  "mattpocock": {
+   "verdict": "no better than placebo",
+   "ratio_p_adj": 0.5543445655434456,
+   "diff_p_adj": 1.0,
+   "n_tasks": 15,
+   "n_treat": 30,
+   "n_control": 30,
+   "cost_treat": 0.1986097666666667,
+   "cost_control": 0.18895287333333335,
+   "pass_treat": 0.8333333333333334,
+   "pass_control": 0.8666666666666667,
+   "ratio": 1.0511074172251276,
+   "ratio_ci": [
+    0.9931621404740637,
+    1.1155935352642616
+   ],
+   "ratio_p": 0.0923907609239076,
+   "diff_pp": -3.3333333333333326,
+   "diff_ci_pp": [
+    -10.000000000000009,
+    0.0
+   ],
+   "diff_p": 0.7409259074092591,
+   "cost_per_solved_treat": 0.23833172000000002,
+   "cost_per_solved_control": 0.2180225461538462,
+   "placebo": "placebo-cc-2",
+   "output_tokens_vs_placebo": {
+    "ratio": 1.093635457812889,
+    "ratio_ci": [
+     1.0267239227485618,
+     1.1630705097385958
+    ]
+   },
+   "mean_output_tokens_skill": 4097.633333333333,
+   "mean_output_tokens_placebo": 3746.8
+  },
+  "karpathy": {
+   "verdict": "no better than placebo",
+   "ratio_p_adj": 1.0,
+   "diff_p_adj": 1.0,
+   "n_tasks": 15,
+   "n_treat": 30,
+   "n_control": 30,
+   "cost_treat": 0.20527160666666663,
+   "cost_control": 0.18895287333333335,
+   "pass_treat": 0.8333333333333334,
+   "pass_control": 0.8666666666666667,
+   "ratio": 1.0863640390614504,
+   "ratio_ci": [
+    0.9304126402250308,
+    1.2313065029084032
+   ],
+   "ratio_p": 0.280971902809719,
+   "diff_pp": -3.3333333333333326,
+   "diff_ci_pp": [
+    -13.333333333333341,
+    6.666666666666665
+   ],
+   "diff_p": 0.7501249875012499,
+   "cost_per_solved_treat": 0.24632592799999997,
+   "cost_per_solved_control": 0.2180225461538462,
+   "placebo": "placebo-cc-2",
+   "output_tokens_vs_placebo": {
+    "ratio": 1.0878171595316892,
+    "ratio_ci": [
+     0.9204613588217754,
+     1.2487587094105053
+    ]
+   },
+   "mean_output_tokens_skill": 4075.8333333333335,
+   "mean_output_tokens_placebo": 3746.8
+  },
+  "ponytail": {
+   "verdict": "beats placebo",
+   "ratio_p_adj": 0.048595140485951406,
+   "diff_p_adj": 1.0,
+   "n_tasks": 15,
+   "n_treat": 30,
+   "n_control": 30,
+   "cost_treat": 0.18362628666666672,
+   "cost_control": 0.20951314666666665,
+   "pass_treat": 0.9,
+   "pass_control": 0.8666666666666667,
+   "ratio": 0.876442789333952,
+   "ratio_ci": [
+    0.7585107495848046,
+    0.9735305101724132
+   ],
+   "ratio_p": 0.0053994600539946005,
+   "diff_pp": 3.3333333333333326,
+   "diff_ci_pp": [
+    -6.666666666666665,
+    13.333333333333341
+   ],
+   "diff_p": 0.8021197880211979,
+   "cost_per_solved_treat": 0.20402920740740746,
+   "cost_per_solved_control": 0.24174593846153844,
+   "placebo": "placebo-cc-4",
+   "output_tokens_vs_placebo": {
+    "ratio": 0.7726579874559584,
+    "ratio_ci": [
+     0.6212549655530007,
+     0.9129145845785062
+    ]
+   },
+   "mean_output_tokens_skill": 3092.1,
+   "mean_output_tokens_placebo": 4001.9
+  },
+  "caveman": {
+   "verdict": "no better than placebo",
+   "ratio_p_adj": 1.0,
+   "diff_p_adj": 1.0,
+   "n_tasks": 15,
+   "n_treat": 30,
+   "n_control": 30,
+   "cost_treat": 0.21180906666666663,
+   "cost_control": 0.21485523333333337,
+   "pass_treat": 0.9,
+   "pass_control": 0.8666666666666667,
+   "ratio": 0.9858222365850366,
+   "ratio_ci": [
+    0.9129467183537535,
+    1.0558862704881067
+   ],
+   "ratio_p": 0.7105289471052895,
+   "diff_pp": 3.3333333333333326,
+   "diff_ci_pp": [
+    0.0,
+    9.999999999999998
+   ],
+   "diff_p": 0.7409259074092591,
+   "cost_per_solved_treat": 0.23534340740740736,
+   "cost_per_solved_control": 0.24790988461538463,
+   "placebo": "placebo-cc-5",
+   "output_tokens_vs_placebo": {
+    "ratio": 0.9473241827291867,
+    "ratio_ci": [
+     0.8561650743732947,
+     1.0336183727069665
+    ]
+   },
+   "mean_output_tokens_skill": 3869.5666666666666,
+   "mean_output_tokens_placebo": 4084.733333333333
+  },
+  "agent-skills": {
+   "verdict": "beats placebo",
+   "ratio_p_adj": 0.048595140485951406,
+   "diff_p_adj": 1.0,
+   "n_tasks": 15,
+   "n_treat": 30,
+   "n_control": 30,
+   "cost_treat": 0.20338538,
+   "cost_control": 0.21485523333333337,
+   "pass_treat": 0.8333333333333334,
+   "pass_control": 0.8666666666666667,
+   "ratio": 0.946615899667016,
+   "ratio_ci": [
+    0.8955883790902164,
+    0.9873904139990752
+   ],
+   "ratio_p": 0.0059994000599940004,
+   "diff_pp": -3.3333333333333326,
+   "diff_ci_pp": [
+    -10.000000000000009,
+    0.0
+   ],
+   "diff_p": 0.7219278072192781,
+   "cost_per_solved_treat": 0.244062456,
+   "cost_per_solved_control": 0.24790988461538463,
+   "placebo": "placebo-cc-5",
+   "output_tokens_vs_placebo": {
+    "ratio": 0.9182892396076447,
+    "ratio_ci": [
+     0.8474127927237128,
+     0.9770072121441008
+    ]
+   },
+   "mean_output_tokens_skill": 3750.9666666666667,
+   "mean_output_tokens_placebo": 4084.733333333333
+  },
+  "i-have-adhd": {
+   "verdict": "no better than placebo",
+   "ratio_p_adj": 0.09519048095190481,
+   "diff_p_adj": 1.0,
+   "n_tasks": 15,
+   "n_treat": 30,
+   "n_control": 30,
+   "cost_treat": 0.19027090666666666,
+   "cost_control": 0.20701523333333335,
+   "pass_treat": 0.8666666666666667,
+   "pass_control": 0.8666666666666667,
+   "ratio": 0.9191154853821545,
+   "ratio_ci": [
+    0.8643847431860439,
+    0.981121435622983
+   ],
+   "ratio_p": 0.013598640135986401,
+   "diff_pp": 0.0,
+   "diff_ci_pp": [
+    -10.000000000000009,
+    9.999999999999998
+   ],
+   "diff_p": 1.0,
+   "cost_per_solved_treat": 0.21954335384615384,
+   "cost_per_solved_control": 0.2388637307692308,
+   "placebo": "placebo-cc-3",
+   "output_tokens_vs_placebo": {
+    "ratio": 0.9770896510485628,
+    "ratio_ci": [
+     0.905506811453028,
+     1.0532986466633034
+    ]
+   },
+   "mean_output_tokens_skill": 3812.766666666667,
+   "mean_output_tokens_placebo": 3902.1666666666665
+  },
+  "planning-with-files": {
+   "verdict": "no better than placebo",
+   "ratio_p_adj": 1.0,
+   "diff_p_adj": 0.17818218178182182,
+   "n_tasks": 15,
+   "n_treat": 30,
+   "n_control": 30,
+   "cost_treat": 0.2140317266666667,
+   "cost_control": 0.20466953999999998,
+   "pass_treat": 0.8333333333333334,
+   "pass_control": 1.0,
+   "ratio": 1.0457429408727197,
+   "ratio_ci": [
+    0.914754099940134,
+    1.1880020618071445
+   ],
+   "ratio_p": 0.5391460853914608,
+   "diff_pp": -16.666666666666664,
+   "diff_ci_pp": [
+    -33.333333333333336,
+    -3.3333333333333326
+   ],
+   "diff_p": 0.0197980201979802,
+   "cost_per_solved_treat": 0.25683807200000003,
+   "cost_per_solved_control": 0.20466953999999998,
+   "placebo": "placebo-cc-1",
+   "output_tokens_vs_placebo": {
+    "ratio": 1.0801657897427428,
+    "ratio_ci": [
+     0.9374293967170747,
+     1.2486931785186082
+    ]
+   },
+   "mean_output_tokens_skill": 4578.066666666667,
+   "mean_output_tokens_placebo": 4238.3
+  },
+  "compound-engineering": {
+   "verdict": "no better than placebo",
+   "ratio_p_adj": 1.0,
+   "diff_p_adj": 1.0,
+   "n_tasks": 15,
+   "n_treat": 30,
+   "n_control": 30,
+   "cost_treat": 0.21586996666666666,
+   "cost_control": 0.20701523333333335,
+   "pass_treat": 0.8666666666666667,
+   "pass_control": 0.8666666666666667,
+   "ratio": 1.0427733418007723,
+   "ratio_ci": [
+    0.9072490605252183,
+    1.2267466673694085
+   ],
+   "ratio_p": 0.6519348065193481,
+   "diff_pp": 0.0,
+   "diff_ci_pp": [
+    -9.999999999999998,
+    9.999999999999998
+   ],
+   "diff_p": 1.0,
+   "cost_per_solved_treat": 0.24908073076923076,
+   "cost_per_solved_control": 0.2388637307692308,
+   "placebo": "placebo-cc-3",
+   "output_tokens_vs_placebo": {
+    "ratio": 1.08876265322684,
+    "ratio_ci": [
+     0.8810821463562345,
+     1.3512701727339524
+    ]
+   },
+   "mean_output_tokens_skill": 4248.533333333334,
+   "mean_output_tokens_placebo": 3902.1666666666665
+  }
+ },
+ "vs_baseline": {
+  "agent-skills": {
+   "cost_vs_baseline": {
+    "ratio": 1.094965177712056,
+    "ratio_ci": [
+     1.017842234445935,
+     1.1928272105270012
+    ],
+    "ratio_p": 0.0165983401659834,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "pass_vs_baseline": {
+    "diff_pp": -3.3333333333333326,
+    "diff_ci_pp": [
+     -10.000000000000009,
+     0.0
+    ],
+    "diff_p": 0.7219278072192781,
+    "pass_arm": 0.8333333333333334,
+    "pass_baseline": 0.8666666666666667
+   },
+   "tokens_vs_baseline": {
+    "ratio": 1.1154906319128899,
+    "ratio_ci": [
+     1.0060205976886112,
+     1.2467113674173007
+    ],
+    "ratio_p": 0.0367963203679632,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "output_tokens_vs_baseline": {
+    "ratio": 0.9507029164272921,
+    "ratio_ci": [
+     0.870109177225472,
+     1.0462904315111097
+    ],
+    "ratio_p": 0.2983701629837016,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "agent_seconds_vs_baseline": {
+    "ratio": 0.886893117567506,
+    "ratio_ci": [
+     0.745192495460434,
+     1.077933768082877
+    ],
+    "ratio_p": 0.24937506249375063,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "diff_lines_vs_baseline": {
+    "ratio": 0.862453531598513,
+    "ratio_ci": [
+     0.7702479338842976,
+     1.1980920314253647
+    ],
+    "ratio_p": 0.2745725427457254,
+    "n_tasks": 7,
+    "n_treat": 10,
+    "n_control": 10
+   },
+   "edit_lines_vs_baseline": {
+    "ratio": 1.5533199195171028,
+    "ratio_ci": [
+     1.2099284158107688,
+     3.761591312056738
+    ],
+    "ratio_p": 0.004011231448054553,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   }
+  },
+  "caveman": {
+   "cost_vs_baseline": {
+    "ratio": 1.1403157509339723,
+    "ratio_ci": [
+     1.0797731421401304,
+     1.2141736287746292
+    ],
+    "ratio_p": 0.00019998000199980003,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "pass_vs_baseline": {
+    "diff_pp": 3.3333333333333326,
+    "diff_ci_pp": [
+     0.0,
+     9.999999999999998
+    ],
+    "diff_p": 0.7409259074092591,
+    "pass_arm": 0.9,
+    "pass_baseline": 0.8666666666666667
+   },
+   "tokens_vs_baseline": {
+    "ratio": 1.1770975540827744,
+    "ratio_ci": [
+     1.082963213023676,
+     1.284943434532039
+    ],
+    "ratio_p": 0.00039996000399960006,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "output_tokens_vs_baseline": {
+    "ratio": 0.9807627319117299,
+    "ratio_ci": [
+     0.9089576683257454,
+     1.0596056381672412
+    ],
+    "ratio_p": 0.6275372462753724,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "agent_seconds_vs_baseline": {
+    "ratio": 0.8869794014658083,
+    "ratio_ci": [
+     0.7652995719594777,
+     1.0270642994104016
+    ],
+    "ratio_p": 0.15278472152784722,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "diff_lines_vs_baseline": {
+    "ratio": 0.8467575382073524,
+    "ratio_ci": [
+     0.7549450549450549,
+     1.2631578947368423
+    ],
+    "ratio_p": 0.29417058294170584,
+    "n_tasks": 7,
+    "n_treat": 9,
+    "n_control": 10
+   },
+   "edit_lines_vs_baseline": {
+    "ratio": 1.1126760563380282,
+    "ratio_ci": [
+     0.43124999999999997,
+     1.3514851485148514
+    ],
+    "ratio_p": 0.5008022462896109,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   }
+  },
+  "compound-engineering": {
+   "cost_vs_baseline": {
+    "ratio": 1.1621784044352756,
+    "ratio_ci": [
+     1.0481450493375721,
+     1.3018533669882062
+    ],
+    "ratio_p": 0.0033996600339966003,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "pass_vs_baseline": {
+    "diff_pp": 0.0,
+    "diff_ci_pp": [
+     -9.999999999999998,
+     9.999999999999998
+    ],
+    "diff_p": 1.0,
+    "pass_arm": 0.8666666666666667,
+    "pass_baseline": 0.8666666666666667
+   },
+   "tokens_vs_baseline": {
+    "ratio": 1.185233424789086,
+    "ratio_ci": [
+     0.9855161913725557,
+     1.4573391375166531
+    ],
+    "ratio_p": 0.08259174082591741,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "output_tokens_vs_baseline": {
+    "ratio": 1.0768138961170628,
+    "ratio_ci": [
+     0.9325662816661083,
+     1.206596262324946
+    ],
+    "ratio_p": 0.3083691630836916,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "agent_seconds_vs_baseline": {
+    "ratio": 1.1690985370507856,
+    "ratio_ci": [
+     0.9020337081001645,
+     1.4788089651133864
+    ],
+    "ratio_p": 0.22097790220977903,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "diff_lines_vs_baseline": {
+    "ratio": 0.9386617100371748,
+    "ratio_ci": [
+     0.8396226415094339,
+     1.1885714285714286
+    ],
+    "ratio_p": 0.7693230676932307,
+    "n_tasks": 7,
+    "n_treat": 10,
+    "n_control": 10
+   },
+   "edit_lines_vs_baseline": {
+    "ratio": 0.9899396378269617,
+    "ratio_ci": [
+     0.4424379232505643,
+     3.5878378378378377
+    ],
+    "ratio_p": 0.99779382270357,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   }
+  },
+  "i-have-adhd": {
+   "cost_vs_baseline": {
+    "ratio": 1.0243608322864732,
+    "ratio_ci": [
+     0.9131033257810458,
+     1.1506858563113043
+    ],
+    "ratio_p": 0.6623337666233376,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "pass_vs_baseline": {
+    "diff_pp": 0.0,
+    "diff_ci_pp": [
+     -10.000000000000009,
+     9.999999999999998
+    ],
+    "diff_p": 1.0,
+    "pass_arm": 0.8666666666666667,
+    "pass_baseline": 0.8666666666666667
+   },
+   "tokens_vs_baseline": {
+    "ratio": 1.0500200659296461,
+    "ratio_ci": [
+     0.9069211017877613,
+     1.2207764954022422
+    ],
+    "ratio_p": 0.543945605439456,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "output_tokens_vs_baseline": {
+    "ratio": 0.966366462775844,
+    "ratio_ci": [
+     0.8399438087887467,
+     1.1300524671172862
+    ],
+    "ratio_p": 0.6999300069993001,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "agent_seconds_vs_baseline": {
+    "ratio": 1.5146248282605246,
+    "ratio_ci": [
+     0.8455238068959102,
+     2.8486084740655704
+    ],
+    "ratio_p": 0.5051494850514948,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "diff_lines_vs_baseline": {
+    "ratio": 1.1505576208178439,
+    "ratio_ci": [
+     1.0032258064516129,
+     1.2312147760115608
+    ],
+    "ratio_p": 0.048995100489951,
+    "n_tasks": 7,
+    "n_treat": 10,
+    "n_control": 10
+   },
+   "edit_lines_vs_baseline": {
+    "ratio": 1.06841046277666,
+    "ratio_ci": [
+     0.5688276933701657,
+     1.941006600660066
+    ],
+    "ratio_p": 0.6436020858403529,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   }
+  },
+  "karpathy": {
+   "cost_vs_baseline": {
+    "ratio": 1.1051200497941684,
+    "ratio_ci": [
+     0.9659642912227572,
+     1.2263334352777506
+    ],
+    "ratio_p": 0.1351864813518648,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "pass_vs_baseline": {
+    "diff_pp": -3.3333333333333326,
+    "diff_ci_pp": [
+     -13.333333333333341,
+     6.666666666666665
+    ],
+    "diff_p": 0.7607239276072393,
+    "pass_arm": 0.8333333333333334,
+    "pass_baseline": 0.8666666666666667
+   },
+   "tokens_vs_baseline": {
+    "ratio": 1.15564410748251,
+    "ratio_ci": [
+     0.9440834647023695,
+     1.3730034332569823
+    ],
+    "ratio_p": 0.1601839816018398,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "output_tokens_vs_baseline": {
+    "ratio": 1.0330421411915784,
+    "ratio_ci": [
+     0.8806342834239661,
+     1.1582227165082133
+    ],
+    "ratio_p": 0.6599340065993401,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "agent_seconds_vs_baseline": {
+    "ratio": 1.0324471078403705,
+    "ratio_ci": [
+     0.7725614361286857,
+     1.4058420206420172
+    ],
+    "ratio_p": 0.8485151484851515,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "diff_lines_vs_baseline": {
+    "ratio": 0.7847996695580339,
+    "ratio_ci": [
+     0.7171492204899778,
+     1.022821838355819
+    ],
+    "ratio_p": 0.073992600739926,
+    "n_tasks": 7,
+    "n_treat": 9,
+    "n_control": 10
+   },
+   "edit_lines_vs_baseline": {
+    "ratio": 1.0140845070422535,
+    "ratio_ci": [
+     0.7623762376237624,
+     1.7163120567375885
+    ],
+    "ratio_p": 0.847573204973927,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   }
+  },
+  "mattpocock": {
+   "cost_vs_baseline": {
+    "ratio": 1.0692547244719195,
+    "ratio_ci": [
+     0.9700712592590409,
+     1.1951921823794691
+    ],
+    "ratio_p": 0.1957804219578042,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "pass_vs_baseline": {
+    "diff_pp": -3.3333333333333326,
+    "diff_ci_pp": [
+     -13.333333333333341,
+     6.666666666666665
+    ],
+    "diff_p": 0.8021197880211979,
+    "pass_arm": 0.8333333333333334,
+    "pass_baseline": 0.8666666666666667
+   },
+   "tokens_vs_baseline": {
+    "ratio": 1.0655488806932092,
+    "ratio_ci": [
+     0.9168552342325332,
+     1.244633990882376
+    ],
+    "ratio_p": 0.44015598440155984,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "output_tokens_vs_baseline": {
+    "ratio": 1.0385674698388023,
+    "ratio_ci": [
+     0.923144066613139,
+     1.1871775042532147
+    ],
+    "ratio_p": 0.5593440655934406,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "agent_seconds_vs_baseline": {
+    "ratio": 1.2352821916316807,
+    "ratio_ci": [
+     0.8261978699860768,
+     1.9094647272556031
+    ],
+    "ratio_p": 0.44735526447355267,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "diff_lines_vs_baseline": {
+    "ratio": 1.187732342007435,
+    "ratio_ci": [
+     0.8998071123192789,
+     1.4703150912106138
+    ],
+    "ratio_p": 0.2535746425357464,
+    "n_tasks": 7,
+    "n_treat": 10,
+    "n_control": 10
+   },
+   "edit_lines_vs_baseline": {
+    "ratio": 2.0261569416498997,
+    "ratio_ci": [
+     1.1092318752877042,
+     12.203703703703702
+    ],
+    "ratio_p": 0.009827517047733655,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   }
+  },
+  "planning-with-files": {
+   "cost_vs_baseline": {
+    "ratio": 1.152281878007086,
+    "ratio_ci": [
+     1.0120748837513416,
+     1.3552387012227098
+    ],
+    "ratio_p": 0.024397560243975602,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "pass_vs_baseline": {
+    "diff_pp": -3.3333333333333326,
+    "diff_ci_pp": [
+     -13.333333333333341,
+     6.666666666666677
+    ],
+    "diff_p": 0.7669233076692331,
+    "pass_arm": 0.8333333333333334,
+    "pass_baseline": 0.8666666666666667
+   },
+   "tokens_vs_baseline": {
+    "ratio": 1.1481693050632584,
+    "ratio_ci": [
+     0.904043207324278,
+     1.4619079532562944
+    ],
+    "ratio_p": 0.32736726327367266,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "output_tokens_vs_baseline": {
+    "ratio": 1.160335912946504,
+    "ratio_ci": [
+     1.0029270992061128,
+     1.3822962411010131
+    ],
+    "ratio_p": 0.043995600439956005,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "agent_seconds_vs_baseline": {
+    "ratio": 2.0547050701407508,
+    "ratio_ci": [
+     1.0125687324098436,
+     3.645186885163113
+    ],
+    "ratio_p": 0.042995700429957005,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "diff_lines_vs_baseline": {
+    "ratio": 0.8847583643122677,
+    "ratio_ci": [
+     0.7097107438016529,
+     1.2642706131078225
+    ],
+    "ratio_p": 0.57994200579942,
+    "n_tasks": 7,
+    "n_treat": 10,
+    "n_control": 10
+   },
+   "edit_lines_vs_baseline": {
+    "ratio": 1.1851106639839033,
+    "ratio_ci": [
+     0.15000000000000002,
+     1.8174603174603174
+    ],
+    "ratio_p": 0.5006016847172082,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   }
+  },
+  "ponytail": {
+   "cost_vs_baseline": {
+    "ratio": 0.9885882142195846,
+    "ratio_ci": [
+     0.8087688435457226,
+     1.1258682336741963
+    ],
+    "ratio_p": 0.9749025097490251,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "pass_vs_baseline": {
+    "diff_pp": 3.3333333333333326,
+    "diff_ci_pp": [
+     0.0,
+     9.999999999999998
+    ],
+    "diff_p": 0.7409259074092591,
+    "pass_arm": 0.9,
+    "pass_baseline": 0.8666666666666667
+   },
+   "tokens_vs_baseline": {
+    "ratio": 1.0362970962429314,
+    "ratio_ci": [
+     0.8873341567035866,
+     1.1775628911399831
+    ],
+    "ratio_p": 0.6097390260973903,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "output_tokens_vs_baseline": {
+    "ratio": 0.783709573856916,
+    "ratio_ci": [
+     0.586590544122855,
+     0.9711411619909257
+    ],
+    "ratio_p": 0.011398860113988602,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "agent_seconds_vs_baseline": {
+    "ratio": 0.8856293739433132,
+    "ratio_ci": [
+     0.7034390966455351,
+     1.1274244532168307
+    ],
+    "ratio_p": 0.35276472352764726,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "diff_lines_vs_baseline": {
+    "ratio": 0.8685366677931734,
+    "ratio_ci": [
+     0.7341430499325236,
+     1.1184056353745289
+    ],
+    "ratio_p": 0.3143685631436856,
+    "n_tasks": 7,
+    "n_treat": 11,
+    "n_control": 10
+   },
+   "edit_lines_vs_baseline": {
+    "ratio": 0.6559356136820926,
+    "ratio_ci": [
+     0.19672131147540986,
+     2.148148148148148
+    ],
+    "ratio_p": 0.3192940232651424,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   }
+  },
+  "superpowers": {
+   "cost_vs_baseline": {
+    "ratio": 1.09232278764077,
+    "ratio_ci": [
+     0.9530254576727729,
+     1.2495773685360458
+    ],
+    "ratio_p": 0.1947805219478052,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "pass_vs_baseline": {
+    "diff_pp": -3.3333333333333326,
+    "diff_ci_pp": [
+     -10.000000000000009,
+     0.0
+    ],
+    "diff_p": 0.7219278072192781,
+    "pass_arm": 0.8333333333333334,
+    "pass_baseline": 0.8666666666666667
+   },
+   "tokens_vs_baseline": {
+    "ratio": 1.0843941993959845,
+    "ratio_ci": [
+     0.9182374920330394,
+     1.2707171610733412
+    ],
+    "ratio_p": 0.3381661833816618,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "output_tokens_vs_baseline": {
+    "ratio": 0.9691798181879626,
+    "ratio_ci": [
+     0.8199094346414848,
+     1.1593422573516825
+    ],
+    "ratio_p": 0.7791220877912208,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "agent_seconds_vs_baseline": {
+    "ratio": 1.1316473450849178,
+    "ratio_ci": [
+     0.8238119040135845,
+     1.6765539351648933
+    ],
+    "ratio_p": 0.533946605339466,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "diff_lines_vs_baseline": {
+    "ratio": 0.9789343246592317,
+    "ratio_ci": [
+     0.9242779078844653,
+     1.1734104046242775
+    ],
+    "ratio_p": 0.8117188281171883,
+    "n_tasks": 7,
+    "n_treat": 12,
+    "n_control": 10
+   },
+   "edit_lines_vs_baseline": {
+    "ratio": 1.2816901408450705,
+    "ratio_ci": [
+     0.5358414697419932,
+     5.994252873563219
+    ],
+    "ratio_p": 0.3933012434817489,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   }
+  }
+ },
+ "placebo_vs_baseline": {
+  "cc-1": {
+   "cost_vs_baseline": {
+    "ratio": 1.1018787055310697,
+    "ratio_ci": [
+     0.9703935645547644,
+     1.2726454651058547
+    ],
+    "ratio_p": 0.148985101489851,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "pass_vs_baseline": {
+    "diff_pp": 13.33333333333333,
+    "diff_ci_pp": [
+     0.0,
+     30.000000000000004
+    ],
+    "diff_p": 0.0715928407159284,
+    "pass_arm": 1.0,
+    "pass_baseline": 0.8666666666666667
+   },
+   "tokens_vs_baseline": {
+    "ratio": 1.1497946010689426,
+    "ratio_ci": [
+     0.9201880305410324,
+     1.4423609997523372
+    ],
+    "ratio_p": 0.2585741425857414,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "output_tokens_vs_baseline": {
+    "ratio": 1.0742202020884728,
+    "ratio_ci": [
+     0.9469537741237403,
+     1.2307449537736956
+    ],
+    "ratio_p": 0.28357164283571645,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "agent_seconds_vs_baseline": {
+    "ratio": 1.2714156128017708,
+    "ratio_ci": [
+     0.9623427765114969,
+     1.6681128955206546
+    ],
+    "ratio_p": 0.09059094090590941,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "diff_lines_vs_baseline": {
+    "ratio": 0.9219330855018588,
+    "ratio_ci": [
+     0.7819209039548023,
+     1.3453784709014833
+    ],
+    "ratio_p": 0.7035296470352965,
+    "n_tasks": 7,
+    "n_treat": 10,
+    "n_control": 10
+   },
+   "edit_lines_vs_baseline": {
+    "ratio": 0.9255533199195172,
+    "ratio_ci": [
+     0.28104575163398693,
+     1.066225165562914
+    ],
+    "ratio_p": 0.3878860810268753,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   }
+  },
+  "cc-2": {
+   "cost_vs_baseline": {
+    "ratio": 1.0172649407181427,
+    "ratio_ci": [
+     0.9062685502087289,
+     1.1602079022053973
+    ],
+    "ratio_p": 0.7773222677732227,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "pass_vs_baseline": {
+    "diff_pp": 0.0,
+    "diff_ci_pp": [
+     -9.999999999999998,
+     9.999999999999998
+    ],
+    "diff_p": 1.0,
+    "pass_arm": 0.8666666666666667,
+    "pass_baseline": 0.8666666666666667
+   },
+   "tokens_vs_baseline": {
+    "ratio": 1.0062435605198181,
+    "ratio_ci": [
+     0.8261007225652893,
+     1.2522102862488718
+    ],
+    "ratio_p": 0.9961003899610039,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "output_tokens_vs_baseline": {
+    "ratio": 0.9496468520834038,
+    "ratio_ci": [
+     0.8406246663076626,
+     1.0993981803292157
+    ],
+    "ratio_p": 0.4781521847815218,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "agent_seconds_vs_baseline": {
+    "ratio": 0.9601618502058301,
+    "ratio_ci": [
+     0.8222061288544966,
+     1.1582856859737178
+    ],
+    "ratio_p": 0.6621337866213378,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "diff_lines_vs_baseline": {
+    "ratio": 0.9007720903631684,
+    "ratio_ci": [
+     0.7931665649786456,
+     1.0455041605482134
+    ],
+    "ratio_p": 0.20937906209379062,
+    "n_tasks": 7,
+    "n_treat": 13,
+    "n_control": 10
+   },
+   "edit_lines_vs_baseline": {
+    "ratio": 1.124748490945674,
+    "ratio_ci": [
+     0.8403041825095056,
+     2.191622340425532
+    ],
+    "ratio_p": 0.27837946249498596,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   }
+  },
+  "cc-3": {
+   "cost_vs_baseline": {
+    "ratio": 1.114507206741881,
+    "ratio_ci": [
+     0.9894556714547096,
+     1.247011680996593
+    ],
+    "ratio_p": 0.0761923807619238,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "pass_vs_baseline": {
+    "diff_pp": 0.0,
+    "diff_ci_pp": [
+     0.0,
+     0.0
+    ],
+    "diff_p": 1.0,
+    "pass_arm": 0.8666666666666667,
+    "pass_baseline": 0.8666666666666667
+   },
+   "tokens_vs_baseline": {
+    "ratio": 1.1075287545214785,
+    "ratio_ci": [
+     0.9936541084746393,
+     1.2614871553893643
+    ],
+    "ratio_p": 0.07039296070392961,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "output_tokens_vs_baseline": {
+    "ratio": 0.9890253793383122,
+    "ratio_ci": [
+     0.8475255641326735,
+     1.1567327650092412
+    ],
+    "ratio_p": 0.9405059494050595,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "agent_seconds_vs_baseline": {
+    "ratio": 1.5886539416517482,
+    "ratio_ci": [
+     0.908534771369713,
+     2.930671251065481
+    ],
+    "ratio_p": 0.2545745425457454,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "diff_lines_vs_baseline": {
+    "ratio": 1.0831361946603584,
+    "ratio_ci": [
+     0.7903474531734538,
+     1.4053537284894837
+    ],
+    "ratio_p": 0.5997400259974003,
+    "n_tasks": 7,
+    "n_treat": 11,
+    "n_control": 10
+   },
+   "edit_lines_vs_baseline": {
+    "ratio": 0.9195171026156941,
+    "ratio_ci": [
+     0.15870017192435332,
+     2.090257648953301
+    ],
+    "ratio_p": 0.8379462494985961,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   }
+  },
+  "cc-4": {
+   "cost_vs_baseline": {
+    "ratio": 1.1279552142483331,
+    "ratio_ci": [
+     1.017873399438087,
+     1.2594045016408804
+    ],
+    "ratio_p": 0.021597840215978402,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "pass_vs_baseline": {
+    "diff_pp": 0.0,
+    "diff_ci_pp": [
+     -9.999999999999998,
+     9.999999999999998
+    ],
+    "diff_p": 1.0,
+    "pass_arm": 0.8666666666666667,
+    "pass_baseline": 0.8666666666666667
+   },
+   "tokens_vs_baseline": {
+    "ratio": 1.1567810882378216,
+    "ratio_ci": [
+     0.9934113969072145,
+     1.339225585495002
+    ],
+    "ratio_p": 0.06359364063593641,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "output_tokens_vs_baseline": {
+    "ratio": 1.0143033354736237,
+    "ratio_ci": [
+     0.9013504228421061,
+     1.1601962662730843
+    ],
+    "ratio_p": 0.8257174282571743,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "agent_seconds_vs_baseline": {
+    "ratio": 1.36832208506676,
+    "ratio_ci": [
+     0.8329296922801465,
+     2.303330933299452
+    ],
+    "ratio_p": 0.387961203879612,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "diff_lines_vs_baseline": {
+    "ratio": 1.0206150726596823,
+    "ratio_ci": [
+     0.7966166858900423,
+     1.1909448818897639
+    ],
+    "ratio_p": 0.9175082491750824,
+    "n_tasks": 7,
+    "n_treat": 11,
+    "n_control": 10
+   },
+   "edit_lines_vs_baseline": {
+    "ratio": 1.9396378269617707,
+    "ratio_ci": [
+     0.9187654702970298,
+     11.65
+    ],
+    "ratio_p": 0.08644203770557561,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   }
+  },
+  "cc-5": {
+   "cost_vs_baseline": {
+    "ratio": 1.156715388044109,
+    "ratio_ci": [
+     1.064532574373959,
+     1.2739866121627268
+    ],
+    "ratio_p": 0.00019998000199980003,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "pass_vs_baseline": {
+    "diff_pp": 0.0,
+    "diff_ci_pp": [
+     0.0,
+     0.0
+    ],
+    "diff_p": 1.0,
+    "pass_arm": 0.8666666666666667,
+    "pass_baseline": 0.8666666666666667
+   },
+   "tokens_vs_baseline": {
+    "ratio": 1.176652117022021,
+    "ratio_ci": [
+     1.0689509273928044,
+     1.2959414140463261
+    ],
+    "ratio_p": 0.0005999400059994001,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "output_tokens_vs_baseline": {
+    "ratio": 1.035297894630124,
+    "ratio_ci": [
+     0.9335490510756282,
+     1.1709151357027654
+    ],
+    "ratio_p": 0.5685431456854314,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "agent_seconds_vs_baseline": {
+    "ratio": 2.0891037050223296,
+    "ratio_ci": [
+     1.0559437715061226,
+     3.332085024510439
+    ],
+    "ratio_p": 0.008999100089991,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   },
+   "diff_lines_vs_baseline": {
+    "ratio": 1.0060408921933086,
+    "ratio_ci": [
+     0.9052069425901202,
+     1.25
+    ],
+    "ratio_p": 0.7725227477252274,
+    "n_tasks": 7,
+    "n_treat": 8,
+    "n_control": 10
+   },
+   "edit_lines_vs_baseline": {
+    "ratio": 0.8853118712273642,
+    "ratio_ci": [
+     0.0,
+     1.2146739130434783
+    ],
+    "ratio_p": 0.697352587244284,
+    "n_tasks": 15,
+    "n_treat": 30,
+    "n_control": 30
+   }
+  }
+ }
+}

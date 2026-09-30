@@ -44,10 +44,10 @@ def agent_seconds(res: Path) -> float | None:
     return (f(a["finished_at"]) - f(a["started_at"])).total_seconds()
 
 
-def collect_rows(jobs: Path, arms: dict) -> tuple[dict, dict]:
+def collect_rows(jobs: Path, arms: dict, blocks: int | None = None) -> tuple[dict, dict]:
     by_trial = defaultdict(list)
     for d in jobs.glob("b*__*"):
-        if d.is_dir():
+        if d.is_dir() and (blocks is None or int(d.name[1:3]) < blocks):
             by_trial[d.name.split("__r")[0]].append(d)
     rows, excluded = [], defaultdict(int)
     for base, attempts in by_trial.items():
@@ -96,9 +96,16 @@ def main():
     ap.add_argument("jobs")
     ap.add_argument("--harness", default="claude-code")
     ap.add_argument("--out", required=True)
+    ap.add_argument("--blocks", type=int, help="primary analysis on complete blocks 0..B-1 only (amendment 17)")
     a = ap.parse_args()
     arms = claude_arms(PRIORITY) if a.harness == "claude-code" else codex_arms(PRIORITY)
-    rows, excluded = collect_rows(Path(a.jobs), arms)
+    rows, excluded = collect_rows(Path(a.jobs), arms, a.blocks)
+    appendix = {}
+    if a.blocks is not None:  # trials of later (incomplete) blocks: counted, not analysed (amendment 17)
+        later, _ = collect_rows(Path(a.jobs), arms, None)
+        later = [r for r in later if int((r.get("block") or "0")) >= a.blocks]
+        appendix = {"blocks_analysed": list(range(a.blocks)), "later_block_trials_not_in_primary": len(later),
+                    "later_blocks": sorted({int(r["block"]) for r in later})}
     present = {r["arm"] for r in rows}
     skills = [s for s in PRIORITY if f"skill-{s}" in present]
     comps, extra = {}, {}
@@ -138,7 +145,7 @@ def main():
             "infra_attempts": infra_attempts(Path(a.jobs)),
             "pins_seen": sorted({(r.get("cli_version"), r.get("session_model")) for r in rows}),
             "first_trial": started[0] if started else None, "last_trial": started[-1] if started else None,
-            "date": (started[-1] or "")[:10] if started else None, "source": str(Path(a.jobs))}
+            "date": (started[-1] or "")[:10] if started else None, "source": str(Path(a.jobs)), **appendix}
     out = {"harness": a.harness, "meta": meta, "comparisons": table, "vs_baseline": vs_base,
            "placebo_vs_baseline": placebo_vs_base}
     Path(a.out).parent.mkdir(parents=True, exist_ok=True)

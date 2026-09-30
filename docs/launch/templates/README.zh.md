@@ -21,9 +21,11 @@
 R 是 skill 的平均成本除以对应安慰剂的平均成本，小于 1 表示 skill 更省。D 是通过率差（百分点）。判定规则见
 [METHOD.md 9.1](METHOD.md#91-verdict-per-skill-and-harness)，对 {{cc.n_skills}} 个 skill 做 Holm 校正。
 
-## Codex（{{codex.model}}，次要结果）
+## Codex（{{codex.model}}，仅试点，次要结果）
 
 {{codex.results_table}}
+
+这是 Codex 试点阶段的 kill 测试：{{codex.n_skills}} 个 skill、{{codex.n_tasks}} 个任务、每组 {{codex.n_per_arm}} 次试验。v1 没有进行 Codex 主实验。
 
 ## 局限
 

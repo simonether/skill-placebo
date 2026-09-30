@@ -19,14 +19,14 @@
 R is the skill's mean cost divided by its placebo's; below 1 the skill is cheaper. D is the pass-rate
 difference. Verdicts follow [METHOD.md 9.1](METHOD.md#91-verdict-per-skill-and-harness), with Holm
 correction across the {{cc.n_skills}} skills. D stays out of the headline: {{cc.d_sentence}}. This is v1: {{cc.n_per_arm}} trials per arm
-([METHOD.md, amendment 16](METHOD.md)); more runs come as updates.
+([METHOD.md, amendments 16-17](METHOD.md)); more runs come as updates.
 
-## Codex ({{codex.model}}, secondary)
+## Codex ({{codex.model}}): pilot only, secondary
 
 {{codex.results_table}}
 
-Codex ran the pre-registered minimal design: {{codex.n_skills}} skills, {{codex.n_per_arm}} trials per arm
-([METHOD.md, amendments 15-16](METHOD.md)).
+These are the pilot's kill test on Codex: {{codex.n_skills}} skills on {{codex.n_tasks}} tasks, {{codex.n_per_arm}} trials per arm.
+The Codex main run did not take place for v1 ([METHOD.md, amendment 17](METHOD.md)); it may come as an update.
 
 ## What the READMEs claim, and what we measured
 
