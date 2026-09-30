@@ -798,3 +798,22 @@ Decided by the hub for the owner on 2026-09-30 (the owner wants an earlier launc
    "Codex results" post). Nothing about the top-up's design changes.
 
 **Runs affected:** the main run from the switch; the Codex top-up's publication.
+
+### Amendment 14 (2026-09-30, during the main run, before any analysis): a missing reward file gets the same single rerun
+
+**Reason** (hub, 2026-09-30). A trial whose verifier leaves no reward file (`RewardFileNotFoundError`) can
+mean that the agent broke the environment (an agent failure) or that the verifier itself failed
+(infrastructure). Counting it always as a failed trial would be wrong half the time, and so would
+counting it always as infrastructure.
+
+**Change.** It is handled exactly like a verifier timeout under amendment 9: the verifier runs once more,
+with the same tests and timeout and no agent, in a fresh container from the snapshot taken before the
+first verification. If the rerun writes a reward, that reward is the trial's result and the episode is
+flagged as infrastructure (`verifier_rerun` in the data); if the reward file is missing again (or the rerun
+times out), it is a failed trial. Checked end to end without a model: a task whose first verification left
+no reward file and whose rerun wrote one gave reward 1; a task that never wrote one stayed a failed trial.
+
+**Retroactive.** No pilot or main-run trial so far has had `RewardFileNotFoundError` (0 of all trials up to
+the switch-on, whose time is in the log), so nothing changes in past data.
+
+**Runs affected:** the main run from the runner restart that switches it on; the Codex top-up.

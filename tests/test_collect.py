@@ -85,3 +85,17 @@ def test_add_tests_dir_error_is_infrastructure(tmp_path):
         "exception_info": {"exception_type": "AddTestsDirError"}}))
     (r,) = list(rows(tmp_path))
     assert r["passed"] is None and r["infra_failure"] == 1
+
+
+def test_reward_file_missing_uses_rerun_like_a_timeout(tmp_path):
+    job = tmp_path / "b00-0001__claude-code__placebo-cc-4__pandas-etl"
+    t = job / "pandas-etl__x"
+    (t / "agent").mkdir(parents=True)
+    (t / "result.json").write_text(json.dumps({"task_name": "pandas-etl", "trial_name": "x",
+        "agent_info": {"model_info": {"name": "claude-opus-5-5"}}, "agent_result": {},
+        "exception_info": {"exception_type": "RewardFileNotFoundError"}}))
+    (r,) = list(rows(tmp_path))
+    assert r["passed"] == 0 and r["infra_failure"] == 0  # without a rerun: a failed trial
+    (t / "verifier_rerun.json").write_text(json.dumps({"outcome": "rerun within timeout", "reward": 1.0}))
+    (r,) = list(rows(tmp_path))
+    assert r["passed"] == 1 and r["verifier_rerun"] == "rerun within timeout"

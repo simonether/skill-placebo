@@ -71,8 +71,9 @@ INFRA_EXCEPTIONS = {
     # First seen 2026-09-30 while Docker Desktop was paused; infrastructure at any time, not only then.
     "AddTestsDirError": "verifier crashed: could not upload its tests",
 }
-# Not infrastructure: VerifierTimeoutError (amendment 9 reruns it once), AgentTimeoutError,
-# NonZeroAgentExitCodeError, RewardFileNotFoundError (the agent can break the tests).
+# Not infrastructure: AgentTimeoutError, NonZeroAgentExitCodeError. VerifierTimeoutError (amendment 9) and
+# RewardFileNotFoundError (amendment 14) get one verifier rerun on the snapshot: a reward there counts and the
+# episode is flagged; otherwise a failed trial.
 
 
 def _is_infra(exc: dict) -> bool:
@@ -206,7 +207,8 @@ def trial_row(res: Path) -> dict | None:
     # METHOD.md amendment 9: a verifier timeout is verified once more on the agent's final state;
     # a rerun within the timeout gives the trial's reward, and the episode is flagged.
     vr = _load(tdir / "verifier_rerun.json")
-    if exc.get("exception_type") == "VerifierTimeoutError" and vr.get("outcome") == "rerun within timeout":
+    if exc.get("exception_type") in ("VerifierTimeoutError", "RewardFileNotFoundError") \
+            and vr.get("outcome") == "rerun within timeout":
         reward = vr.get("reward")
     turns_file = tdir / "agent" / "approval_turns.txt"
     pins = session_pins(tdir)

@@ -359,6 +359,9 @@ def rerun_result(rerun_job: Path) -> dict:
     return {"reward": None, "exception": "no result"}
 
 
+RERUN_ON = ("VerifierTimeoutError", "RewardFileNotFoundError")
+
+
 def verifier_rerun(job_dir: Path, task_dir: Path, env: dict | None) -> list[dict]:
     """METHOD.md amendment 9: a trial whose verifier timed out is verified once more, on the image
     committed before its first verification, with the same verifier and timeout and no agent.
@@ -372,12 +375,15 @@ def verifier_rerun(job_dir: Path, task_dir: Path, env: dict | None) -> list[dict
         if not res.exists() or (tdir / "verifier_rerun.json").exists():
             continue
         info = json.loads(res.read_text()).get("exception_info") or {}
-        if info.get("exception_type") != "VerifierTimeoutError":
+        # Amendment 9: verifier timeouts; amendment 14: a missing reward file (the agent may have broken
+        # the environment, or the verifier itself failed) gets the same single rerun.
+        if info.get("exception_type") not in RERUN_ON:
             continue
         snap = {}
         if (tdir / "snapshot.json").exists():
             snap = json.loads((tdir / "snapshot.json").read_text())
-        rec = {"source": "snapshot before the first verification", "snapshot": snap.get("image"),
+        rec = {"source": "snapshot before the first verification", "trigger": info.get("exception_type"),
+               "snapshot": snap.get("image"),
                "snapshot_error": snap.get("error"), "attempts": []}
         if not snap.get("image"):
             rec["outcome"] = "no snapshot"
@@ -392,13 +398,15 @@ def verifier_rerun(job_dir: Path, task_dir: Path, env: dict | None) -> list[dict
                     subprocess.run(cmd, cwd=ROOT, env=env, stdout=f, stderr=subprocess.STDOUT)
                 r = rerun_result(base / name)
                 rec["attempts"].append({"job": f"verifier-rerun/{name}", **r})
-                if r["reward"] is not None or r["exception"] == "VerifierTimeoutError":
+                if r["reward"] is not None or r["exception"] in RERUN_ON:
                     break
             last = rec["attempts"][-1]
             if last["reward"] is not None:
                 rec.update(outcome="rerun within timeout", reward=last["reward"])
             elif last["exception"] == "VerifierTimeoutError":
                 rec["outcome"] = "timeout again"
+            elif last["exception"] == "RewardFileNotFoundError":
+                rec["outcome"] = "no reward file again"
             else:
                 rec["outcome"] = f"rerun failed: {last['exception']}"
         (tdir / "verifier_rerun.json").write_text(json.dumps(rec, indent=1) + "\n")

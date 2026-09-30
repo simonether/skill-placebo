@@ -446,3 +446,13 @@ def test_infra_classification_table(tmp_path):
         (job / "t" / "result.json").write_text(json.dumps({"exception_info": {"exception_type": exc}}))
         assert infra_failure(job) == expected, exc
     assert "AddTestsDirError" in INFRA_EXCEPTIONS
+
+
+def test_verifier_rerun_also_triggers_on_missing_reward_file(tmp_path):
+    from skill_placebo.runner import verifier_rerun
+
+    t = tmp_path / "job" / "trial__x"
+    t.mkdir(parents=True)
+    (t / "result.json").write_text(json.dumps({"task_name": "t", "exception_info": {"exception_type": "RewardFileNotFoundError"}}))
+    (rec,) = verifier_rerun(tmp_path / "job", tmp_path / "task", None)
+    assert rec["trigger"] == "RewardFileNotFoundError" and rec["outcome"] == "no snapshot"
