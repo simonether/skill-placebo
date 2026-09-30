@@ -76,4 +76,4 @@ MIT, see [LICENSE](LICENSE).
 `[![placebo-tested](https://raw.githubusercontent.com/simonether/skill-placebo/main/docs/badges/<skill>-cc.svg)](https://github.com/simonether/skill-placebo#results-claude-code)`
 
 ---
-<sub>Made by Simon (@simonether) · I build production-grade AI MVPs at Keelfast.</sub>
+<sub>Made by Simon (@simonether) · I take AI-built apps from demo to production at Keelfast.</sub>
