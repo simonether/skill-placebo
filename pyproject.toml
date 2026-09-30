@@ -1,6 +1,6 @@
 [project]
 name = "skill-placebo"
-version = "0.0.1"
+version = "0.1.0"
 description = "Placebo-controlled benchmark of the most-starred coding agent skills"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -26,3 +26,7 @@ packages = ["src/skill_placebo"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.hatch.build.targets.sdist]
+# Only the package and what it needs to explain itself; tasks, arms and results live in the repository.
+include = ["/src", "/README.md", "/LICENSE", "/METHOD.md"]

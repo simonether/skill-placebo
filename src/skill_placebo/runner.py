@@ -633,7 +633,7 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
               week_pause_probe_s: int = 3600, disk_pause_gib: float | None = None,
               disk_stop_gib: float | None = None, disk_check_s: int = 60,
               max_concurrency: int | None = None, codex_week_cap_action: str = "stop",
-              codex_relative_stop: bool = True) -> BatchState:
+              codex_relative_stop: bool = True, secrets: dict | None = None) -> BatchState:
     """units_budget: stop once the ledger's limit units since window_start (the plan's weekly reset,
     UTC) reach it - the translation of 25% of the week (METHOD.md amendment 2). Required for
     real runs. pace_units_5h: never start a trial while the trailing 5 hours hold that many units.
@@ -680,7 +680,9 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
         raise SystemExit("units_budget or usd_budget is required for real runs (METHOD.md amendments 1-2)")
     units_budget = float("inf") if units_budget is None else units_budget
     usd_budget = float("inf") if usd_budget is None else usd_budget
-    env = None if dry_run else clean_env(harness, load_secrets())
+    # Logins: from .secrets/api.env (the study), or passed in (the CLI takes them from the environment, so no
+    # user token is ever written to disk).
+    env = None if dry_run else clean_env(harness, load_secrets() if secrets is None else secrets)
     if not dry_run:
         for t in trials:  # a trial that finished after a stop was recorded: adopt it, don't rerun
             if t.job_name not in state.done and list((jobs_dir / t.job_name).glob("*/result.json")):
