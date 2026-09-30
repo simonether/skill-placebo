@@ -67,6 +67,31 @@ def _is_infra(exc: dict) -> bool:
         or (t == "RuntimeError" and "docker" in str(exc.get("exception_message", "")).lower())
 
 
+def partial_usage(trial_dir: Path) -> dict:
+    """Tokens of an attempt that never wrote result.json (runner or host stopped mid-trial), from
+    the per-message usage in Claude Code's stream (largest value per message id), in trial_row's
+    terms: n_input includes cache reads and writes."""
+    msgs: dict[str, dict] = {}
+    for p in trial_dir.rglob("claude-code.txt"):
+        for line in p.read_text(errors="replace").splitlines():
+            try:
+                ev = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if not isinstance(ev, dict) or ev.get("type") != "assistant":
+                continue
+            m = ev.get("message") or {}
+            u = m.get("usage") or {}
+            cur = msgs.setdefault(m.get("id") or str(len(msgs)), {})
+            for k in ("input_tokens", "cache_creation_input_tokens", "cache_read_input_tokens", "output_tokens"):
+                cur[k] = max(cur.get(k, 0), u.get(k) or 0)
+    tot = {k: sum(m.get(k, 0) for m in msgs.values()) for k in
+           ("input_tokens", "cache_creation_input_tokens", "cache_read_input_tokens", "output_tokens")}
+    n_c, cw, n_out = tot["cache_read_input_tokens"], tot["cache_creation_input_tokens"], tot["output_tokens"]
+    return {"n_input": tot["input_tokens"] + n_c + cw, "n_cached": n_c, "n_cache_write": cw, "n_output": n_out,
+            "messages": len(msgs)}
+
+
 def trial_row(res: Path) -> dict | None:
     """One trial's row from its result.json (jobs/<...>/<job>/<trial>/result.json)."""
     tdir = res.parent

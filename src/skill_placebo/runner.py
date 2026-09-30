@@ -242,6 +242,43 @@ def _docker(*args: str, timeout: float = 300) -> subprocess.CompletedProcess:
     return subprocess.run(["docker", *args], capture_output=True, text=True, timeout=timeout)
 
 
+def record_interrupted(job_dir: Path, harness: str, model: str) -> dict | None:
+    """An attempt without result.json and without a live Harbor process was interrupted (runner or
+    host stopped). Record it once: <job>/interrupted.json and a ledger row with the tokens it used,
+    flagged as an infrastructure failure; the trial itself is retried (METHOD.md section 7)."""
+    from .collect import cost_from_tokens, partial_usage, units_from_tokens
+
+    if (job_dir / "interrupted.json").exists() or list(job_dir.glob("*/result.json")):
+        return None
+    if subprocess.run(["pgrep", "-f", "--", f"--job-name {re.escape(job_dir.name)}( |$)"],
+                      capture_output=True).returncode == 0:
+        return None  # still running (e.g. a trial finishing while its runner is replaced)
+    trial_dirs = [d for d in job_dir.glob("*/") if (d / "config.json").exists()]
+    u = partial_usage(job_dir)
+    rec = {"reason": "interrupted: no result.json and no live Harbor process (runner or host stopped)",
+           "phase": "verification" if any((d / "snapshot.json").exists() for d in trial_dirs) else "agent or setup",
+           "tokens_from": "partial Claude Code stream", **u}
+    (job_dir / "interrupted.json").write_text(json.dumps(rec, indent=1) + "\n")
+    mm = re.search(r"__r(\d+)$", job_dir.name)
+    row = {"ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "job": job_dir.name,
+           "trial": trial_dirs[0].name if trial_dirs else None, "arm": job_dir.name.split("__")[2],
+           "model": model.split("/")[-1], "exception": "Interrupted", "attempt": int(mm.group(1)) if mm else 0,
+           "infra_failure": 1, "n_input": u["n_input"], "n_cached": u["n_cached"],
+           "n_cache_write": u["n_cache_write"], "n_output": u["n_output"],
+           "cost_est_usd": cost_from_tokens(model, u["n_input"], u["n_cached"], u["n_cache_write"], u["n_output"]),
+           "units": units_from_tokens(u["n_input"], u["n_cached"], u["n_cache_write"], u["n_output"]),
+           "arm_hash": None, "verifier_rerun": None, "passed": None, "plan_five_hour": None, "plan_week": None}
+    with open(ledger_path(harness), "a") as f:
+        f.write(json.dumps(row) + "\n")
+    return rec
+
+
+def units_from_partial(u: dict) -> float:
+    from .collect import units_from_tokens
+
+    return units_from_tokens(u["n_input"], u["n_cached"], u["n_cache_write"], u["n_output"])
+
+
 def remove_snapshots(job_dir: Path) -> None:
     """Delete the snapshot images of a finished attempt (they are only needed for a rerun)."""
     for snap in job_dir.glob("*/snapshot.json"):
@@ -609,6 +646,14 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
                 ledger_add(harness.name, jobs_dir / t.job_name)
     def attempts_so_far(t: Trial) -> list[Path]:
         return [d for d in [jobs_dir / t.job_name] + sorted(jobs_dir.glob(f"{t.job_name}__r*")) if d.is_dir()]
+
+    if not dry_run:  # attempts cut off by a stopped runner or host: count their tokens, then retry
+        for t in trials:
+            for d in attempts_so_far(t):
+                rec = record_interrupted(d, harness.name, harness.model)
+                if rec:
+                    print(f"{msk_now()} {d.name}: interrupted during {rec['phase']}, "
+                          f"{units_from_partial(rec) / 1e6:.2f}M units recorded, trial will be retried", flush=True)
 
     if not dry_run:  # a trial whose last attempt failed on infrastructure gets its remaining retries
         for t in trials:

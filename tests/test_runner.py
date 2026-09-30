@@ -261,3 +261,34 @@ def test_run_batch_pauses_then_stops_on_low_disk(tmp_path, monkeypatch, capsys):
     out = capsys.readouterr().out
     assert "disk pause" in out and state.stopped.startswith("host disk free 3.0 GiB")
     assert started == []  # no trial started
+
+
+def test_interrupted_attempt_is_recorded_once_with_its_tokens(tmp_path, monkeypatch):
+    from skill_placebo import runner
+
+    monkeypatch.setattr(runner, "ROOT", tmp_path)
+    (tmp_path / "jobs").mkdir()
+    job = tmp_path / "jobs" / "b00-0069__claude-code__placebo-cc-5__fix_async_worker_queue"
+    t = job / "fix_async_worker_queue__x"
+    (t / "agent").mkdir(parents=True)
+    (t / "config.json").write_text("{}")
+    (job / "result.json").write_text("{}")  # Harbor's job-level result exists; the trial's does not
+    ev = lambda mid, out: json.dumps({"type": "assistant", "message": {"id": mid, "usage": {
+        "input_tokens": 10, "cache_creation_input_tokens": 100, "cache_read_input_tokens": 1000, "output_tokens": out}}})
+    (t / "agent" / "claude-code.txt").write_text("\n".join([ev("m1", 5), ev("m1", 50), ev("m2", 20), "not json"]))
+    rec = runner.record_interrupted(job, "claude-code", "anthropic/claude-opus-5-5")
+    assert rec["phase"] == "agent or setup" and rec["messages"] == 2
+    assert rec["n_output"] == 70 and rec["n_cached"] == 2000 and rec["n_input"] == 2220
+    (row,) = [json.loads(x) for x in runner.ledger_path("claude-code").read_text().splitlines()]
+    assert row["exception"] == "Interrupted" and row["infra_failure"] == 1 and row["arm"] == "placebo-cc-5"
+    assert row["units"] == 20 * 1.0 + 200 * 1.25 + 2000 * 0.1 + 70 * 5
+    assert runner.record_interrupted(job, "claude-code", "anthropic/claude-opus-5-5") is None  # once
+
+
+def test_finished_attempt_is_not_interrupted(tmp_path):
+    from skill_placebo.runner import record_interrupted
+
+    t = tmp_path / "job" / "trial__x"
+    t.mkdir(parents=True)
+    (t / "result.json").write_text("{}")
+    assert record_interrupted(tmp_path / "job", "claude-code", "m") is None
