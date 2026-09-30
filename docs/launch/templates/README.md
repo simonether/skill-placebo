@@ -68,6 +68,10 @@ uvx skill-placebo run DietrichGebert/ponytail   # one skill: baseline, placebo, 
 - [ ] Propose a skill: open an issue with the repository
 - [ ] Rerun on fresh tasks (a recent SWE-rebench slice)
 
+## License
+
+MIT, see [LICENSE](LICENSE).
+
 ## Badge for tested skills
 
 `[![placebo-tested](https://raw.githubusercontent.com/simonether/skill-placebo/main/docs/badges/<skill>-cc.svg)](https://github.com/simonether/skill-placebo#results-claude-code)`
