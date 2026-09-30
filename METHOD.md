@@ -747,3 +747,31 @@ resets on 2026-10-04 and 2026-10-11, only batch 1 fits before 2026-10-08; batch 
 fresh quota is confirmed by a probe.
 
 **Runs affected:** the Codex top-up.
+
+### Amendment 12 (2026-09-30, during the main run, before any analysis and before the change is switched on): size of the final diff
+
+**Reason.** Section 8 lists the size of the final diff as a secondary outcome, and it is the quantity
+closest to one README claim (ponytail, "~54% less code"). It was not collected: Harbor's SWE-bench
+verifier prints the test patch, not the agent's changes, and every container is removed after its trial.
+Found on 2026-09-30 while preparing the claims table; decided by the hub for the owner the same day.
+
+**Change.**
+1. **(a) Exact measure on the SWE-bench subset (7 of 15 tasks), from the moment it is switched on.**
+   Right before verification, in the same hook as the snapshot (amendment 9), read-only commands in the
+   container: `git diff --numstat` of the working tree against the task's base commit (the commit its
+   verifier checks out), plus the line count of untracked files (`git ls-files --others
+   --exclude-standard`, `wc -l`), with `GIT_OPTIONAL_LOCKS=0` so that git writes nothing. No `git add`,
+   no index change: the verifier applies its test patch to this repository afterwards. For the other
+   tasks, `docker diff` (paths added, changed, deleted) is logged as an exploratory record only and does
+   not enter the claims table. A failure of this step is written to the trial's record; it neither fails
+   the trial nor causes an infrastructure retry.
+2. **(b) Exploratory measure for every trial: lines written by the agent's edit tools** (Claude Code's
+   Edit, MultiEdit, Write and NotebookEdit calls that succeeded, from the session log): lines written and
+   lines replaced. Edits made through shell commands are not seen, so (b) is not the final diff and is
+   labelled that way wherever it appears.
+3. Trials that ran before (a) was switched on have no (a) record. Blocks are randomized, so which trials
+   miss it depends on time, not on arm. The number is recorded in the log when (a) is switched on.
+4. The claims table compares ponytail's "~54% less code" with (a) only, on the SWE-bench subset, with its
+   n shown; if n is small, the table says so. (b) appears as an exploratory column.
+
+**Runs affected:** the main run from the moment (a) is switched on (the design is unchanged); the analysis.
