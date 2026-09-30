@@ -14,7 +14,8 @@
 
 > 药物试验会给对照组吃糖丸。我们也给 coding agent 准备了一颗：与每个 skill 长度相同、安装方式相同的中性说明文字。
 
-**9 个 skill 中 2 个优于安慰剂，0 个更差，7 个没有差别。** 对照组：同样长度、同样安装方式的中性安慰剂。<br>
+**9 个 skill 中 2 个优于安慰剂（Holm 校正后 p = 0.049），0 个更差，7 个没有差别。** 对照组：同样长度、同样安装方式的中性安慰剂。<br>
+次要结果（与不装 skill 相比）：没有一个 skill 的成本明显低于不装 skill；同样长度的安慰剂本身使成本变化 +2% to +16%。<br>
 <sub>测量日期 2026-09-30：15 个公开任务（SWE-bench Verified、Terminal-Bench 2.1、OpenThoughts-TBLite），Claude Code + claude-opus-5-5，每组 30 次试验，共 450 次。方法在第一次运行前登记：[METHOD.md](METHOD.md)。原始轨迹：[`results/`](results/)。复现一行：`git clone https://github.com/simonether/skill-placebo && cd skill-placebo && uv run skill-placebo run <owner/repo>`。</sub>
 
 ## 结果：Claude Code（claude-opus-5-5）

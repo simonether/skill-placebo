@@ -891,3 +891,17 @@ infrastructure failures, plan windows and disk had been reported).
    show them as they are, and the headline stays on cost and verdicts (section 9.2).
 
 **Runs affected:** the main run (stopped); the Codex runs of amendments 15-16 (not run).
+
+### Amendment 18 (2026-09-30, after the analysis, before publication): where the data are released
+
+Section 15 says the raw trajectories are published. They are, in two parts, because the agents' full logs are
+large (about 560 MB for the Claude Code run: documents that the tasks give the agent are inside, base64-encoded):
+- **Per-trial records in the repository** (`results/main/claude-code/`, `results/pilot/codex/`): each trial's
+  Harbor result (tokens, reward, exceptions), the verifier's output and reward, the final-diff and snapshot
+  records of amendments 9, 12 and 14, and the approval turns. Layout: `trials/<arm>/<job>/` for the primary
+  analysis (blocks 0-1, amendment 17), `appendix-block2/` for the incomplete block, `not-analysed/` for every
+  other attempt with its reason.
+- **The agents' full logs** (Claude Code's raw stream and the ATIF trajectory per trial; the Codex rollouts) as
+  assets of GitHub release v0.1.0, one archive per harness, under the same paths; their sha256 are committed in
+  `results/*/*/AGENT_LOGS.json`.
+Everything passed `scripts/scrub.py` (keys, the runner's home path, e-mail) before export.

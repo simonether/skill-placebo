@@ -11,7 +11,8 @@
 
 > 药物试验会给对照组吃糖丸。我们也给 coding agent 准备了一颗：与每个 skill 长度相同、安装方式相同的中性说明文字。
 
-**{{cc.n_skills}} 个 skill 中 {{cc.n_beats}} 个优于安慰剂，{{cc.n_worse}} 个更差，{{cc.n_nobetter}} 个没有差别。** 对照组：同样长度、同样安装方式的中性安慰剂。<br>
+**{{cc.headline_zh}}。** 对照组：同样长度、同样安装方式的中性安慰剂。<br>
+{{cc.secondary_line_zh}}<br>
 <sub>测量日期 {{date}}：{{cc.n_tasks}} 个公开任务（SWE-bench Verified、Terminal-Bench 2.1、OpenThoughts-TBLite），Claude Code + {{cc.model}}，每组 {{cc.n_per_arm}} 次试验，共 {{cc.n_trials}} 次。方法在第一次运行前登记：[METHOD.md](METHOD.md)。原始轨迹：[`results/`](results/)。复现一行：`{{run_cmd}}`。</sub>
 
 ## 结果：Claude Code（{{cc.model}}）

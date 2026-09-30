@@ -83,10 +83,22 @@
      "their_setup": "repository description, read with gh api on 2026-09-30",
      "parts": [
       {
+       "claim": "65% fewer tokens (talking like a caveman: the agent's output)",
+       "claimed_change": -0.65,
+       "our_measure": "output tokens vs baseline (comparable to the claim)",
+       "our_key": "output_tokens_vs_baseline"
+      },
+      {
        "claim": "65% fewer tokens",
        "claimed_change": -0.65,
-       "our_measure": "total tokens vs baseline (output tokens alongside)",
+       "our_measure": "total tokens vs baseline (input and cache included; not the claim's metric)",
        "our_key": "tokens_vs_baseline"
+      },
+      {
+       "claim": "65% fewer tokens",
+       "claimed_change": -0.65,
+       "our_measure": "cost vs baseline (not the claim's metric)",
+       "our_key": "cost_vs_baseline"
       }
      ]
     },

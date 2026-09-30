@@ -10,7 +10,8 @@
 > Drug trials give the control group a sugar pill. We gave coding agents one: neutral instructions of the same length, installed the same way as each skill.
 
 **{{cc.headline}}.** Control: a same-length neutral placebo, installed like the skill.<br>
-<sub>Measured {{date}} on {{cc.n_tasks}} public tasks (SWE-bench Verified, Terminal-Bench 2.1, OpenThoughts-TBLite) with {{cc.model}} in Claude Code, {{cc.n_per_arm}} trials per arm, {{cc.n_trials}} trials in total. Method registered before the first run: [METHOD.md](METHOD.md). Per-trial records: [`results/`](results/); the agents' full logs are a release asset (sha256 in `results/*/*/AGENT_LOGS.json`). Reproduce a row: `{{run_cmd}}`.</sub>
+{{cc.secondary_line}}<br>
+<sub>Measured {{date}} on {{cc.n_tasks}} public tasks (SWE-bench Verified, Terminal-Bench 2.1, OpenThoughts-TBLite) with {{cc.model}} in Claude Code, {{cc.n_per_arm}} trials per arm, {{cc.n_trials}} trials in total. Method registered before the first run: [METHOD.md](METHOD.md). Per-trial records: [`results/`](results/); the agents' full logs: [release v0.1.0](https://github.com/simonether/skill-placebo/releases/tag/v0.1.0) (sha256 in `results/*/*/AGENT_LOGS.json`). Reproduce a row: `{{run_cmd}}`.</sub>
 
 ## Results: Claude Code ({{cc.model}})
 
