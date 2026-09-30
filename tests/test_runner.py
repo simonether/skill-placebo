@@ -361,3 +361,32 @@ def test_run_batch_waits_while_pause_file_exists(tmp_path, monkeypatch, capsys):
     out = capsys.readouterr().out
     assert "pause:" in out and "resume: PAUSE removed" in out and sleeps == [60]
     assert state.stopped.startswith("host disk")
+
+
+def test_concurrency_file_changes_parallelism_without_restart(tmp_path, monkeypatch):
+    import threading
+    from skill_placebo import runner
+
+    monkeypatch.setattr(runner, "ROOT", tmp_path)
+    monkeypatch.setattr(runner, "sweep_snapshots", lambda own=None: None)
+    monkeypatch.setattr(runner, "verifier_rerun", lambda *a, **k: [])
+    monkeypatch.setattr(runner, "remove_snapshots", lambda d: None)
+    jobs = tmp_path / "jobs" / "b"
+    jobs.mkdir(parents=True)
+    (jobs / "CONCURRENCY").write_text("3")
+    live, peak, lock = [0], [0], threading.Lock()
+
+    def fake_run(cmd, **k):
+        with lock:
+            live[0] += 1
+            peak[0] = max(peak[0], live[0])
+        import time as _t
+        _t.sleep(0.05)
+        with lock:
+            live[0] -= 1
+        return type("R", (), {"returncode": 0})()
+    monkeypatch.setattr(runner.subprocess, "run", fake_run)
+    trials = runner.plan([f"t{i}" for i in range(9)], [runner.Arm("baseline")], "test-h", n=1, seed=1)
+    state = runner.run_batch(trials, runner.Harness("test-h", "a", "m"), {"baseline": runner.Arm("baseline")},
+                             jobs, units_budget=1e9, concurrency=2, max_concurrency=3)
+    assert peak[0] == 3 and len(state.done) == 9 and state.stopped is None

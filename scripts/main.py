@@ -112,6 +112,7 @@ def main():
     print(f"{harness} main: {len(trials)} trials, {len(arms)} arms: {', '.join(x.name for x in arms)}")
     state = run_batch(trials, HARNESSES[harness], {x.name: x for x in arms}, jobs_dir, mounts=mounts(),
                       concurrency=a.concurrency if harness == "codex" else 2, dry_run=a.dry_run,
+                      max_concurrency=3 if harness == "claude-code" else None,  # CONCURRENCY file, amendment 13
                       stop_after=a.stop_after, **guards, **DISK_GUARDS)
     if state.stopped:
         print(f"STOPPED: {state.stopped}")

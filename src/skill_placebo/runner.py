@@ -611,7 +611,8 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
               claude_week_cap: float = 0.80, claude_week_cap_action: str = "stop",
               claude_week_relative_stop: bool = True, rolling_week: bool = False,
               week_pause_probe_s: int = 3600, disk_pause_gib: float | None = None,
-              disk_stop_gib: float | None = None, disk_check_s: int = 60) -> BatchState:
+              disk_stop_gib: float | None = None, disk_check_s: int = 60,
+              max_concurrency: int | None = None) -> BatchState:
     """units_budget: stop once the ledger's limit units since window_start (the plan's weekly reset,
     UTC) reach it - the translation of 25% of the week (METHOD.md amendment 2). Required for
     real runs. pace_units_5h: never start a trial while the trailing 5 hours hold that many units.
@@ -630,7 +631,10 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
     ledger budget applies per limit week. Every trial whose verifier times out is verified once
     more on its snapshot (amendment 9). disk_pause_gib / disk_stop_gib: before each trial starts,
     pause while the host volume has less free space than the first, stop below the second (Docker
-    Desktop's disk can share the host volume with other projects)."""
+    Desktop's disk can share the host volume with other projects).
+    max_concurrency: upper bound for <jobs_dir>/CONCURRENCY, a file holding the wanted number of
+    parallel trials; it is read whenever a slot frees, so the load changes without a restart (a lower
+    number lets running trials finish and starts fewer). Without the file, `concurrency` applies."""
     jobs_dir.mkdir(parents=True, exist_ok=True)
     lock = jobs_dir / ".lock"
     if not dry_run:
@@ -770,10 +774,28 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
             time.sleep(disk_check_s)
         return t
 
-    with ThreadPoolExecutor(max_workers=concurrency) as pool:
+    top = max(concurrency, max_concurrency or concurrency)
+    last_wanted = {"n": None}
+
+    def wanted() -> int:
+        n = concurrency
+        f = jobs_dir / "CONCURRENCY"
+        if not dry_run and f.exists():
+            try:
+                n = int(f.read_text().strip())
+            except ValueError:
+                pass
+        n = max(1, min(top, n))
+        if n != last_wanted["n"]:
+            if last_wanted["n"] is not None:
+                print(f"{msk_now()} concurrency {last_wanted['n']} -> {n}", flush=True)
+            last_wanted["n"] = n
+        return n
+
+    with ThreadPoolExecutor(max_workers=top) as pool:
         pending = iter(todo)
         running = {}
-        for _ in range(concurrency):
+        for _ in range(wanted()):
             t = paced_next()
             if t:
                 running[pool.submit(one, t)] = t
@@ -845,8 +867,10 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
                     for f in running:
                         f.cancel()
                     break
-            t_next = paced_next() if not state.stopped else None
-            if t_next and not state.stopped:
+            while not state.stopped and len(running) < wanted():
+                t_next = paced_next()
+                if not t_next or state.stopped:
+                    break
                 running[pool.submit(one, t_next)] = t_next
     save()
     if not dry_run and lock.exists():

@@ -775,3 +775,26 @@ Found on 2026-09-30 while preparing the claims table; decided by the hub for the
    n shown; if n is small, the table says so. (b) appears as an exploratory column.
 
 **Runs affected:** the main run from the moment (a) is switched on (the design is unchanged); the analysis.
+
+### Amendment 13 (2026-09-30, during the main run, before any analysis): concurrency 3; Codex decoupled from the launch date
+
+Decided by the hub for the owner on 2026-09-30 (the owner wants an earlier launch, tentatively
+2026-10-06). Resource and schedule reasons only; no result has been looked at.
+
+1. **Concurrency 3 instead of 2** for the rest of the Claude Code main run, while three conditions hold:
+   the Docker VM keeps at least 1.5 GiB of memory available with three trial containers; the host has at
+   least 15 GiB of free disk; the median trial wall time, normalized per task against the trials before
+   the switch, rises by no more than 30%. If any fails, the runner goes back to 2 (a watchdog writes the
+   wanted number into the batch's `CONCURRENCY` file; the runner reads it whenever a slot frees, so no
+   restart and no trial is lost). All other guards are unchanged, including the pause at 80% of the
+   5-hour window. The switch time and any change back are recorded in the log.
+2. **Effect on the analysis.** Cost, tokens and pass rate do not depend on local load. Wall time (a
+   secondary outcome) does. Blocks are randomized, so every arm meets both load levels in the same
+   proportion; wall-time comparisons are additionally adjusted for the period (before or after each
+   switch), and the switch times are reported with them.
+3. **Codex is decoupled from the launch.** The launch publishes the Claude Code main run as the result and
+   the Codex pilot as a secondary result with its actual n. The Codex top-up (amendment 11) runs after
+   the 2026-10-04 reset; its results come out as an update 2-3 days after the launch (README and a
+   "Codex results" post). Nothing about the top-up's design changes.
+
+**Runs affected:** the main run from the switch; the Codex top-up's publication.
