@@ -871,3 +871,23 @@ disk).
    more tasks or harnesses) is an update under its own amendment.
 
 **Runs affected:** the rest of the Claude Code main run; the Codex run.
+
+### Amendment 17 (2026-09-30, after the owner stopped the run, before any look at outcomes): stop at N = 2; no Codex main run
+
+**Decision.** The owner, 2026-09-30 about 17:58 MSK (via the hub): do not start Codex, and stop the Claude
+Code run where it is, because the machine had been lagging throughout the run. The stop is about load on the
+owner's machine and is blind: no one had looked at main-run outcomes by arm (only counts of trials,
+infrastructure failures, plan windows and disk had been reported).
+
+**Change** (replaces amendment 16's volume):
+1. The Claude Code runner stopped at 18:02 MSK; the two trials in flight finished and were recorded. Complete
+   blocks: 0 and 1, i.e. N = 2 for every arm and task: 15 arms x 15 tasks x 2 = 450 trials.
+2. **The primary analysis uses blocks 0-1 only** (450 trials), with the pre-registered analysis of section 9
+   unchanged. The 33 valid trials of the incomplete block 2 are not in the primary analysis (block 2 covers
+   the arms unevenly); they are reported in an appendix line with their number.
+3. **No Codex main run.** The launch reports the Codex pilot (kill test, amendment 8) as a secondary result
+   with its actual n. A Codex main run may come later as an update under its own amendment.
+4. With N = 2 the confidence intervals are wider than the N = 5 design assumed (section 13, power); the tables
+   show them as they are, and the headline stays on cost and verdicts (section 9.2).
+
+**Runs affected:** the main run (stopped); the Codex runs of amendments 15-16 (not run).
