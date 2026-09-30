@@ -13,7 +13,7 @@
 > Drug trials give the control group a sugar pill. We gave coding agents one: neutral instructions of the same length, installed the same way as each skill.
 
 **2 of 9 skills beat a same-length placebo (0 worse, 7 no better).** Control: a same-length neutral placebo, installed like the skill.<br>
-<sub>Measured 2026-09-30 on 15 public tasks (SWE-bench Verified, Terminal-Bench 2.1, OpenThoughts-TBLite) with claude-opus-5-5 in Claude Code, 30 trials per arm, 450 trials in total. Method registered before the first run: [METHOD.md](METHOD.md). Raw trajectories: [`results/`](results/). Reproduce a row: `git clone https://github.com/simonether/skill-placebo && cd skill-placebo && uv run skill-placebo run <owner/repo>`.</sub>
+<sub>Measured 2026-09-30 on 15 public tasks (SWE-bench Verified, Terminal-Bench 2.1, OpenThoughts-TBLite) with claude-opus-5-5 in Claude Code, 30 trials per arm, 450 trials in total. Method registered before the first run: [METHOD.md](METHOD.md). Per-trial records: [`results/`](results/); the agents' full logs are a release asset (sha256 in `results/*/*/AGENT_LOGS.json`). Reproduce a row: `git clone https://github.com/simonether/skill-placebo && cd skill-placebo && uv run skill-placebo run <owner/repo>`.</sub>
 
 ## Results: Claude Code (claude-opus-5-5)
 
