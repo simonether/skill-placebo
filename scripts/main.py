@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from skill_placebo.arms import PRIORITY, claude_arms, codex_arms, mounts, placebo_bucket_of  # noqa: E402
+from skill_placebo.arms import NOT_ON_CODEX, PRIORITY, claude_arms, codex_arms, mounts, placebo_bucket_of  # noqa: E402
 from skill_placebo.collect import write_csv  # noqa: E402
 from skill_placebo.harnesses import HARNESSES  # noqa: E402
 from skill_placebo.runner import plan, run_batch  # noqa: E402
@@ -46,6 +46,17 @@ def selected_tasks() -> list[str]:
     return [f"pool/{t}" for t in json.loads((ROOT / "tasks" / "selected.json").read_text())["selected"]]
 
 
+CODEX_MINIMAL_N = 3
+
+
+def codex_floorless_tasks() -> list[str]:
+    """The selected tasks in seeded order without those where Codex's baseline selection trial failed."""
+    import pilot
+
+    outcomes = pilot.selection_outcomes("codex")
+    return [t for t in selected_tasks() if outcomes.get(t.split("/")[-1]) and all(outcomes[t.split("/")[-1]])]
+
+
 def codex_topup_tasks() -> list[str]:
     """The selected tasks in their seeded order without those where Codex's baseline selection trial
     failed (the floor), first CODEX_TOPUP_TASKS of them (amendment 9)."""
@@ -58,7 +69,7 @@ def codex_topup_tasks() -> list[str]:
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("step", choices=["claude-code", "codex-probe", "codex-topup", "collect"])
+    ap.add_argument("step", choices=["claude-code", "codex-probe", "codex-topup", "codex-minimal", "collect"])
     ap.add_argument("--batch", type=int, choices=[1, 2], help="codex-topup: which batch of N=2 (amendment 11)")
     ap.add_argument("--weekly-start", type=float, help="codex-topup: Codex weekly used %% at the start of this quota (probe)")
     ap.add_argument("--concurrency", type=int, default=2)
@@ -89,6 +100,24 @@ def main():
             print(f"PROBE codex weekly={rl.get('weekly')}% five_hour={rl.get('five_hour')}% "
                   f"weekly_resets_at={utc_iso(rl['weekly_resets_at']) if rl.get('weekly_resets_at') else None} "
                   f"stopped={state.stopped}")
+        return
+
+    if a.step == "codex-minimal":  # amendment 15: the pre-registered minimal design on Codex, final buckets
+        harness, all_arms = "codex", codex_arms(PRIORITY)
+        skills = [s for s in PRIORITY[:6] if s not in NOT_ON_CODEX]
+        names = ["baseline"] + [f"skill-{s}" for s in skills]
+        names += sorted({f"placebo-{placebo_bucket_of(s, harness)}" for s in skills})
+        arms = [all_arms[n] for n in names]
+        trials = plan(codex_floorless_tasks(), arms, harness, n=CODEX_MINIMAL_N, seed=SEED)
+        jobs_dir = ROOT / "jobs" / "main" / harness
+        print(f"codex minimal: {len(trials)} trials, {len(arms)} arms: {', '.join(x.name for x in arms)}")
+        state = run_batch(trials, HARNESSES[harness], {x.name: x for x in arms}, jobs_dir, mounts=mounts(),
+                          concurrency=a.concurrency, max_concurrency=3, dry_run=a.dry_run, stop_after=a.stop_after,
+                          codex_pace_pct=90.0, codex_weekly_cap=95.0, codex_week_cap_action="pause",
+                          codex_relative_stop=False, **DISK_GUARDS)
+        if state.stopped:
+            print(f"STOPPED: {state.stopped}")
+            sys.exit(2)
         return
 
     if a.step == "claude-code":

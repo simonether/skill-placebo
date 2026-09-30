@@ -632,7 +632,8 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
               claude_week_relative_stop: bool = True, rolling_week: bool = False,
               week_pause_probe_s: int = 3600, disk_pause_gib: float | None = None,
               disk_stop_gib: float | None = None, disk_check_s: int = 60,
-              max_concurrency: int | None = None) -> BatchState:
+              max_concurrency: int | None = None, codex_week_cap_action: str = "stop",
+              codex_relative_stop: bool = True) -> BatchState:
     """units_budget: stop once the ledger's limit units since window_start (the plan's weekly reset,
     UTC) reach it - the translation of 25% of the week (METHOD.md amendment 2). Required for
     real runs. pace_units_5h: never start a trial while the trailing 5 hours hold that many units.
@@ -654,7 +655,9 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
     Desktop's disk can share the host volume with other projects).
     max_concurrency: upper bound for <jobs_dir>/CONCURRENCY, a file holding the wanted number of
     parallel trials; it is read whenever a slot frees, so the load changes without a restart (a lower
-    number lets running trials finish and starts fewer). Without the file, `concurrency` applies."""
+    number lets running trials finish and starts fewer). Without the file, `concurrency` applies.
+    codex_week_cap_action: "stop" or "pause" (until the weekly reset Codex reports) at codex_weekly_cap;
+    codex_relative_stop: the +weekly_budget_pp stop over the start value (lifted by the owner, amendment 15)."""
     jobs_dir.mkdir(parents=True, exist_ok=True)
     lock = jobs_dir / ".lock"
     if not dry_run:
@@ -862,6 +865,11 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
                     if state.codex_weekly_start is None:
                         state.codex_weekly_start = wk
                     state.codex_weekly_last = wk
+                    if codex_week_cap_action == "pause" and wk >= codex_weekly_cap:
+                        until = rl.get("weekly_resets_at") or time.time() + week_pause_probe_s
+                        codex_pause["until"] = max(codex_pause["until"], float(until))
+                        print(f"{msk_now()} pause: Codex week {wk}% >= {codex_weekly_cap}% until "
+                              f"{utc_iso(codex_pause['until'])}", flush=True)
                 state.done.append(t.job_name)
                 for prev in sorted(jobs_dir.glob(f"{t.job_name}__r*")) + [jobs_dir / t.job_name]:
                     if prev.is_dir() and prev != tdir:
@@ -878,14 +886,15 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
                     state.stopped = "limit marker: " + hits[0][:300]
                 elif pin:
                     state.stopped = "pin: " + pin
-                elif wk is not None and state.codex_weekly_start is not None and wk - state.codex_weekly_start > weekly_budget_pp:
+                elif codex_relative_stop and wk is not None and state.codex_weekly_start is not None \
+                        and wk - state.codex_weekly_start > weekly_budget_pp:
                     state.stopped = f"codex weekly usage +{wk - state.codex_weekly_start:.1f} pp > {weekly_budget_pp} pp"
                 elif claude_week_cap_action == "stop" and cw.get("seven_day") is not None and cw["seven_day"] >= claude_week_cap:
                     state.stopped = f"claude plan week utilization {cw['seven_day']:.0%} >= cap {claude_week_cap:.0%}"
                 elif claude_week_relative_stop and cw.get("seven_day") is not None \
                         and (cw["seven_day"] - claude_week_start) * 100 >= weekly_budget_pp:
                     state.stopped = f"claude plan week utilization {cw['seven_day']:.0%} (+{(cw['seven_day']-claude_week_start)*100:.0f} pp)"
-                elif wk is not None and wk >= codex_weekly_cap:
+                elif codex_week_cap_action == "stop" and wk is not None and wk >= codex_weekly_cap:
                     state.stopped = f"codex weekly usage {wk}% >= cap {codex_weekly_cap}%"
                 elif state.usd_spent_window >= units_budget:
                     state.stopped = f"week units {state.usd_spent_window/1e6:.1f}M >= budget {units_budget/1e6:.1f}M"

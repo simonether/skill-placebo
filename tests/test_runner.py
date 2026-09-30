@@ -456,3 +456,39 @@ def test_verifier_rerun_also_triggers_on_missing_reward_file(tmp_path):
     (t / "result.json").write_text(json.dumps({"task_name": "t", "exception_info": {"exception_type": "RewardFileNotFoundError"}}))
     (rec,) = verifier_rerun(tmp_path / "job", tmp_path / "task", None)
     assert rec["trigger"] == "RewardFileNotFoundError" and rec["outcome"] == "no snapshot"
+
+
+def test_codex_week_cap_pauses_instead_of_stopping(tmp_path, monkeypatch, capsys):
+    import time as _t
+    from skill_placebo import runner
+
+    monkeypatch.setattr(runner, "ROOT", tmp_path)
+    monkeypatch.setattr(runner, "sweep_snapshots", lambda own=None: None)
+    monkeypatch.setattr(runner, "docker_ok", lambda: True)
+    monkeypatch.setattr(runner, "verifier_rerun", lambda *a, **k: [])
+    monkeypatch.setattr(runner, "remove_snapshots", lambda d: None)
+    jobs = tmp_path / "jobs" / "cx"
+    reset_at = _t.time() + 3600
+    slept = []
+
+    def fake_run(cmd, **k):
+        if cmd[0] == "pgrep":
+            return type("R", (), {"returncode": 1})()
+        name = cmd[cmd.index("--job-name") + 1]
+        t = jobs / name / "task__x"
+        (t / "agent").mkdir(parents=True)
+        (t / "result.json").write_text(json.dumps({"task_name": "t", "trial_name": "x",
+            "agent_info": {"model_info": {"name": "gpt-6-sol"}}, "agent_result": {}, "verifier_result": {"rewards": {"reward": 1.0}}}))
+        (t / "agent" / "rollout-1.jsonl").write_text(json.dumps({"payload": {"rate_limits": {
+            "primary": {"used_percent": 10.0, "resets_at": _t.time() + 100},
+            "secondary": {"used_percent": 96.0, "resets_at": reset_at}}}}))
+        return type("R", (), {"returncode": 0})()
+    monkeypatch.setattr(runner.subprocess, "run", fake_run)
+    monkeypatch.setattr(runner.time, "sleep", lambda s: slept.append(s))
+    trials = runner.plan(["t1", "t2"], [runner.Arm("baseline")], "codex", n=1, seed=1)
+    state = runner.run_batch(trials, runner.Harness("codex", "a", "openai/gpt-6-sol"), {"baseline": runner.Arm("baseline")},
+                             jobs, concurrency=1, codex_weekly_cap=95.0, codex_week_cap_action="pause",
+                             codex_relative_stop=False, codex_pace_pct=90.0)
+    out = capsys.readouterr().out
+    assert state.stopped is None and len(state.done) == 2
+    assert "pause: Codex week 96.0% >= 95.0%" in out and any(s > 3000 for s in slept)
