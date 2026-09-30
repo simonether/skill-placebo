@@ -817,3 +817,35 @@ no reward file and whose rerun wrote one gave reward 1; a task that never wrote 
 the switch-on, whose time is in the log), so nothing changes in past data.
 
 **Runs affected:** the main run from the runner restart that switches it on; the Codex top-up.
+
+### Amendment 15 (2026-09-30, before any Codex main-run trial): Codex runs the minimal design; the owner lifts the Codex budget stop
+
+**Reason.** The owner (2026-09-30, via the hub): "в codex лимиты еще есть. разрешаю тратить полностью" -
+the whole Codex weekly quota may be used. No Codex data from the top-up exists yet; this is decided before
+any.
+
+**Change** (replaces the Codex top-up of amendments 9 and 11):
+1. **Design: the pre-registered minimal design of section 11.3**, counted with the final Codex buckets of
+   amendment 8. The minimal design keeps the first 6 skills by priority; of those, 4 run on Codex
+   (superpowers, mattpocock, ponytail, agent-skills; karpathy and caveman are not run on Codex, section 3).
+   Arms: baseline, the 4 skills and their placebos cx-2, cx-3, cx-4, cx-5 = 9 arms (section 11.3's "8 arms"
+   was counted with the character buckets, before amendment 8). Tasks: the 15 selected tasks without the 4
+   where Codex's baseline selection trial failed (application-debug, sympy-17630, extract-elf,
+   seaborn-3069) = 11 tasks. N = 3 in 3 randomized blocks, seed 20260930: 9 x 11 x 3 = 297 trials.
+2. **Guards.** The +25-point stop on the Codex week is lifted by the owner. Pause (not stop) while the
+   weekly window is at 95% or more, until its reset (2026-10-04 00:41 UTC); pause while the 5-hour window is
+   at 90% or more, until it resets. Limit, rate-limit and authentication error events still stop the batch.
+   Versions: Codex CLI 0.157.0, gpt-6-sol, medium, checked after every trial (amendment 10).
+3. **Priority to Claude Code.** Codex runs alongside the Claude Code main run with concurrency 1 only while
+   the Docker VM keeps at least 1.5 GiB of memory available, the host at least 15 GiB of free disk, and the
+   per-task median wall time of Claude Code trials stays within +30% of its level before Codex started;
+   otherwise Codex pauses until the Claude Code run ends, then runs with concurrency 2-3.
+4. **Publication.** If the Codex run finishes by 2026-10-04 18:00 MSK, its results go into the 2026-10-06
+   launch; otherwise they come out as an update (amendment 13). The hub decides on 2026-10-04 from the
+   runner's report. The analysis is the pre-registered one (section 9), Holm across the 4 Codex skills.
+
+**Expected use** (pilot rate, 0.21-0.26 points of the Plus week per trial): about 62-77 points for 297
+trials. The week was at 37% on 2026-09-30, so about 225-275 trials fit before the 95% pause and the rest
+run after the 2026-10-04 reset.
+
+**Runs affected:** Codex main run (replaces the top-up; no top-up trial has run).
