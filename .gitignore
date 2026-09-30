@@ -29,3 +29,6 @@ tmp/
 
 # Skill checkouts at pinned shas (scripts/vendor_skills.py)
 vendor/
+
+# Private launch material (third-party contacts): never in git
+docs/launch/private/

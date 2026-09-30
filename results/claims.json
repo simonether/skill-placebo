@@ -1,0 +1,166 @@
+{
+ "retrieved": "2026-09-30",
+ "rule": "METHOD.md section 10: numeric claims in the skill's README at the pinned commit (and the repository description), quoted with file and line; the measured quantity closest to each. Claims without a number are not listed.",
+ "no_numeric_claim_checked_by": "grep for percentages and N-times figures in each README at the pinned commit; hits that describe features or targets (agent-skills '~95% confidence', compound-engineering '80% is in planning') are not claims about the skill's effect",
+ "skills": [
+  {
+   "skill": "superpowers",
+   "repo": "obra/superpowers",
+   "sha": "8ca22dba9a94f28898bbce59f2537ff4d87c747d",
+   "claims": []
+  },
+  {
+   "skill": "mattpocock",
+   "repo": "mattpocock/skills",
+   "sha": "c55ee46073ed923f86ce59a5eb3b6d895095d1b7",
+   "claims": []
+  },
+  {
+   "skill": "karpathy",
+   "repo": "multica-ai/andrej-karpathy-skills",
+   "sha": "2c606141936f1eeef17fa3043a72095b4765b9c2",
+   "claims": []
+  },
+  {
+   "skill": "ponytail",
+   "repo": "DietrichGebert/ponytail",
+   "sha": "e3ba2aa6f1e6f0bc4d69eb09c9f0d0a93af56156",
+   "claims": [
+    {
+     "quote": "~54% less code (up to 94%) · ~20% cheaper · ~27% faster · 100% safe",
+     "file": "README.md",
+     "line": 33,
+     "url": "https://github.com/DietrichGebert/ponytail/blob/e3ba2aa6f1e6f0bc4d69eb09c9f0d0a93af56156/README.md#L33",
+     "their_setup": "mean over 12 feature tasks, Haiku 4.5, n=4, vs the same agent with no skill (README.md:34)",
+     "parts": [
+      {
+       "claim": "~54% less code",
+       "claimed_change": -0.54,
+       "our_measure": "final diff size vs baseline",
+       "our_key": "diff_lines_vs_baseline"
+      },
+      {
+       "claim": "~20% cheaper",
+       "claimed_change": -0.2,
+       "our_measure": "cost vs baseline (and vs placebo)",
+       "our_key": "cost_vs_baseline"
+      },
+      {
+       "claim": "~27% faster",
+       "claimed_change": -0.27,
+       "our_measure": "agent wall time vs baseline",
+       "our_key": "agent_seconds_vs_baseline"
+      }
+     ]
+    },
+    {
+     "quote": "| **ponytail** | **-54%** | **-22%** | **-20%** | **-27%** | **100%** |",
+     "file": "README.md",
+     "line": 85,
+     "url": "https://github.com/DietrichGebert/ponytail/blob/e3ba2aa6f1e6f0bc4d69eb09c9f0d0a93af56156/README.md#L85",
+     "their_setup": "same benchmark; the -22% column is tokens",
+     "parts": [
+      {
+       "claim": "-22% tokens",
+       "claimed_change": -0.22,
+       "our_measure": "total tokens vs baseline",
+       "our_key": "tokens_vs_baseline"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "skill": "caveman",
+   "repo": "JuliusBrussee/caveman",
+   "sha": "2fd153c67988e980fb0b2455c90832159a6a5a25",
+   "claims": [
+    {
+     "quote": "cuts 65% of tokens by talking like a caveman",
+     "file": "GitHub repository description",
+     "line": null,
+     "url": "https://github.com/JuliusBrussee/caveman",
+     "their_setup": "repository description, read with gh api on 2026-09-30",
+     "parts": [
+      {
+       "claim": "65% fewer tokens",
+       "claimed_change": -0.65,
+       "our_measure": "total tokens vs baseline (output tokens alongside)",
+       "our_key": "tokens_vs_baseline"
+      }
+     ]
+    },
+    {
+     "quote": "50% fewer output tokens at the median on top of the terse control. Length only, not correctness",
+     "file": "README.md",
+     "line": 206,
+     "url": "https://github.com/JuliusBrussee/caveman/blob/2fd153c67988e980fb0b2455c90832159a6a5a25/README.md#L206",
+     "their_setup": "ten dev questions, skill vs a plain 'Answer concisely.' control, claude-opus-4-6",
+     "parts": [
+      {
+       "claim": "-50% output tokens vs a terse control",
+       "claimed_change": -0.5,
+       "our_measure": "output tokens vs placebo (our placebo is neutral, not terse)",
+       "our_key": "output_tokens_vs_placebo"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "skill": "agent-skills",
+   "repo": "addyosmani/agent-skills",
+   "sha": "2686b620fc1fed2e8f60c704839c766b8594c6b6",
+   "claims": []
+  },
+  {
+   "skill": "i-have-adhd",
+   "repo": "ayghri/i-have-adhd",
+   "sha": "839872f9d1cd634fed642b4589ce7226199cc15f",
+   "claims": []
+  },
+  {
+   "skill": "planning-with-files",
+   "repo": "OthmanAdi/planning-with-files",
+   "sha": "51c1caa27f9fefe259e45a7cc92fa79ee8787cd7",
+   "claims": [
+    {
+     "quote": "benchmark-96.7% pass (29/30)",
+     "file": "README.md",
+     "line": 33,
+     "url": "https://github.com/OthmanAdi/planning-with-files/blob/51c1caa27f9fefe259e45a7cc92fa79ee8787cd7/README.md#L33",
+     "their_setup": "v2.21.0 eval on claude-sonnet-4-6, 30 assertions of file-pattern fidelity, not task success (README.md:702)",
+     "parts": [
+      {
+       "claim": "96.7% assertion pass rate",
+       "claimed_change": null,
+       "our_measure": "not comparable: our pass is the task's own tests; pass rate vs baseline and placebo is shown",
+       "our_key": "pass_vs_baseline"
+      }
+     ]
+    },
+    {
+     "quote": "the plan on disk turned a 13.3-turn re-orientation into 5.0 turns",
+     "file": "README.md",
+     "line": 75,
+     "url": "https://github.com/OthmanAdi/planning-with-files/blob/51c1caa27f9fefe259e45a7cc92fa79ee8787cd7/README.md#L75",
+     "their_setup": "turns to resume after a context wipe, internal benchmark v1",
+     "parts": [
+      {
+       "claim": "13.3 → 5.0 turns after a context wipe",
+       "claimed_change": -0.6240601503759399,
+       "our_measure": "not measured: single-session tasks, no context wipe (METHOD.md section 13)",
+       "our_key": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "skill": "compound-engineering",
+   "repo": "EveryInc/compound-engineering-plugin",
+   "sha": "e80c5c40440b90672d78f032f6dfaedc0daeb292",
+   "claims": []
+  }
+ ]
+}
