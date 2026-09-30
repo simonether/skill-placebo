@@ -61,10 +61,23 @@ def cost_from_tokens(model: str, n_input: int, n_cached: int, n_cache_write: int
     return (uncached * p[0] + n_cached * p[1] + n_cache_write * p[2] + n_output * p[3]) / 1e6
 
 
+# Harbor exceptions that are infrastructure failures (METHOD.md section 7): the trial is rerun, up to 2 times,
+# and never counts as a failed trial. The one table used by the runner and by the analysis.
+INFRA_EXCEPTIONS = {
+    "AgentSetupTimeoutError": "agent install timed out",
+    "EnvironmentStartTimeoutError": "container did not start",
+    "HealthcheckError": "container did not start",
+    "SandboxBuildFailedError": "container did not start",
+    # First seen 2026-09-30 while Docker Desktop was paused; infrastructure at any time, not only then.
+    "AddTestsDirError": "verifier crashed: could not upload its tests",
+}
+# Not infrastructure: VerifierTimeoutError (amendment 9 reruns it once), AgentTimeoutError,
+# NonZeroAgentExitCodeError, RewardFileNotFoundError (the agent can break the tests).
+
+
 def _is_infra(exc: dict) -> bool:
     t = exc.get("exception_type")
-    return t in {"AgentSetupTimeoutError", "EnvironmentStartTimeoutError", "HealthcheckError", "SandboxBuildFailedError",
-                 "AddTestsDirError"} \
+    return t in INFRA_EXCEPTIONS \
         or (t == "RuntimeError" and "docker" in str(exc.get("exception_message", "")).lower())
 
 

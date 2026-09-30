@@ -69,6 +69,19 @@ def collect_rows(jobs: Path, arms: dict) -> tuple[dict, dict]:
     return rows, dict(excluded)
 
 
+def infra_attempts(jobs: Path) -> dict:
+    """Every attempt (retried ones included) that ended in an infrastructure exception, by type, with the
+    UTC times, so that clusters (e.g. a Docker pause) can be told apart from a steady rate."""
+    from skill_placebo.collect import INFRA_EXCEPTIONS
+    out: dict[str, list[str]] = defaultdict(list)
+    for res in jobs.glob("b*__*/*/result.json"):
+        r = json.loads(res.read_text())
+        t = (r.get("exception_info") or {}).get("exception_type")
+        if t in INFRA_EXCEPTIONS:
+            out[t].append(r.get("started_at"))
+    return {k: sorted(v) for k, v in out.items()}
+
+
 def arm_data(rows, arm, metric):
     out = defaultdict(list)
     for r in rows:
@@ -122,6 +135,7 @@ def main():
             "n_trials": len(rows), "n_tasks": len({r["task"] for r in rows}),
             "n_per_arm": max(per_arm.values()) if per_arm else 0, "trials_per_arm": dict(sorted(per_arm.items())),
             "excluded": excluded, "verifier_reruns": sum(1 for r in rows if r.get("verifier_rerun")),
+            "infra_attempts": infra_attempts(Path(a.jobs)),
             "pins_seen": sorted({(r.get("cli_version"), r.get("session_model")) for r in rows}),
             "first_trial": started[0] if started else None, "last_trial": started[-1] if started else None,
             "date": (started[-1] or "")[:10] if started else None, "source": str(Path(a.jobs))}

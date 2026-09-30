@@ -102,10 +102,7 @@ def plan(tasks: list[str], arms: list[Arm], harness: str, n: int, seed: int) -> 
     return trials
 
 
-# AddTestsDirError: the verifier could not even upload its tests (METHOD.md 7, "verifier crashed"); seen only
-# while Docker Desktop was paused (30.09).
-INFRA_EXCEPTIONS = {"AgentSetupTimeoutError", "EnvironmentStartTimeoutError", "HealthcheckError", "SandboxBuildFailedError",
-                    "AddTestsDirError"}
+from .collect import INFRA_EXCEPTIONS  # noqa: E402 - the one classification table
 MAX_INFRA_RETRIES = 2
 
 

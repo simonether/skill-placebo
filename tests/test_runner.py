@@ -433,3 +433,16 @@ def test_run_batch_waits_for_docker(tmp_path, monkeypatch):
     runner.run_batch(trials, runner.Harness("test-h", "a", "m"), {"baseline": runner.Arm("baseline")},
                      tmp_path / "jobs" / "b", units_budget=1e9, concurrency=1)
     assert slept.count(30) == 2
+
+
+def test_infra_classification_table(tmp_path):
+    from skill_placebo.collect import INFRA_EXCEPTIONS
+    from skill_placebo.runner import infra_failure
+
+    for exc, expected in (("AddTestsDirError", "AddTestsDirError"), ("AgentSetupTimeoutError", "AgentSetupTimeoutError"),
+                          ("VerifierTimeoutError", None), ("AgentTimeoutError", None), ("RewardFileNotFoundError", None)):
+        job = tmp_path / exc
+        (job / "t").mkdir(parents=True)
+        (job / "t" / "result.json").write_text(json.dumps({"exception_info": {"exception_type": exc}}))
+        assert infra_failure(job) == expected, exc
+    assert "AddTestsDirError" in INFRA_EXCEPTIONS
