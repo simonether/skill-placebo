@@ -1,0 +1,48 @@
+downloading uv 0.7.13 aarch64-unknown-linux-gnu
+no checksums to verify
+installing to /root/.local/bin
+  uv
+  uvx
+everything's installed!
+
+To add $HOME/.local/bin to your PATH, either restart your shell or run:
+
+    source $HOME/.local/bin/env (sh, bash, zsh)
+    source $HOME/.local/bin/env.fish (fish)
+Using CPython 3.13.15 interpreter at: /usr/local/bin/python
+Creating virtual environment at: .tbench-testing
+Using Python 3.13.15 environment at: .tbench-testing
+Resolved 4 packages in 1.00s
+Prepared 4 packages in 399ms
+Installed 4 packages in 5ms
+ + iniconfig==2.3.0
+ + packaging==26.3
+ + pluggy==1.6.0
+ + pytest==8.3.4
+Using Python 3.13.15 environment at: .tbench-testing
+Resolved 6 packages in 1.27s
+Downloading pandas (14.5MiB)
+Downloading numpy (15.0MiB)
+ Downloading numpy
+ Downloading pandas
+Prepared 6 packages in 2.44s
+Installed 6 packages in 100ms
+ + numpy==2.5.3
+ + pandas==2.2.3
+ + python-dateutil==2.9.0.post0
+ + pytz==2026.4
+ + six==1.17.0
+ + tzdata==2026.4
+============================= test session starts ==============================
+platform linux -- Python 3.13.15, pytest-8.3.4, pluggy-1.6.0
+rootdir: /tests
+collected 3 items
+
+../tests/test_outputs.py ...                                             [100%]
+
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED ../tests/test_outputs.py::test_result_exists
+PASSED ../tests/test_outputs.py::test_data_matches
+PASSED ../tests/test_outputs.py::test_columns
+============================== 3 passed in 1.49s ===============================

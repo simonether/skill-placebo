@@ -1,0 +1,27 @@
+Waiting for API to start...
+API started successfully
+Downloading pygments (1.2MiB)
+ Downloading pygments
+Installed 14 packages in 13ms
+============================= test session starts ==============================
+platform linux -- Python 3.11.16, pytest-8.4.1, pluggy-1.6.0
+rootdir: /tests
+plugins: json-ctrf-0.3.5, anyio-4.15.1
+collected 11 items
+
+../tests/test_state.py ...........                                       [100%]
+
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED ../tests/test_state.py::test_health_endpoint
+PASSED ../tests/test_state.py::test_workers_are_started
+PASSED ../tests/test_state.py::test_submit_job
+PASSED ../tests/test_state.py::test_get_job_status_exists
+PASSED ../tests/test_state.py::test_get_job_status_not_found
+PASSED ../tests/test_state.py::test_job_gets_processed
+PASSED ../tests/test_state.py::test_job_status_transitions
+PASSED ../tests/test_state.py::test_completed_at_timestamp
+PASSED ../tests/test_state.py::test_multiple_jobs_concurrent
+PASSED ../tests/test_state.py::test_queue_empties_after_processing
+PASSED ../tests/test_state.py::test_job_data_preserved
+============================== 11 passed in 8.73s ==============================

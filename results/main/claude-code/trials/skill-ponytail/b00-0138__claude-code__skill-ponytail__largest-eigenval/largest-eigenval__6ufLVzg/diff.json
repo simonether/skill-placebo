@@ -1,0 +1,1 @@
+{"method": "docker diff (exploratory)", "docker_diff": {"A": 23, "C": 7, "D": 0}, "docker_diff_top": {"/var/lib": 19, "/app/__pycache__": 2, "/app/_ext": 2, "/opt": 1, "/app": 1, "/app/_eig.cpython-313-aarch64-linux-gnu.so": 1, "/app/eigen.py": 1, "/root": 1, "/root/.claude.json": 1, "/var": 1}, "seconds": 1.2}

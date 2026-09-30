@@ -1,0 +1,277 @@
+{
+    "id": "325c2c25-d4f7-40f6-942b-ad59cdd69d78",
+    "task_name": "django__django-11265",
+    "trial_name": "django__django-11265__CifP6u4",
+    "trial_uri": "file://~/projects/skill-placebo/jobs/main/claude-code/b00-0104__claude-code__skill-ponytail__django__django-11265/django__django-11265__CifP6u4",
+    "task_id": {
+        "path": "~/projects/skill-placebo/tasks/pool/swebench-verified/django__django-11265"
+    },
+    "source": null,
+    "task_checksum": "0f9bb1ff9eca546934e2146443e04779d3e20bcefd17adf27dcd13682845c29c",
+    "config": {
+        "task": {
+            "path": "~/projects/skill-placebo/tasks/pool/swebench-verified/django__django-11265",
+            "git_url": null,
+            "git_commit_id": null,
+            "name": null,
+            "ref": null,
+            "overwrite": false,
+            "download_dir": null,
+            "source": null
+        },
+        "trial_name": "django__django-11265__CifP6u4",
+        "trials_dir": "~/projects/skill-placebo/jobs/main/claude-code/b00-0104__claude-code__skill-ponytail__django__django-11265",
+        "install_only": false,
+        "timeout_multiplier": 1.0,
+        "agent_timeout_multiplier": null,
+        "verifier_timeout_multiplier": null,
+        "agent_setup_timeout_multiplier": 2.0,
+        "environment_build_timeout_multiplier": null,
+        "agent": {
+            "name": "skill_placebo.harbor_agents:ClaudeCodeArms",
+            "import_path": null,
+            "model_name": "anthropic/claude-opus-5-5",
+            "n_concurrent": null,
+            "concurrency_group": null,
+            "skills": [],
+            "override_timeout_sec": null,
+            "override_setup_timeout_sec": null,
+            "max_timeout_sec": null,
+            "resume_trajectory": false,
+            "load_trajectory": null,
+            "extra_allowed_hosts": [],
+            "kwargs": {
+                "version": "2.1.282",
+                "reasoning_effort": "medium",
+                "disallowed_tools": "WebSearch,WebFetch"
+            },
+            "env": {
+                "CLAUDE_CODE_PLUGIN_DIRS": "/opt/plugins/ponytail"
+            },
+            "mcp_servers": []
+        },
+        "user_agent": null,
+        "environment": {
+            "type": "docker",
+            "import_path": null,
+            "force_build": false,
+            "delete": true,
+            "cpu_enforcement_policy": "auto",
+            "memory_enforcement_policy": "auto",
+            "override_cpus": null,
+            "override_memory_mb": null,
+            "override_storage_mb": null,
+            "override_gpus": null,
+            "override_tpu": null,
+            "mounts": [
+                {
+                    "type": "bind",
+                    "source": "~/projects/skill-placebo/vendor/agent-skills",
+                    "target": "/opt/plugins/agent-skills",
+                    "read_only": true
+                },
+                {
+                    "type": "bind",
+                    "source": "~/projects/skill-placebo/vendor/caveman",
+                    "target": "/opt/plugins/caveman",
+                    "read_only": true
+                },
+                {
+                    "type": "bind",
+                    "source": "~/projects/skill-placebo/vendor/compound-engineering",
+                    "target": "/opt/plugins/compound-engineering",
+                    "read_only": true
+                },
+                {
+                    "type": "bind",
+                    "source": "~/projects/skill-placebo/vendor/i-have-adhd",
+                    "target": "/opt/plugins/i-have-adhd",
+                    "read_only": true
+                },
+                {
+                    "type": "bind",
+                    "source": "~/projects/skill-placebo/vendor/karpathy",
+                    "target": "/opt/plugins/karpathy",
+                    "read_only": true
+                },
+                {
+                    "type": "bind",
+                    "source": "~/projects/skill-placebo/vendor/mattpocock",
+                    "target": "/opt/plugins/mattpocock",
+                    "read_only": true
+                },
+                {
+                    "type": "bind",
+                    "source": "~/projects/skill-placebo/arms/codex-mkt/agent-skills",
+                    "target": "/opt/plugins/mkt-agent-skills",
+                    "read_only": true
+                },
+                {
+                    "type": "bind",
+                    "source": "~/projects/skill-placebo/arms/codex-mkt/compound-engineering",
+                    "target": "/opt/plugins/mkt-compound-engineering",
+                    "read_only": true
+                },
+                {
+                    "type": "bind",
+                    "source": "~/projects/skill-placebo/arms/codex-mkt/planning-with-files",
+                    "target": "/opt/plugins/mkt-planning-with-files",
+                    "read_only": true
+                },
+                {
+                    "type": "bind",
+                    "source": "~/projects/skill-placebo/arms/codex-mkt/ponytail",
+                    "target": "/opt/plugins/mkt-ponytail",
+                    "read_only": true
+                },
+                {
+                    "type": "bind",
+                    "source": "~/projects/skill-placebo/arms/codex-mkt/superpowers",
+                    "target": "/opt/plugins/mkt-superpowers",
+                    "read_only": true
+                },
+                {
+                    "type": "bind",
+                    "source": "~/projects/skill-placebo/arms/placebo/cc-1",
+                    "target": "/opt/plugins/placebo-cc-1",
+                    "read_only": true
+                },
+                {
+                    "type": "bind",
+                    "source": "~/projects/skill-placebo/arms/placebo/cc-2",
+                    "target": "/opt/plugins/placebo-cc-2",
+                    "read_only": true
+                },
+                {
+                    "type": "bind",
+                    "source": "~/projects/skill-placebo/arms/placebo/cc-3",
+                    "target": "/opt/plugins/placebo-cc-3",
+                    "read_only": true
+                },
+                {
+                    "type": "bind",
+                    "source": "~/projects/skill-placebo/arms/placebo/cc-4",
+                    "target": "/opt/plugins/placebo-cc-4",
+                    "read_only": true
+                },
+                {
+                    "type": "bind",
+                    "source": "~/projects/skill-placebo/arms/placebo/cc-5",
+                    "target": "/opt/plugins/placebo-cc-5",
+                    "read_only": true
+                },
+                {
+                    "type": "bind",
+                    "source": "~/projects/skill-placebo/arms/placebo/cx-1",
+                    "target": "/opt/plugins/placebo-cx-1",
+                    "read_only": true
+                },
+                {
+                    "type": "bind",
+                    "source": "~/projects/skill-placebo/arms/placebo/cx-2",
+                    "target": "/opt/plugins/placebo-cx-2",
+                    "read_only": true
+                },
+                {
+                    "type": "bind",
+                    "source": "~/projects/skill-placebo/arms/placebo/cx-3",
+                    "target": "/opt/plugins/placebo-cx-3",
+                    "read_only": true
+                },
+                {
+                    "type": "bind",
+                    "source": "~/projects/skill-placebo/arms/placebo/cx-4",
+                    "target": "/opt/plugins/placebo-cx-4",
+                    "read_only": true
+                },
+                {
+                    "type": "bind",
+                    "source": "~/projects/skill-placebo/arms/placebo/cx-5",
+                    "target": "/opt/plugins/placebo-cx-5",
+                    "read_only": true
+                },
+                {
+                    "type": "bind",
+                    "source": "~/projects/skill-placebo/vendor/planning-with-files",
+                    "target": "/opt/plugins/planning-with-files",
+                    "read_only": true
+                },
+                {
+                    "type": "bind",
+                    "source": "~/projects/skill-placebo/vendor/ponytail",
+                    "target": "/opt/plugins/ponytail",
+                    "read_only": true
+                },
+                {
+                    "type": "bind",
+                    "source": "~/projects/skill-placebo/vendor/superpowers",
+                    "target": "/opt/plugins/superpowers",
+                    "read_only": true
+                }
+            ],
+            "extra_docker_compose": [],
+            "kwargs": {},
+            "extra_allowed_hosts": []
+        },
+        "verifier": {
+            "override_timeout_sec": null,
+            "max_timeout_sec": null,
+            "disable": false
+        },
+        "artifacts": [],
+        "extra_instruction_paths": [],
+        "extra_instructions": [],
+        "job_id": "ad8bd8ae-b990-4131-918c-763e70ed59b2",
+        "source_trial": null
+    },
+    "agent_info": {
+        "name": "claude-code",
+        "version": "2.1.282",
+        "model_info": {
+            "name": "claude-opus-5-5",
+            "provider": "anthropic"
+        }
+    },
+    "agent_result": {
+        "n_input_tokens": 179063,
+        "n_cache_tokens": 166024,
+        "n_output_tokens": 2662,
+        "cost_usd": 0.19069280000000002,
+        "model_usage": {
+            "claude-opus-5-5": {
+                "n_input_tokens": 179063,
+                "n_cache_tokens": 166024,
+                "n_output_tokens": 2662,
+                "cost_usd": 0.15162380000000003
+            }
+        },
+        "rollout_details": null,
+        "metadata": null
+    },
+    "verifier_result": {
+        "rewards": {
+            "reward": 1.0
+        }
+    },
+    "verifier_environment_mode": "shared",
+    "exception_info": null,
+    "started_at": "2026-09-30T01:56:02.967560Z",
+    "finished_at": "2026-09-30T02:05:54.975135Z",
+    "environment_setup": {
+        "started_at": "2026-09-30T01:56:03.353068Z",
+        "finished_at": "2026-09-30T01:56:18.669821Z"
+    },
+    "agent_setup": {
+        "started_at": "2026-09-30T01:56:18.670854Z",
+        "finished_at": "2026-09-30T01:58:35.699909Z"
+    },
+    "agent_execution": {
+        "started_at": "2026-09-30T01:58:35.714292Z",
+        "finished_at": "2026-09-30T01:59:57.339387Z"
+    },
+    "verifier": {
+        "started_at": "2026-09-30T02:04:42.658587Z",
+        "finished_at": "2026-09-30T02:05:40.448211Z"
+    },
+    "step_results": null
+}

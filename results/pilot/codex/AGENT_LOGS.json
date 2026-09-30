@@ -1,0 +1,7 @@
+{
+ "archive": "skill-placebo-v1-codex-pilot-agent-logs.tar.gz",
+ "sha256": "1fd55e264728cf603a711a64f913aa04e442b66dbef35538d955bbcb2b753300",
+ "bytes": 7517562,
+ "contents": "each trial's agent/claude-code.txt (raw stream) or Codex rollout, and agent/trajectory.json (ATIF), under the same <where>/<arm>/<job>/<trial>/ paths as this folder; scrubbed",
+ "published_as": "GitHub release asset (the owner attaches it at launch)"
+}

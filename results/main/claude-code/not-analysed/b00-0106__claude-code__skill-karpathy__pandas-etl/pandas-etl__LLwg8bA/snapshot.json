@@ -1,0 +1,1 @@
+{"project": "pandas-etl__llwg8ba__env", "error": "RuntimeError: docker ps rc=1: Error response from daemon: Docker Desktop is manually paused. Unpause it through the Whale menu or Dashboard.\n", "seconds": 0.0}

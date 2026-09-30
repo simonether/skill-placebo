@@ -1,0 +1,134 @@
+++ cd /testbed
+++ set +x
+++ python -m pip install -e .
+Obtaining file:///testbed
+  Preparing metadata (setup.py): started
+  Preparing metadata (setup.py): finished with status 'done'
+Requirement already satisfied: mpmath>=0.19 in /opt/miniconda3/envs/testbed/lib/python3.9/site-packages (from sympy==1.5.dev0) (1.3.0)
+Installing collected packages: sympy
+  Attempting uninstall: sympy
+    Found existing installation: sympy 1.5.dev0
+    Uninstalling sympy-1.5.dev0:
+      Successfully uninstalled sympy-1.5.dev0
+  DEPRECATION: Legacy editable install of sympy==1.5.dev0 from file:///testbed (setup.py develop) is deprecated. pip 25.0 will enforce this behaviour change. A possible replacement is to add a pyproject.toml or enable --use-pep517, and use setuptools >= 64. If the resulting installation is not behaving as expected, try using --config-settings editable_mode=compat. Please consult the setuptools documentation for more information. Discussion can be found at https://github.com/pypa/pip/issues/11457
+  Running setup.py develop for sympy
+Successfully installed sympy
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable.It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+++ git checkout 58e78209c8577b9890e957b624466e5beed7eb08 sympy/matrices/expressions/tests/test_blockmatrix.py sympy/matrices/expressions/tests/test_matadd.py
+Updated 1 path from 6511a0ce9f
+++ git clean -fd
+++ echo 'diff --git a/sympy/matrices/expressions/tests/test_blockmatrix.py b/sympy/matrices/expressions/tests/test_blockmatrix.py
+--- a/sympy/matrices/expressions/tests/test_blockmatrix.py
++++ b/sympy/matrices/expressions/tests/test_blockmatrix.py
+@@ -3,7 +3,7 @@
+     BlockMatrix, bc_dist, bc_matadd, bc_transpose, bc_inverse,
+     blockcut, reblock_2x2, deblock)
+ from sympy.matrices.expressions import (MatrixSymbol, Identity,
+-        Inverse, trace, Transpose, det)
++        Inverse, trace, Transpose, det, ZeroMatrix)
+ from sympy.matrices import (
+     Matrix, ImmutableMatrix, ImmutableSparseMatrix)
+ from sympy.core import Tuple, symbols, Expr
+@@ -104,6 +104,13 @@ def test_block_collapse_explicit_matrices():
+     A = ImmutableSparseMatrix([[1, 2], [3, 4]])
+     assert block_collapse(BlockMatrix([[A]])) == A
+
++def test_issue_17624():
++    a = MatrixSymbol("a", 2, 2)
++    z = ZeroMatrix(2, 2)
++    b = BlockMatrix([[a, z], [z, z]])
++    assert block_collapse(b * b) == BlockMatrix([[a**2, z], [z, z]])
++    assert block_collapse(b * b * b) == BlockMatrix([[a**3, z], [z, z]])
++
+ def test_BlockMatrix_trace():
+     A, B, C, D = [MatrixSymbol(s, 3, 3) for s in '\''ABCD'\'']
+     X = BlockMatrix([[A, B], [C, D]])
+diff --git a/sympy/matrices/expressions/tests/test_matadd.py b/sympy/matrices/expressions/tests/test_matadd.py
+--- a/sympy/matrices/expressions/tests/test_matadd.py
++++ b/sympy/matrices/expressions/tests/test_matadd.py
+@@ -1,7 +1,8 @@
+ from sympy.matrices.expressions import MatrixSymbol, MatAdd, MatPow, MatMul
+-from sympy.matrices.expressions.matexpr import GenericZeroMatrix
++from sympy.matrices.expressions.matexpr import GenericZeroMatrix, ZeroMatrix
+ from sympy.matrices import eye, ImmutableMatrix
+-from sympy.core import Basic, S
++from sympy.core import Add, Basic, S
++from sympy.utilities.pytest import XFAIL, raises
+
+ X = MatrixSymbol('\''X'\'', 2, 2)
+ Y = MatrixSymbol('\''Y'\'', 2, 2)
+@@ -30,3 +31,11 @@ def test_doit_args():
+ def test_generic_identity():
+     assert MatAdd.identity == GenericZeroMatrix()
+     assert MatAdd.identity != S.Zero
++
++
++def test_zero_matrix_add():
++    assert Add(ZeroMatrix(2, 2), ZeroMatrix(2, 2)) == ZeroMatrix(2, 2)
++
++@XFAIL
++def test_matrix_add_with_scalar():
++    raises(TypeError, lambda: Add(0, ZeroMatrix(2, 2)))
+'
+++ git apply --check /tmp/test_patch.diff
+++ git apply /tmp/test_patch.diff
++++ mktemp
+++ LOG_FILE=/tmp/tmp.zZA3YlrIgU
+++ export LOG_FILE
+++ exec
+++ exec
++++ tee /tmp/tmp.zZA3YlrIgU
+++ set +x
+============================= test process starts ==============================
+executable:         /opt/miniconda3/envs/testbed/bin/python  (3.9.20-final-0) [CPython]
+architecture:       64-bit
+cache:              no
+ground types:       python 
+numpy:              None
+random seed:        93142055
+hash randomization: on (PYTHONHASHSEED=1565488361)
+
+sympy/matrices/expressions/tests/test_blockmatrix.py[16] 
+test_bc_matmul ok
+test_bc_matadd ok
+test_bc_transpose ok
+test_bc_dist_diag ok
+test_block_plus_ident ok
+test_BlockMatrix ok
+test_block_collapse_explicit_matrices ok
+test_issue_17624 ok
+test_BlockMatrix_trace ok
+test_BlockMatrix_Determinant ok
+test_squareBlockMatrix ok
+test_BlockDiagMatrix ok
+test_blockcut ok
+test_reblock_2x2 ok
+test_deblock ok
+test_block_collapse_type ok                                                 [OK]
+
+sympy/matrices/expressions/tests/test_matadd.py[7] 
+test_sort_key ok
+test_matadd_sympify ok
+test_matadd_of_matrices ok
+test_doit_args ok
+test_generic_identity ok
+test_zero_matrix_add F
+test_matrix_add_with_scalar f                                             [FAIL]
+
+
+________________________________________________________________________________
+_____ sympy/matrices/expressions/tests/test_matadd.py:test_zero_matrix_add _____
+Traceback (most recent call last):
+  File "/testbed/sympy/matrices/expressions/tests/test_matadd.py", line 37, in test_zero_matrix_add
+    assert Add(ZeroMatrix(2, 2), ZeroMatrix(2, 2)) == ZeroMatrix(2, 2)
+AssertionError
+
+=== tests finished: 21 passed, 1 failed, 1 expected to fail, in 0.12 seconds ===
+DO *NOT* COMMIT!
+Updated 2 paths from 6511a0ce9f
+Downloading virtualenv (5.2MiB)
+ Downloading virtualenv
+Installed 74 packages in 5.29s
+SWEBench results starts here
+FAILED
+SWEBench results ends here

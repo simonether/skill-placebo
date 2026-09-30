@@ -1,0 +1,81 @@
+Hit:1 http://deb.debian.org/debian bookworm InRelease
+Hit:2 http://deb.debian.org/debian bookworm-updates InRelease
+Hit:3 http://deb.debian.org/debian-security bookworm-security InRelease
+Reading package lists...
+Reading package lists...
+Building dependency tree...
+Reading state information...
+curl is already the newest version (7.88.1-10+deb12u15).
+0 upgraded, 0 newly installed, 0 to remove and 1 not upgraded.
+downloading uv 0.9.5 aarch64-unknown-linux-gnu
+no checksums to verify
+installing to /root/.local/bin
+  uv
+  uvx
+everything's installed!
+
+To add $HOME/.local/bin to your PATH, either restart your shell or run:
+
+    source $HOME/.local/bin/env (sh, bash, zsh)
+    source $HOME/.local/bin/env.fish (fish)
+Downloading pygments (1.2MiB)
+ Downloading pygments
+Installed 6 packages in 9ms
+============================= test session starts ==============================
+platform linux -- Python 3.13.15, pytest-8.4.1, pluggy-1.6.0
+rootdir: /tests
+plugins: json-ctrf-0.3.5
+collected 13 items
+
+../tests/test_outputs.py ........F..F.                                   [100%]
+
+=================================== FAILURES ===================================
+__________________________ test_stack_traces_present ___________________________
+
+    def test_stack_traces_present():
+        """Test that stack traces are extracted for top exceptions."""
+        with open("/app/incident_report.json") as f:
+            data = json.load(f)
+    
+        stack_traces = data["stack_traces"]
+        assert len(stack_traces) <= 3, "At most 3 stack traces should be present"
+    
+        for trace in stack_traces:
+            assert "exception_class" in trace, "Stack trace must have exception_class"
+            assert "stack_trace" in trace, "Stack trace must have stack_trace"
+>           assert "Exception occurred:" in trace["stack_trace"], "Stack trace must contain exception line"
+E           AssertionError: Stack trace must contain exception line
+E           assert 'Exception occurred:' in 'java.util.concurrent.TimeoutException\n    at com.example.app.Service6.method3(com.example.app.Service6.java:142)\n  ...example.app.Controller.handle(Controller.java:37)\n    at javax.servlet.http.HttpServlet.service(HttpServlet.java:100)'
+
+/tests/test_outputs.py:134: AssertionError
+_________________________ test_percentage_calculations _________________________
+
+    def test_percentage_calculations():
+        """Test that percentage calculations are mathematically correct."""
+        with open("/app/incident_report.json") as f:
+            data = json.load(f)
+    
+        # Test that log level percentages are reasonable (not necessarily 100% since not all lines have log levels)
+        total_percentage = sum(level["percentage"] for level in data["log_levels"].values())
+        assert total_percentage > 0, "Log level percentages should be greater than 0"
+>       assert total_percentage <= 100, "Log level percentages should not exceed 100%"
+E       AssertionError: Log level percentages should not exceed 100%
+E       assert 100.1 <= 100
+
+/tests/test_outputs.py:176: AssertionError
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED ../tests/test_outputs.py::test_output_files_exist
+PASSED ../tests/test_outputs.py::test_json_structure_valid
+PASSED ../tests/test_outputs.py::test_log_files_processed
+PASSED ../tests/test_outputs.py::test_decimal_precision
+PASSED ../tests/test_outputs.py::test_exception_sorting
+PASSED ../tests/test_outputs.py::test_log_level_order
+PASSED ../tests/test_outputs.py::test_text_report_format
+PASSED ../tests/test_outputs.py::test_critical_failures_calculation
+PASSED ../tests/test_outputs.py::test_stack_traces_correspond_to_top_exceptions
+PASSED ../tests/test_outputs.py::test_stack_traces_include_line_numbers
+PASSED ../tests/test_outputs.py::test_anti_cheat_validation
+FAILED ../tests/test_outputs.py::test_stack_traces_present - AssertionError: ...
+FAILED ../tests/test_outputs.py::test_percentage_calculations - AssertionErro...
+========================= 2 failed, 11 passed in 0.12s =========================

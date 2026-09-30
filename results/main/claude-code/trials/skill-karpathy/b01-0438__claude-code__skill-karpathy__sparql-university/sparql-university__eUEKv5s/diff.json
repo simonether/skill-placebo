@@ -1,0 +1,1 @@
+{"method": "docker diff (exploratory)", "docker_diff": {"A": 21, "C": 6, "D": 0}, "docker_diff_top": {"/var/lib": 21, "/app": 1, "/app/solution.sparql": 1, "/root": 1, "/root/.claude.json": 1, "/var": 1, "/opt": 1}, "seconds": 0.7}
