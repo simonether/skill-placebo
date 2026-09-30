@@ -103,9 +103,13 @@ def main():
             text = raw.decode("utf-8")
         except UnicodeDecodeError:
             hits = [k for k, v in values if v.encode() in raw]
-            if hits:
-                found += 1
-                print(f"{path}: binary file contains {', '.join('secret:' + h for h in hits)}")
+            # Not UTF-8 (a binary, or text with a few stray bytes such as a git history dump): the secret
+            # values are checked on the bytes, the patterns (keys, home path, e-mail) on a lossy decoding.
+            lossy = raw.decode("utf-8", errors="replace")
+            kinds = sorted({k for k, _, _ in scan_text(lossy, [])})
+            if hits or kinds:
+                found += len(hits) + len(kinds)
+                print(f"{path}: non-UTF-8 file contains {', '.join(['secret:' + h for h in hits] + kinds)}")
             continue
         spans = sorted(set(scan_text(text, values)), key=lambda s: (s[1], -(s[2] - s[1]), s[0]))
         if not spans:
