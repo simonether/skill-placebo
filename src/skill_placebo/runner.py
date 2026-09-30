@@ -443,6 +443,21 @@ def limit_hits(trial_dir: Path) -> list[str]:
     return hits
 
 
+def pin_mismatch(trial_dir: Path, h: Harness) -> str | None:
+    """The harness version and model the session logs report must be the pinned ones (METHOD.md
+    section 5, amendment 10); anything else stops the batch. A trial without session logs (the agent
+    never started) is not checked here."""
+    from .collect import session_pins
+
+    pins = session_pins(trial_dir)
+    want_v, want_m = str(h.kwargs.get("version") or ""), h.model.split("/")[-1]
+    bad_v = [v for v in pins["cli_versions"] if want_v and v != want_v]
+    bad_m = [m for m in pins["models"] if m != want_m]
+    if bad_v or bad_m:
+        return f"session reports version {pins['cli_versions']} / model {pins['models']}, pinned {want_v} / {want_m}"
+    return None
+
+
 def codex_rate_limits(trial_dir: Path) -> dict:
     """Last Codex rate-limit reading in a trial's rollout: {'weekly': %, 'five_hour': %, 'five_hour_resets_s': s}."""
     out = {}
@@ -791,8 +806,11 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
                 completed_here += 1
                 print(f"{msk_now()} {t.job_name} rc={rc} week={state.usd_spent_window/1e6:.1f}M units ${dollars:.2f}"
                       + (f" codex-weekly={wk}%" if wk is not None else ""), flush=True)
+                pin = pin_mismatch(tdir, harness)
                 if hits:
                     state.stopped = "limit marker: " + hits[0][:300]
+                elif pin:
+                    state.stopped = "pin: " + pin
                 elif wk is not None and state.codex_weekly_start is not None and wk - state.codex_weekly_start > weekly_budget_pp:
                     state.stopped = f"codex weekly usage +{wk - state.codex_weekly_start:.1f} pp > {weekly_budget_pp} pp"
                 elif claude_week_cap_action == "stop" and cw.get("seven_day") is not None and cw["seven_day"] >= claude_week_cap:

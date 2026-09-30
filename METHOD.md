@@ -692,3 +692,31 @@ owner buys ChatGPT Pro, Codex is extended by a separate amendment.
 (amendments 2-3) were pilot guards. Pilot data do not enter the main run (section 11.3).
 
 **Runs affected:** the main run, the Codex top-up, and the pilot's one verifier-timeout trial.
+
+### Amendment 10 (2026-09-30, during the main run, before the Codex top-up): newer Codex and model, pins kept and enforced
+
+**Note on the Codex model** (hub, 2026-09-30, checked against the sources). Section 5 chose
+`gpt-6-sol` as the model Codex documented for "complex coding and agentic workflows"
+(learn.chatgpt.com/docs/models, 2026-09-25). After this method was registered, GPT-6.1 Sol appeared:
+Codex CLI 0.159.1 (2026-09-29) made it the default in the bundled catalog (release notes, #49323),
+and the models page now reads "For complex coding and agentic workflows, use GPT-6.1 Sol when
+available to your account and client". `gpt-6-sol` is still listed there. The study keeps
+`gpt-6-sol`, so that the Codex top-up is comparable with the Codex pilot; results are for that model
+(section 13).
+
+**Harness versions stay pinned.** Codex CLI 0.158.0-0.159.2 (2026-09-28/29) changed plugin loading
+(#47858, #47939, #48035), skill catalogs (#48353) and removed the bundled `plugin-creator` skill
+(#48604), which would change the baseline arm's catalog. The top-up stays on Codex CLI 0.157.0 with
+`gpt-6-sol` at medium, like the pilot. Each trial installs the exact version (`npm install -g
+@openai/codex@0.157.0`, Claude Code 2.1.282 likewise) and passes the model explicitly, so neither
+a new release nor a new default reaches the containers. Checked in the session logs of every trial so
+far: 114 Codex sessions report CLI 0.157.0, gpt-6-sol, effort medium; every Claude Code session of the
+pilot and of the main run reports 2.1.282 and claude-opus-5-5.
+
+**Enforced from now on:** after each trial the runner compares the CLI version and model that the
+agent's own session logs report with the pins and stops the batch on any difference
+(`runner.pin_mismatch`); the version and model go into every trial's row. For the main run this takes
+effect when the runner restarts at the report checkpoint (about trial 375); the trials before it
+were checked the same way afterwards.
+
+**Runs affected:** the Codex top-up; the main run from its checkpoint (a guard, the design is unchanged).

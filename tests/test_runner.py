@@ -292,3 +292,34 @@ def test_finished_attempt_is_not_interrupted(tmp_path):
     t.mkdir(parents=True)
     (t / "result.json").write_text("{}")
     assert record_interrupted(tmp_path / "job", "claude-code", "m") is None
+
+
+def _session(tmp_path, version, model):
+    t = tmp_path / "job" / "trial__x" / "agent"
+    t.mkdir(parents=True, exist_ok=True)
+    (t / "claude-code.txt").write_text(json.dumps({"type": "system", "subtype": "init",
+                                                    "claude_code_version": version, "model": model}) + "\n")
+    return tmp_path / "job"
+
+
+def test_pin_mismatch_claude(tmp_path):
+    from skill_placebo.harnesses import CLAUDE_CODE
+    from skill_placebo.runner import pin_mismatch
+
+    assert pin_mismatch(_session(tmp_path / "a", "2.1.282", "claude-opus-5-5"), CLAUDE_CODE) is None
+    assert "2.1.290" in pin_mismatch(_session(tmp_path / "b", "2.1.290", "claude-opus-5-5"), CLAUDE_CODE)
+    assert "claude-sonnet-5" in pin_mismatch(_session(tmp_path / "c", "2.1.282", "claude-sonnet-5"), CLAUDE_CODE)
+
+
+def test_pin_mismatch_codex(tmp_path):
+    from skill_placebo.harnesses import CODEX
+    from skill_placebo.runner import pin_mismatch
+
+    d = tmp_path / "job" / "trial__x" / "agent" / "sessions"
+    d.mkdir(parents=True)
+    rollout = lambda v, m: "\n".join([json.dumps({"type": "session_meta", "payload": {"cli_version": v}}),
+                                      json.dumps({"type": "turn_context", "payload": {"model": m}})])
+    (d / "rollout-1.jsonl").write_text(rollout("0.157.0", "gpt-6-sol"))
+    assert pin_mismatch(tmp_path / "job", CODEX) is None
+    (d / "rollout-1.jsonl").write_text(rollout("0.159.1", "gpt-6.1-sol"))
+    assert "gpt-6.1-sol" in pin_mismatch(tmp_path / "job", CODEX)

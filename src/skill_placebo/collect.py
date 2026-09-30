@@ -92,6 +92,35 @@ def partial_usage(trial_dir: Path) -> dict:
             "messages": len(msgs)}
 
 
+def session_pins(trial_dir: Path) -> dict:
+    """CLI versions and models the agent's own session logs report: Claude Code's init events,
+    Codex's session_meta and turn_context. Sets, because approval turns start new sessions."""
+    ver, models = set(), set()
+    for p in trial_dir.rglob("claude-code.txt"):
+        for line in p.read_text(errors="replace").splitlines():
+            if '"init"' not in line:
+                continue
+            try:
+                ev = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if isinstance(ev, dict) and ev.get("subtype") == "init":
+                ver.add(ev.get("claude_code_version"))
+                models.add(ev.get("model"))
+    for p in trial_dir.rglob("rollout-*.jsonl"):
+        for line in p.read_text(errors="replace").splitlines():
+            try:
+                ev = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            pl = ev.get("payload") or {} if isinstance(ev, dict) else {}
+            if ev.get("type") == "session_meta":
+                ver.add(pl.get("cli_version"))
+            elif ev.get("type") == "turn_context":
+                models.add(pl.get("model"))
+    return {"cli_versions": sorted(v for v in ver if v), "models": sorted(m for m in models if m)}
+
+
 def trial_row(res: Path) -> dict | None:
     """One trial's row from its result.json (jobs/<...>/<job>/<trial>/result.json)."""
     tdir = res.parent
@@ -119,6 +148,7 @@ def trial_row(res: Path) -> dict | None:
     if exc.get("exception_type") == "VerifierTimeoutError" and vr.get("outcome") == "rerun within timeout":
         reward = vr.get("reward")
     turns_file = tdir / "agent" / "approval_turns.txt"
+    pins = session_pins(tdir)
     return {
         **meta,
         "trial": r.get("trial_name"),
@@ -135,6 +165,8 @@ def trial_row(res: Path) -> dict | None:
         "attempt": attempt,
         "infra_failure": int(_is_infra(exc)),
         "verifier_rerun": vr.get("outcome"),
+        "cli_version": ",".join(pins["cli_versions"]),
+        "session_model": ",".join(pins["models"]),
         "n_input": n_in, "n_cached": n_c, "n_cache_write": cw, "n_output": n_out,
         "cost_est_usd": cost_from_tokens(model, n_in, n_c, cw, n_out),
         "units": units_from_tokens(n_in, n_c, cw, n_out),
