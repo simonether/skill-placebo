@@ -19,6 +19,8 @@
 
 {{cc.results_table}}
 
+{{cc.ci_note_zh}}
+
 R 是 skill 的平均成本除以对应安慰剂的平均成本，小于 1 表示 skill 更省。D 是通过率差（百分点）。判定规则见
 [METHOD.md 9.1](METHOD.md#91-verdict-per-skill-and-harness)，对 {{cc.n_skills}} 个 skill 做 Holm 校正。
 

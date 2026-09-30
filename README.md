@@ -30,6 +30,8 @@ Secondary, against no skill: none of the 9 skills was measurably cheaper than ru
 | planning-with-files | 1.05 [0.91, 1.19] | +5% | 83% / 100% | −17 [−33, −3] | no better than placebo | 30/30 |
 | compound-engineering | 1.04 [0.91, 1.23] | +4% | 87% / 87% | +0 [−10, +10] | no better than placebo | 30/30 |
 
+CIs are unadjusted; verdicts use Holm-adjusted p across 9 skills (i-have-adhd: cost CI excludes 1, Holm-adjusted p = 0.095; planning-with-files: pass-rate CI excludes 0, Holm-adjusted p = 0.178).
+
 R is the skill's mean cost divided by its placebo's; below 1 the skill is cheaper. D is the pass-rate
 difference. Verdicts follow [METHOD.md 9.1](METHOD.md#91-verdict-per-skill-and-harness), with Holm
 correction across the 9 skills. D stays out of the headline: with this many trials its 95% CI is about ±10 points, too wide to rank skills by. This is v1: 30 trials per arm

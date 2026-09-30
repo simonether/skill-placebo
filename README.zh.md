@@ -32,6 +32,8 @@
 | planning-with-files | 1.05 [0.91, 1.19] | +5% | 83% / 100% | −17 [−33, −3] | no better than placebo | 30/30 |
 | compound-engineering | 1.04 [0.91, 1.23] | +4% | 87% / 87% | +0 [−10, +10] | no better than placebo | 30/30 |
 
+置信区间未经校正；判定使用 9 个 skill 的 Holm 校正 p 值（i-have-adhd：成本的未校正置信区间不含 1，Holm 校正后 p = 0.095；planning-with-files：通过率的未校正置信区间不含 0，Holm 校正后 p = 0.178）。
+
 R 是 skill 的平均成本除以对应安慰剂的平均成本，小于 1 表示 skill 更省。D 是通过率差（百分点）。判定规则见
 [METHOD.md 9.1](METHOD.md#91-verdict-per-skill-and-harness)，对 9 个 skill 做 Holm 校正。
 

@@ -17,6 +17,8 @@
 
 {{cc.results_table}}
 
+{{cc.ci_note}}
+
 R is the skill's mean cost divided by its placebo's; below 1 the skill is cheaper. D is the pass-rate
 difference. Verdicts follow [METHOD.md 9.1](METHOD.md#91-verdict-per-skill-and-harness), with Holm
 correction across the {{cc.n_skills}} skills. D stays out of the headline: {{cc.d_sentence}}. This is v1: {{cc.n_per_arm}} trials per arm
