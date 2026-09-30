@@ -478,6 +478,11 @@ def codex_rate_limits(trial_dir: Path) -> dict:
                 for k in ("resets_in_seconds", "resets_after_seconds"):
                     if isinstance(prim.get(k), (int, float)):
                         out["five_hour_resets_s"] = float(prim[k])
+                # Codex 0.157 reports an absolute epoch ("resets_at"); the pilot's pauses fell back to 1 h.
+                if isinstance(prim.get("resets_at"), (int, float)):
+                    out["five_hour_resets_s"] = max(0.0, float(prim["resets_at"]) - time.time())
+            if isinstance(sec.get("resets_at"), (int, float)):
+                out["weekly_resets_at"] = float(sec["resets_at"])
     return out
 
 
@@ -739,6 +744,14 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
                             pace_wait_seconds(harness.name, pace_usd_5h, field_name="cost_est_usd") if pace_usd_5h else 0.0)) > 0:
                 print(f"{msk_now()} pace: 5-hour window full, waiting {w/60:.0f} min")
                 time.sleep(min(w, 600))
+        paused = False
+        while t is not None and not dry_run and (jobs_dir / "PAUSE").exists():
+            if not paused:  # an operator or a watchdog paused this batch; remove the file to go on
+                print(f"{msk_now()} pause: {jobs_dir / 'PAUSE'} exists: {(jobs_dir / 'PAUSE').read_text().strip()[:200]}", flush=True)
+                paused = True
+            time.sleep(60)
+        if paused:
+            print(f"{msk_now()} resume: PAUSE removed", flush=True)
         announced = False
         while t is not None and not dry_run and (disk_pause_gib or disk_stop_gib):
             free = host_free_gib()

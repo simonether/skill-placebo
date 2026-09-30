@@ -720,3 +720,30 @@ effect when the runner restarts at the report checkpoint (about trial 375); the 
 were checked the same way afterwards.
 
 **Runs affected:** the Codex top-up; the main run from its checkpoint (a guard, the design is unchanged).
+
+### Amendment 11 (2026-09-30, before any Codex top-up trial): Codex top-up to N = 4 in two quota batches
+
+Decided by the hub for the owner on 2026-09-30, before any top-up data, so that no stop can depend on
+results.
+
+1. The Codex top-up of amendment 9 grows to N = 4: the same 5 arms and 10 tasks, 4 randomized blocks
+   with seed 20260930 (blocks 0-1 are exactly the N = 2 plan of amendment 9), in two batches of N = 2:
+   batch 1 = blocks 0-1, batch 2 = blocks 2-3, one batch per Codex weekly quota. Each batch starts from a
+   probe (one trivial Codex run) that reads the weekly window; a quota counts as fresh when the probe
+   reads about 0-2%. Each batch stops at +25 points over its probe's reading or 80% absolute, and pauses
+   at 40% of the 5-hour window.
+2. Batch 2 runs whatever batch 1 shows, if it can finish by 2026-10-08 inclusive. If it cannot, the
+   analysis uses N = 2 (batch 1) and says so. A batch cut short by its stop rule is reported as is.
+3. While the Claude Code main run is going, Codex runs alongside only with concurrency 1, only if the
+   Docker VM keeps at least 2 GiB of memory available next to the two Claude Code containers and the
+   host has at least 15 GiB of free disk, and it is paused if the per-task median wall time of Claude
+   Code trials rises by more than 20%. The Claude Code run has priority.
+4. Versions stay Codex CLI 0.157.0 with gpt-6-sol at medium, checked after every trial (amendment 10).
+
+**Observed at registration.** The owner reported on 2026-09-30 that the Codex weekly limits had been
+reset early. A probe at 04:54 MSK read the weekly window at 37% (the pilot's end value) with the reset
+still at 2026-10-04 00:41 UTC, so no fresh quota was confirmed and no top-up trial ran. With weekly
+resets on 2026-10-04 and 2026-10-11, only batch 1 fits before 2026-10-08; batch 2 runs only if an earlier
+fresh quota is confirmed by a probe.
+
+**Runs affected:** the Codex top-up.

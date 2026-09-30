@@ -38,7 +38,8 @@ CLAUDE_GUARDS = dict(
 DISK_GUARDS = dict(disk_pause_gib=10.0, disk_stop_gib=6.0)  # host volume, checked before each trial
 CODEX_TOPUP_SKILLS = ["ponytail", "agent-skills", "compound-engineering"]
 CODEX_TOPUP_TASKS = 10
-CODEX_TOPUP_N = 2
+CODEX_TOPUP_N = 4          # amendment 11: two batches of N=2, one per Codex weekly quota
+CODEX_BATCH_BLOCKS = {1: (0, 1), 2: (2, 3)}
 
 
 def selected_tasks() -> list[str]:
@@ -57,7 +58,10 @@ def codex_topup_tasks() -> list[str]:
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("step", choices=["claude-code", "codex-topup", "collect"])
+    ap.add_argument("step", choices=["claude-code", "codex-probe", "codex-topup", "collect"])
+    ap.add_argument("--batch", type=int, choices=[1, 2], help="codex-topup: which batch of N=2 (amendment 11)")
+    ap.add_argument("--weekly-start", type=float, help="codex-topup: Codex weekly used %% at the start of this quota (probe)")
+    ap.add_argument("--concurrency", type=int, default=2)
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--stop-after", type=int, help="stop after this many trials complete (report checkpoint)")
     a = ap.parse_args()
@@ -70,6 +74,23 @@ def main():
         print(f"{n} trials collected")
         return
 
+    if a.step == "codex-probe":  # one trivial Codex run: reads the weekly window and its reset time
+        from skill_placebo.runner import codex_rate_limits, utc_iso
+        import time as _time
+        arms = [codex_arms(PRIORITY)["baseline"]]
+        trials = plan(["calibration/say-ok"], arms, "codex", n=1, seed=SEED)
+        jobs_dir = ROOT / "jobs" / "main" / f"codex-probe-{_time.strftime('%Y%m%dT%H%M%SZ', _time.gmtime())}"
+        state = run_batch(trials, HARNESSES["codex"], {x.name: x for x in arms}, jobs_dir, mounts=mounts(),
+                          concurrency=1, dry_run=a.dry_run, codex_pace_pct=40.0, codex_weekly_cap=80.0, **DISK_GUARDS)
+        if not a.dry_run:
+            rl = {}
+            for d in sorted(jobs_dir.glob("b*__*")):
+                rl.update(codex_rate_limits(d))
+            print(f"PROBE codex weekly={rl.get('weekly')}% five_hour={rl.get('five_hour')}% "
+                  f"weekly_resets_at={utc_iso(rl['weekly_resets_at']) if rl.get('weekly_resets_at') else None} "
+                  f"stopped={state.stopped}")
+        return
+
     if a.step == "claude-code":
         harness, all_arms = "claude-code", claude_arms(PRIORITY)
         arms = list(all_arms.values())
@@ -80,14 +101,18 @@ def main():
         names = [f"skill-{s}" for s in CODEX_TOPUP_SKILLS]
         names += sorted({f"placebo-{placebo_bucket_of(s, harness)}" for s in CODEX_TOPUP_SKILLS})
         arms = [all_arms[n] for n in names]
-        trials = plan(codex_topup_tasks(), arms, harness, n=CODEX_TOPUP_N, seed=SEED)
-        # The start value is the first trial's reading after the weekly reset.
-        guards = dict(codex_pace_pct=40.0, codex_weekly_cap=80.0)
+        if not a.batch or a.weekly_start is None:
+            sys.exit("codex-topup needs --batch 1|2 and --weekly-start (the probe's reading for this quota)")
+        blocks = CODEX_BATCH_BLOCKS[a.batch]
+        # Blocks 0-1 of the N=4 plan are the N=2 plan of amendment 9 (same seed, same shuffles).
+        trials = [t for t in plan(codex_topup_tasks(), arms, harness, n=CODEX_TOPUP_N, seed=SEED) if t.block in blocks]
+        guards = dict(codex_pace_pct=40.0, codex_weekly_cap=80.0, codex_weekly_start=a.weekly_start)
 
     jobs_dir = ROOT / "jobs" / "main" / harness
     print(f"{harness} main: {len(trials)} trials, {len(arms)} arms: {', '.join(x.name for x in arms)}")
     state = run_batch(trials, HARNESSES[harness], {x.name: x for x in arms}, jobs_dir, mounts=mounts(),
-                      concurrency=2, dry_run=a.dry_run, stop_after=a.stop_after, **guards, **DISK_GUARDS)
+                      concurrency=a.concurrency if harness == "codex" else 2, dry_run=a.dry_run,
+                      stop_after=a.stop_after, **guards, **DISK_GUARDS)
     if state.stopped:
         print(f"STOPPED: {state.stopped}")
         sys.exit(2)

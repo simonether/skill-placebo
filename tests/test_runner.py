@@ -323,3 +323,41 @@ def test_pin_mismatch_codex(tmp_path):
     assert pin_mismatch(tmp_path / "job", CODEX) is None
     (d / "rollout-1.jsonl").write_text(rollout("0.159.1", "gpt-6.1-sol"))
     assert "gpt-6.1-sol" in pin_mismatch(tmp_path / "job", CODEX)
+
+
+def test_codex_rate_limits_reads_resets_at(tmp_path):
+    import time as _t
+    from skill_placebo.runner import codex_rate_limits
+
+    d = tmp_path / "t" / "agent"
+    d.mkdir(parents=True)
+    now = _t.time()
+    (d / "rollout-1.jsonl").write_text(json.dumps({"type": "event_msg", "payload": {"rate_limits": {
+        "primary": {"used_percent": 24.0, "window_minutes": 300, "resets_at": now + 1800},
+        "secondary": {"used_percent": 1.0, "window_minutes": 10080, "resets_at": now + 7 * 86400}}}}))
+    rl = codex_rate_limits(tmp_path / "t")
+    assert rl["five_hour"] == 24.0 and rl["weekly"] == 1.0
+    assert 1790 < rl["five_hour_resets_s"] <= 1800 and rl["weekly_resets_at"] > now
+
+
+def test_run_batch_waits_while_pause_file_exists(tmp_path, monkeypatch, capsys):
+    from skill_placebo import runner
+
+    monkeypatch.setattr(runner, "ROOT", tmp_path)
+    monkeypatch.setattr(runner, "sweep_snapshots", lambda own=None: None)
+    jobs = tmp_path / "jobs" / "b"
+    jobs.mkdir(parents=True)
+    (jobs / "PAUSE").write_text("test pause")
+    sleeps = []
+
+    def fake_sleep(s):  # the operator removes the file during the first wait
+        sleeps.append(s)
+        (jobs / "PAUSE").unlink(missing_ok=True)
+    monkeypatch.setattr(runner.time, "sleep", fake_sleep)
+    monkeypatch.setattr(runner, "host_free_gib", lambda path="/": 3.0)  # then stop before any trial
+    trials = runner.plan(["t1"], [runner.Arm("baseline")], "test-h", n=1, seed=1)
+    state = runner.run_batch(trials, runner.Harness("test-h", "a", "m"), {"baseline": runner.Arm("baseline")},
+                             jobs, units_budget=1e9, concurrency=1, disk_stop_gib=6)
+    out = capsys.readouterr().out
+    assert "pause:" in out and "resume: PAUSE removed" in out and sleeps == [60]
+    assert state.stopped.startswith("host disk")
