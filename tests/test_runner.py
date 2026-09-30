@@ -390,3 +390,46 @@ def test_concurrency_file_changes_parallelism_without_restart(tmp_path, monkeypa
     state = runner.run_batch(trials, runner.Harness("test-h", "a", "m"), {"baseline": runner.Arm("baseline")},
                              jobs, units_budget=1e9, concurrency=2, max_concurrency=3)
     assert peak[0] == 3 and len(state.done) == 9 and state.stopped is None
+
+
+def test_no_trial_result_is_retried_and_not_kept_done(tmp_path, monkeypatch):
+    from skill_placebo import runner
+
+    monkeypatch.setattr(runner, "ROOT", tmp_path)
+    monkeypatch.setattr(runner, "sweep_snapshots", lambda own=None: None)
+    monkeypatch.setattr(runner, "docker_ok", lambda: True)
+    calls = []
+
+    def harbor_fails(cmd, **k):  # Harbor exits before creating the job directory (Docker down)
+        if cmd and cmd[0] == "pgrep":
+            return type("R", (), {"returncode": 1})()
+        calls.append(cmd)
+        return type("R", (), {"returncode": 1})()
+    monkeypatch.setattr(runner.subprocess, "run", harbor_fails)
+    jobs = tmp_path / "jobs" / "b"
+    trials = runner.plan(["t1"], [runner.Arm("baseline")], "test-h", n=1, seed=1)
+    arms = {"baseline": runner.Arm("baseline")}
+    runner.run_batch(trials, runner.Harness("test-h", "a", "m"), arms, jobs, units_budget=1e9, concurrency=1)
+    assert len(calls) == 1 + runner.MAX_INFRA_RETRIES  # retried as an infrastructure failure
+    state = json.loads((jobs / "batch-state.json").read_text())
+    assert state["done"] == [trials[0].job_name]
+    calls.clear()
+    runner.run_batch(trials, runner.Harness("test-h", "a", "m"), arms, jobs, units_budget=1e9, concurrency=1)
+    assert len(calls) == 1 + runner.MAX_INFRA_RETRIES  # the resume put it back in the queue
+
+
+def test_run_batch_waits_for_docker(tmp_path, monkeypatch):
+    from skill_placebo import runner
+
+    monkeypatch.setattr(runner, "ROOT", tmp_path)
+    monkeypatch.setattr(runner, "sweep_snapshots", lambda own=None: None)
+    states = iter([False, False, True])
+    monkeypatch.setattr(runner, "docker_ok", lambda: next(states))
+    slept = []
+    monkeypatch.setattr(runner.time, "sleep", lambda s: slept.append(s))
+    monkeypatch.setattr(runner.subprocess, "run", lambda cmd, **k: type("R", (), {"returncode": 1 if cmd[0] == "pgrep" else 0})())
+    monkeypatch.setattr(runner, "has_trial_result", lambda d: True)
+    trials = runner.plan(["t1"], [runner.Arm("baseline")], "test-h", n=1, seed=1)
+    runner.run_batch(trials, runner.Harness("test-h", "a", "m"), {"baseline": runner.Arm("baseline")},
+                     tmp_path / "jobs" / "b", units_budget=1e9, concurrency=1)
+    assert slept.count(30) == 2

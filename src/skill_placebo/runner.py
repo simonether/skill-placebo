@@ -290,6 +290,18 @@ def remove_snapshots(job_dir: Path) -> None:
             _docker("rmi", "-f", tag)
 
 
+def docker_ok() -> bool:
+    """Docker answers (not stopped, not paused in Docker Desktop)."""
+    try:
+        return subprocess.run(["docker", "info"], capture_output=True, timeout=60).returncode == 0
+    except (subprocess.SubprocessError, OSError):
+        return False
+
+
+def has_trial_result(job_dir: Path) -> bool:
+    return job_dir.is_dir() and any(job_dir.glob("*/result.json"))
+
+
 def host_free_gib(path: str = "/") -> float:
     """Free space on the host volume that holds Docker Desktop's disk, as `df` reports it."""
     import shutil
@@ -679,6 +691,11 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
                     print(f"{msk_now()} {d.name}: interrupted during {rec['phase']}, "
                           f"{units_from_partial(rec) / 1e6:.2f}M units recorded, trial will be retried", flush=True)
 
+    if not dry_run:  # "done" without a trial result anywhere (Harbor failed before the trial): not done
+        for t in trials:
+            if t.job_name in state.done and not any(has_trial_result(d) for d in attempts_so_far(t)) \
+                    and not any(has_trial_result(d) for d in [jobs_dir / t.job_name]):
+                state.done.remove(t.job_name)
     if not dry_run:  # a trial whose last attempt failed on infrastructure gets its remaining retries
         for t in trials:
             tries = attempts_so_far(t)
@@ -706,6 +723,12 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
         name = t.job_name
         for attempt in range(len(attempts_so_far(t)), MAX_INFRA_RETRIES + 1):
             name = t.job_name if attempt == 0 else f"{t.job_name}__r{attempt}"
+            waited = 0
+            while not docker_ok():  # Docker stopped or paused (e.g. by the owner): wait, don't burn attempts
+                if waited % 600 == 0:
+                    print(f"{msk_now()} {name}: Docker unavailable (stopped or paused), waiting", flush=True)
+                time.sleep(30)
+                waited += 30
             dirs = arm_host_dirs(arms[t.arm], mounts)
             h_start = tree_hash(dirs)
             with open(jobs_dir / f"{name}.runner.log", "w") as f:
@@ -722,7 +745,8 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
             changed = None
             if h_start != arm_ref.get(t.arm) or h_end != arm_ref.get(t.arm):
                 changed = "arm directory content changed or differs from the batch reference"
-            why = infra_failure(jobs_dir / name) or changed or arm_not_applied(jobs_dir / name, arms[t.arm])
+            why = (infra_failure(jobs_dir / name) or changed or arm_not_applied(jobs_dir / name, arms[t.arm])
+                   or (None if has_trial_result(jobs_dir / name) else "no trial result (Harbor failed before the trial)"))
             if not why:
                 break
             print(f"{msk_now()} {name}: infrastructure failure {why}, retry {attempt + 1}/{MAX_INFRA_RETRIES}", flush=True)
