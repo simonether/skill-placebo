@@ -46,7 +46,7 @@ def selected_tasks() -> list[str]:
     return [f"pool/{t}" for t in json.loads((ROOT / "tasks" / "selected.json").read_text())["selected"]]
 
 
-CODEX_MINIMAL_N = 3
+CODEX_MINIMAL_N = 2  # amendment 16 (was 3 in amendment 15); the N=2 plan is blocks 0-1 of the N=3 plan
 
 
 def codex_floorless_tasks() -> list[str]:
@@ -73,6 +73,7 @@ def main():
     ap.add_argument("--batch", type=int, choices=[1, 2], help="codex-topup: which batch of N=2 (amendment 11)")
     ap.add_argument("--weekly-start", type=float, help="codex-topup: Codex weekly used %% at the start of this quota (probe)")
     ap.add_argument("--concurrency", type=int, default=2)
+    ap.add_argument("--blocks", type=int, help="claude-code: run only the first B blocks of the N=5 plan (amendment 16)")
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--stop-after", type=int, help="stop after this many trials complete (report checkpoint)")
     a = ap.parse_args()
@@ -124,6 +125,8 @@ def main():
         harness, all_arms = "claude-code", claude_arms(PRIORITY)
         arms = list(all_arms.values())
         trials = plan(selected_tasks(), arms, harness, n=N, seed=SEED)
+        if a.blocks:  # amendment 16: stop at a block boundary (blocks are complete, balanced replicates)
+            trials = [t for t in trials if t.block < a.blocks]
         guards = CLAUDE_GUARDS
     else:
         harness, all_arms = "codex", codex_arms(PRIORITY)

@@ -849,3 +849,25 @@ trials. The week was at 37% on 2026-09-30, so about 225-275 trials fit before th
 run after the 2026-10-04 reset.
 
 **Runs affected:** Codex main run (replaces the top-up; no top-up trial has run).
+
+### Amendment 16 (2026-09-30, during the main run, before the block boundary it sets and before any look at outcomes): v1 volume
+
+**Decision.** The owner, 2026-09-30 about 14:00 MSK: better to test the main skills and release early than to
+spend several more days on this many skills (paraphrased from the hub's relay). The hub turned it into the
+rule below. It is made blind: no one (owner, hub, the runner's agent) had looked at main-run outcomes by arm.
+Only resource and process counts had been reported (trials done, infrastructure failures, plan windows,
+disk).
+
+**Change.**
+1. **Claude Code stops at the block boundary after block 3**: blocks 0-2 of the randomized N = 5 plan, so
+   N = 3 per task and arm, 15 arms x 15 tasks x 3 = 675 trials. All 9 skills stay: blocks are shuffled over
+   every arm and task, so every arm has the same N at a block boundary and dropping skills now would save
+   nothing. Blocks 3-4 are not run for v1.
+2. **Codex runs N = 2** instead of 3 (amendment 15): 9 arms x 11 tasks x 2 = 198 trials, blocks 0-1 of the
+   same seeded plan. It starts as soon as the Claude Code run stops; its guards are unchanged.
+3. **Publication.** The results are published as v1 (Claude Code N = 3, Codex N = 2) with the
+   pre-registered analysis of section 9 unchanged. With N = 3 the confidence intervals are wider than the
+   N = 5 design assumed (section 13, power); the tables show them as they are. Any later run (blocks 3-4,
+   more tasks or harnesses) is an update under its own amendment.
+
+**Runs affected:** the rest of the Claude Code main run; the Codex run.
