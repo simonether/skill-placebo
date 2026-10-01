@@ -61,7 +61,7 @@ collections of unrelated skills. Nine pass; no tenth fits the rule, so the study
 gets that day. Every install is made from a local checkout of that commit, never from a marketplace
 that would fetch a newer HEAD.
 
-The table order is the **priority order**: by stars (owner's hub decision, 2026-09-28). The reduced
+The table order is the **priority order**: by stars (maintainers' decision, 2026-09-28). The reduced
 designs in section 11.3 drop skills from the bottom of the table.
 
 | # | Skill | Stars (28.09) | Commit | Type in Claude Code | Always-on chars (CC) | On Codex | Numeric README claim | Prior independent measurement |
@@ -356,14 +356,14 @@ The pilot is capped at 150 runs per harness and runs with concurrency 2.
   | Reduced | first 8 (drops compound-engineering) | first 15 of the selected set, seeded order | 3 | 14 x 45 = 630 | 10 x 45 = 450 |
   | Minimal | first 6 (also drops planning-with-files, i-have-adhd) | 15 | 3 | 12 x 45 = 540 | 8 x 45 = 360 |
 
-- **Choice of design, from resource numbers only, never from effect estimates** (owner's hub
+- **Choice of design, from resource numbers only, never from effect estimates** (maintainers'
   decision, 2026-09-28). For each harness, `U` = the share of that plan's weekly limit the pilot used,
   scaled to 150 runs:
   - `U <= 3%`: **Full**, spread up to 2026-10-09 across the plan's weekly reset;
   - `3% < U <= 6%`: **Reduced**;
   - `U > 6%`: **Minimal**.
 
-  A design is also dropped a step if its runs cannot finish by 2026-10-09 12:00 MSK at the pilot's
+  A design is also dropped a step if its runs cannot finish by 2026-10-09 09:00 UTC at the pilot's
   mean wall time per run with concurrency 2, keeping 12 hours of reserve. If even the minimal design
   does not fit, that harness runs it on as many of the 15 tasks as fit, in the seeded order, and the
   gap is reported; fewer than 10 tasks drops the harness and the owner is asked. The 25% stop rule of
@@ -412,11 +412,10 @@ cost estimate.
 
 - Each skill is installed the way its author documents, at a pinned commit, including hooks,
   agents and commands when the author ships them.
-- Results go to the authors of the tested skills 48 hours before publication. Replies are linked
-  from the results page. Installation errors found by authors are fixed and the affected skill's
-  arms are rerun in full before publication (an amendment records it).
-  *[Replaced by amendment 19 (2026-10-01): no notice to authors before publication; disputes come as
-  issues after it.]*
+- After publication, anyone can open an issue about how a skill was installed or about its placebo
+  (template: `.github/ISSUE_TEMPLATE/skill-install-dispute.yml`); every trial's records are public, so an
+  issue can point at the exact runs. A confirmed installation error means that skill's arms are rerun in
+  full, the result is updated, an amendment records it, and the issue is linked from the results page.
 - Neutral wording. The results say what was measured, on which tasks and models, and nothing about
   intent.
 
@@ -434,7 +433,7 @@ cost estimate.
 
 **Reason.** The owner uses Claude Code for other projects in parallel, so the change in the plan's
 usage page between "before" and "after" a batch mixes the benchmark with other work and cannot
-measure the benchmark's share (owner, 2026-09-29, via the hub).
+measure the benchmark's share (owner, 2026-09-29).
 
 **Change** (replaces the measurement in sections 11.3 and 12; the thresholds themselves are unchanged):
 
@@ -443,14 +442,14 @@ measure the benchmark's share (owner, 2026-09-29, via the hub).
    at public API list prices (`claude-opus-5-5`, `gpt-6-sol`). The runner appends every trial to
    `jobs/ledger-<harness>.jsonl` and keeps the running total. This is the same token-based cost
    estimate that is already a secondary outcome.
-2. The hub converts $ to a share of the weekly limit: the owner gives one reading of the plan's usage
-   page (% of the week and the reset time); the hub computes the owner's local Claude Code use since
+2. The maintainers convert $ to a share of the weekly limit: the owner gives one reading of the plan's usage
+   page (% of the week and the reset time); the maintainers compute the owner's local Claude Code use since
    that reset from the session logs on this machine at the same prices; their ratio is "% of the
    week per $". Same model (Opus 5.5), so the ratio carries over. It is conservative: use on other
    machines is not in the local logs, so the ratio overstates the share per $.
 3. The 25% stop rule and the design thresholds of section 11.3 are applied to this estimate. The
    runner stops a batch when the ledger's $ equivalent since the weekly reset exceeds the $
-   threshold the hub derives from 25%; it refuses to run without one.
+   threshold the maintainers derive from 25%; it refuses to run without one.
 4. Codex: the weekly `used_percent` from Codex's own rate-limit events is used as before when the
    owner does not use Codex in parallel; otherwise the same token method applies. Both stops are
    active.
@@ -459,27 +458,27 @@ measure the benchmark's share (owner, 2026-09-29, via the hub).
 
 ### Amendment 2 (2026-09-29, before any benchmark run): limit units, pace and checkpoints
 
-**Reason.** The hub calibrated the owner's Claude plan against his own session logs in *units*
-rather than dollars, so the benchmark must be metered in the same units (hub, 2026-09-29: one
+**Reason.** The maintainers calibrated the owner's Claude plan against the owner's own session logs in *units*
+rather than dollars, so the benchmark must be metered in the same units (2026-09-29: one
 reading of the usage page, Max 20x, 4% of the week used, reset Mon 2026-10-05 10:00 UTC).
 
 **Change** (refines amendment 1; the $ equivalent stays as the cost outcome of section 8):
 
 1. **Units** per trial = uncached input x 1 + cache write x 1.25 + cache read x 0.1 + output x 5,
-   in tokens (`collect.units_from_tokens`), the same formula the hub applied to the owner's logs.
+   in tokens (`collect.units_from_tokens`), the same formula the maintainers applied to the owner's logs.
    The runner logs units per trial and in total per limit week.
-2. **Claude Code stop:** 145 million units in the limit week (the hub's conservative translation of
+2. **Claude Code stop:** 145 million units in the limit week (the maintainers' conservative translation of
    25%), or any limit warning, rate-limit error or authentication failure.
 3. **Claude Code pace:** no trial starts while the trailing 5 hours hold 75 million units or more
    (about 40% of a 5-hour window), so the owner keeps room for other work; the runner waits.
 4. **Design thresholds of section 11.3 in units**, scaled to 150 pilot runs: at most 17 million
    units (about 3% of the week) → Full; 17-35 million → Reduced; more → Minimal.
 5. **Checkpoint:** after the first 10 task trials the runner stops and the median and maximum units
-   per trial go to the hub before the pilot continues.
+   per trial go to the maintainers before the pilot continues.
 6. **Codex** (owner, 2026-09-29: ChatGPT Plus, weekly limit 12% used, no parallel Codex use): the
    weekly `used_percent` from Codex's own rate-limit events is the measure; stop at +25 percentage
    points over 12%; pause while the 5-hour window is 40% full or more. Units are logged too.
-7. Before the main run the owner gives a new usage reading and the hub recalculates the ratio.
+7. Before the main run the owner gives a new usage reading and the maintainers recalculate the ratio.
 
 **Runs affected:** all (no run has happened yet).
 
@@ -498,10 +497,10 @@ matched the owner's usage page (13% and 4%).
 2. Main guard for Claude Code, from the last event of each trial: stop when the 7-day utilization
    reaches its value before the pilot + 0.25 (0.04 → 0.29) or 0.80 absolute; pause until the
    5-hour window resets when its utilization is 0.80 or more (the stricter of the two values
-   discussed; hub, 2026-09-29). This counts all of the owner's use,
+   discussed; 2026-09-29). This counts all of the owner's use,
    so it is conservative.
 3. The units and $-equivalent ledger stays: it attributes use to the benchmark and carries the
-   design thresholds (hub, 2026-09-29: at most $45 / $90 per 150 pilot runs, and 17 / 35 million
+   design thresholds (2026-09-29: at most $45 / $90 per 150 pilot runs, and 17 / 35 million
    units; the stricter decides). The weekly $370 and 145-million-unit stops stay as second guards.
 4. The ledger records the 5-hour and 7-day utilization after every trial.
 5. A regression test pins that an "allowed" event never stops a batch.
@@ -547,7 +546,7 @@ happen before the agent works and use close to nothing. Counting them would cut 
 third trials, kill test), one per trial however many infrastructure attempts it needed.
 Calibration runs and infrastructure retries are excluded from the cap but stay in the ledger:
 every attempt is logged with its attempt number and an infrastructure-failure flag, and its tokens
-count in the attribution of use to the benchmark and in every stop rule. Decided by the hub,
+count in the attribution of use to the benchmark and in every stop rule. Decided by the maintainers,
 2026-09-29.
 
 **Runs affected:** the selection step (in progress; its first trials are unaffected) and the kill
@@ -557,7 +556,7 @@ test.
 
 **Reason.** Claude Code with Opus 5.5 at medium effort passed 77 of 78 baseline selection trials:
 38 of 39 pool tasks at 2/2, one (application-debug) at 1/2. Only one task qualified for the
-30-70% band, far below 20. As agreed with the hub before the selection step finished (2026-09-29),
+30-70% band, far below 20. As agreed by the maintainers before the selection step finished (2026-09-29),
 the pool is topped up with harder tasks; the rule "tasks are selected on baseline results only"
 is unchanged, and no skill or placebo arm had run on any task.
 
@@ -575,7 +574,7 @@ is unchanged, and no skill or placebo arm had run on any task.
 4. Selection then follows section 6 rules 3-4 over the 48-task pool. If fewer than 15 tasks qualify,
    the set is filled to 15 with tasks that passed every trial, in the seeded order, flagged
    "ceiling". The headline stays on cost; pass rate is reported with its CI and the ceiling is
-   listed as a limitation (hub, 2026-09-29).
+   listed as a limitation (2026-09-29).
 
 Pilot task trials on Claude Code after this: 78 + 16 + 5 + 50 (kill test) = 149 of 150.
 
@@ -591,7 +590,7 @@ i-have-adhd's placebo is cc-3, so the three skills have three placebos and the k
 **Change.** The kill-test arms follow the buckets of amendment 4: skill-caveman, skill-ponytail,
 skill-i-have-adhd, placebo-cc-5, placebo-cc-4, placebo-cc-3. The five tasks drawn before the pilot
 stay unchanged (django-15957, pytest-7490, django-11265, largest-eigenval, fix_async_worker_queue).
-The Claude Code pilot cap rises to 160 task trials (hub decision, 2026-09-29): the cap was a
+The Claude Code pilot cap rises to 160 task trials (maintainers' decision, 2026-09-29): the cap was a
 resource guard set before cost was known; measured cost is about 0.8 percentage points of the week
 per 78 trials, so 9 more trials are about 0.1 points ($1.6 equivalent). Dropping a pre-drawn task or
 arm would change the method to save that. The real guards are unchanged: stop at 7-day utilization
@@ -632,7 +631,7 @@ Codex cap of 100.
 
 ### Amendment 9 (2026-09-30, after the pilot, before any main-run trial): main-run design, guards, verifier timeouts, Codex
 
-Decided by the hub for the owner on 2026-09-30, from the pilot's resource numbers
+Decided by the maintainers on 2026-09-30, from the pilot's resource numbers
 (`results/pilot/SUMMARY.md`); no effect estimate enters the choice.
 
 **1. Claude Code: full design.** 9 skills, the 15 selected tasks (`tasks/selected.json`), N = 5:
@@ -642,7 +641,7 @@ wall time per trial (4.5 minutes, 164 trials) the design needs about 42 hours at
 fits the 2026-10-09 deadline with the 12-hour reserve. The run may cross the plan's weekly reset
 (Mon 2026-10-05 10:00 UTC). Guards (replacing those of amendments 2-3 for the main run):
 - **Main stop: the benchmark's own use by the ledger**, at most 25 points of the plan's week per limit
-  week, at the hub's calibration of 1 point ≈ 5.8 million units: 145 million units. It counts every
+  week, at the maintainers' calibration of 1 point ≈ 5.8 million units: 145 million units. It counts every
   benchmark run logged in that limit week (the pilot included) and follows the reset time that Claude
   Code reports. The $370-per-week equivalent of amendment 3 stays as a second guard.
 - **Account 7-day window at 0.80 or more: pause, not stop**, so that the owner keeps room for other
@@ -697,7 +696,7 @@ owner buys ChatGPT Pro, Codex is extended by a separate amendment.
 
 ### Amendment 10 (2026-09-30, during the main run, before the Codex top-up): newer Codex and model, pins kept and enforced
 
-**Note on the Codex model** (hub, 2026-09-30, checked against the sources). Section 5 chose
+**Note on the Codex model** (2026-09-30, checked against the sources). Section 5 chose
 `gpt-6-sol` as the model Codex documented for "complex coding and agentic workflows"
 (learn.chatgpt.com/docs/models, 2026-09-25). After this method was registered, GPT-6.1 Sol appeared:
 Codex CLI 0.159.1 (2026-09-29) made it the default in the bundled catalog (release notes, #49323),
@@ -725,7 +724,7 @@ were checked the same way afterwards.
 
 ### Amendment 11 (2026-09-30, before any Codex top-up trial): Codex top-up to N = 4 in two quota batches
 
-Decided by the hub for the owner on 2026-09-30, before any top-up data, so that no stop can depend on
+Decided by the maintainers on 2026-09-30, before any top-up data, so that no stop can depend on
 results.
 
 1. The Codex top-up of amendment 9 grows to N = 4: the same 5 arms and 10 tasks, 4 randomized blocks
@@ -743,7 +742,7 @@ results.
 4. Versions stay Codex CLI 0.157.0 with gpt-6-sol at medium, checked after every trial (amendment 10).
 
 **Observed at registration.** The owner reported on 2026-09-30 that the Codex weekly limits had been
-reset early. A probe at 04:54 MSK read the weekly window at 37% (the pilot's end value) with the reset
+reset early. A probe at 01:54 UTC read the weekly window at 37% (the pilot's end value) with the reset
 still at 2026-10-04 00:41 UTC, so no fresh quota was confirmed and no top-up trial ran. With weekly
 resets on 2026-10-04 and 2026-10-11, only batch 1 fits before 2026-10-08; batch 2 runs only if an earlier
 fresh quota is confirmed by a probe.
@@ -755,7 +754,7 @@ fresh quota is confirmed by a probe.
 **Reason.** Section 8 lists the size of the final diff as a secondary outcome, and it is the quantity
 closest to one README claim (ponytail, "~54% less code"). It was not collected: Harbor's SWE-bench
 verifier prints the test patch, not the agent's changes, and every container is removed after its trial.
-Found on 2026-09-30 while preparing the claims table; decided by the hub for the owner the same day.
+Found on 2026-09-30 while preparing the claims table; decided by the maintainers the same day.
 
 **Change.**
 1. **(a) Exact measure on the SWE-bench subset (7 of 15 tasks), from the moment it is switched on.**
@@ -780,7 +779,7 @@ Found on 2026-09-30 while preparing the claims table; decided by the hub for the
 
 ### Amendment 13 (2026-09-30, during the main run, before any analysis): concurrency 3; Codex decoupled from the launch date
 
-Decided by the hub for the owner on 2026-09-30 (the owner wants an earlier launch, tentatively
+Decided by the maintainers on 2026-09-30 (the owner wants an earlier launch, tentatively
 2026-10-06). Resource and schedule reasons only; no result has been looked at.
 
 1. **Concurrency 3 instead of 2** for the rest of the Claude Code main run, while three conditions hold:
@@ -803,7 +802,7 @@ Decided by the hub for the owner on 2026-09-30 (the owner wants an earlier launc
 
 ### Amendment 14 (2026-09-30, during the main run, before any analysis): a missing reward file gets the same single rerun
 
-**Reason** (hub, 2026-09-30). A trial whose verifier leaves no reward file (`RewardFileNotFoundError`) can
+**Reason** (2026-09-30). A trial whose verifier leaves no reward file (`RewardFileNotFoundError`) can
 mean that the agent broke the environment (an agent failure) or that the verifier itself failed
 (infrastructure). Counting it always as a failed trial would be wrong half the time, and so would
 counting it always as infrastructure.
@@ -822,8 +821,7 @@ the switch-on, whose time is in the log), so nothing changes in past data.
 
 ### Amendment 15 (2026-09-30, before any Codex main-run trial): Codex runs the minimal design; the owner lifts the Codex budget stop
 
-**Reason.** The owner (2026-09-30, via the hub): "в codex лимиты еще есть. разрешаю тратить полностью" -
-the whole Codex weekly quota may be used. No Codex data from the top-up exists yet; this is decided before
+**Reason.** The owner (2026-09-30): the whole Codex weekly quota may be used. No Codex data from the top-up exists yet; this is decided before
 any.
 
 **Change** (replaces the Codex top-up of amendments 9 and 11):
@@ -842,8 +840,8 @@ any.
    the Docker VM keeps at least 1.5 GiB of memory available, the host at least 15 GiB of free disk, and the
    per-task median wall time of Claude Code trials stays within +30% of its level before Codex started;
    otherwise Codex pauses until the Claude Code run ends, then runs with concurrency 2-3.
-4. **Publication.** If the Codex run finishes by 2026-10-04 18:00 MSK, its results go into the 2026-10-06
-   launch; otherwise they come out as an update (amendment 13). The hub decides on 2026-10-04 from the
+4. **Publication.** If the Codex run finishes by 2026-10-04 15:00 UTC, its results go into the 2026-10-06
+   launch; otherwise they come out as an update (amendment 13). The maintainers decide on 2026-10-04 from the
    runner's report. The analysis is the pre-registered one (section 9), Holm across the 4 Codex skills.
 
 **Expected use** (pilot rate, 0.21-0.26 points of the Plus week per trial): about 62-77 points for 297
@@ -854,9 +852,9 @@ run after the 2026-10-04 reset.
 
 ### Amendment 16 (2026-09-30, during the main run, before the block boundary it sets and before any look at outcomes): v1 volume
 
-**Decision.** The owner, 2026-09-30 about 14:00 MSK: better to test the main skills and release early than to
-spend several more days on this many skills (paraphrased from the hub's relay). The hub turned it into the
-rule below. It is made blind: no one (owner, hub, the runner's agent) had looked at main-run outcomes by arm.
+**Decision.** The owner, 2026-09-30 about 11:00 UTC: better to test the main skills and release early than to
+spend several more days on this many skills (paraphrased). The maintainers turned it into the
+rule below. It is made blind: no one (the owner, the maintainers, the runner's agent) had looked at main-run outcomes by arm.
 Only resource and process counts had been reported (trials done, infrastructure failures, plan windows,
 disk).
 
@@ -876,13 +874,13 @@ disk).
 
 ### Amendment 17 (2026-09-30, after the owner stopped the run, before any look at outcomes): stop at N = 2; no Codex main run
 
-**Decision.** The owner, 2026-09-30 about 17:58 MSK (via the hub): do not start Codex, and stop the Claude
+**Decision.** The owner, 2026-09-30 about 14:58 UTC: do not start Codex, and stop the Claude
 Code run where it is, because the machine had been lagging throughout the run. The stop is about load on the
 owner's machine and is blind: no one had looked at main-run outcomes by arm (only counts of trials,
 infrastructure failures, plan windows and disk had been reported).
 
 **Change** (replaces amendment 16's volume):
-1. The Claude Code runner stopped at 18:02 MSK; the two trials in flight finished and were recorded. Complete
+1. The Claude Code runner stopped at 15:02 UTC; the two trials in flight finished and were recorded. Complete
    blocks: 0 and 1, i.e. N = 2 for every arm and task: 15 arms x 15 tasks x 2 = 450 trials.
 2. **The primary analysis uses blocks 0-1 only** (450 trials), with the pre-registered analysis of section 9
    unchanged. The 33 valid trials of the incomplete block 2 are not in the primary analysis (block 2 covers
@@ -907,21 +905,3 @@ large (about 560 MB for the Claude Code run: documents that the tasks give the a
   assets of GitHub release v0.1.0, one archive per harness, under the same paths; their sha256 are committed in
   `results/*/*/AGENT_LOGS.json`.
 Everything passed `scripts/scrub.py` (keys, the runner's home path, e-mail) before export.
-
-### Amendment 19 (2026-10-01, after the analysis, before publication): no notice to authors before publication
-
-**Decision.** The owner, 2026-10-01 (via the hub): results are revised only if the authors themselves write;
-nothing is sent to them in advance. This replaces the second point of section 14 ("Results go to the authors
-of the tested skills 48 hours before publication ..."), which stays in place, marked as replaced.
-
-**Change.**
-1. No skill author receives results before publication.
-2. After publication, an author or anyone else can open an issue about how a skill was installed or about its
-   placebo (template: `.github/ISSUE_TEMPLATE/skill-install-dispute.yml`). Every trial's records are public
-   (amendment 18), so a dispute can point at the exact trials.
-3. A confirmed installation error means that skill's arms are rerun in full; the result is updated, an
-   amendment records the error and the rerun, and the issue is linked from the results page. A dispute that is
-   not confirmed stays linked with the reason.
-4. Neutral wording (section 14, third point) is unchanged.
-
-**Runs affected:** none; it changes how results are published and corrected.

@@ -3,5 +3,5 @@
  "sha256": "306ff51dff39426ec88ab0e2197ac7b6834769b2bb25ca952683cdf1b793443b",
  "bytes": 304232720,
  "contents": "each trial's agent/claude-code.txt (raw stream) or Codex rollout, and agent/trajectory.json (ATIF), under the same <where>/<arm>/<job>/<trial>/ paths as this folder; scrubbed",
- "published_as": "GitHub release asset (the owner attaches it at launch)"
+ "published_as": "GitHub release asset (release v0.1.0)"
 }

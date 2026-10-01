@@ -32,3 +32,17 @@ vendor/
 
 # Private launch material (third-party contacts): never in git
 docs/launch/private/
+
+# Internal working material (kept locally, not part of the public product)
+STATUS.md
+docs/log/
+docs/decisions.md
+docs/budget.md
+docs/launch-notes.md
+docs/launch/README.md
+docs/launch/PYPI.md
+docs/launch/final/
+docs/launch/pilot/
+docs/launch/manual-*.json
+docs/launch/templates/channels/
+docs/launch/templates/authors/

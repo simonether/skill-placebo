@@ -561,9 +561,9 @@ def ledger_spent(harness: str, window_start: str | None, field_name: str = "unit
     return total
 
 
-def msk_now() -> str:
-    """Wall clock for runner output in Moscow time (UTC+3), whatever the machine's zone (UTC+5)."""
-    return time.strftime("%H:%M:%S", time.gmtime(time.time() + 3 * 3600)) + " MSK"
+def clock() -> str:
+    """Wall clock for runner output, in UTC whatever the machine's zone."""
+    return time.strftime("%H:%M:%S", time.gmtime()) + " UTC"
 
 
 def utc_iso(t: float) -> str:
@@ -701,7 +701,7 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
             for d in attempts_so_far(t):
                 rec = record_interrupted(d, harness.name, harness.model)
                 if rec:
-                    print(f"{msk_now()} {d.name}: interrupted during {rec['phase']}, "
+                    print(f"{clock()} {d.name}: interrupted during {rec['phase']}, "
                           f"{units_from_partial(rec) / 1e6:.2f}M units recorded, trial will be retried", flush=True)
 
     if not dry_run:  # "done" without a trial result anywhere (Harbor failed before the trial): not done
@@ -739,7 +739,7 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
             waited = 0
             while not docker_ok():  # Docker stopped or paused (e.g. by the owner): wait, don't burn attempts
                 if waited % 600 == 0:
-                    print(f"{msk_now()} {name}: Docker unavailable (stopped or paused), waiting", flush=True)
+                    print(f"{clock()} {name}: Docker unavailable (stopped or paused), waiting", flush=True)
                 time.sleep(30)
                 waited += 30
             dirs = arm_host_dirs(arms[t.arm], mounts)
@@ -749,7 +749,7 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
                                     cwd=ROOT, env=env, stdout=f, stderr=subprocess.STDOUT).returncode
             try:
                 for rec in verifier_rerun(jobs_dir / name, ROOT / "tasks" / t.task, env):
-                    print(f"{msk_now()} {name}: verifier timeout, rerun on snapshot: {rec['outcome']}"
+                    print(f"{clock()} {name}: verifier timeout, rerun on snapshot: {rec['outcome']}"
                           + (f" reward={rec['reward']}" if "reward" in rec else ""), flush=True)
             finally:
                 remove_snapshots(jobs_dir / name)
@@ -762,7 +762,7 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
                    or (None if has_trial_result(jobs_dir / name) else "no trial result (Harbor failed before the trial)"))
             if not why:
                 break
-            print(f"{msk_now()} {name}: infrastructure failure {why}, retry {attempt + 1}/{MAX_INFRA_RETRIES}", flush=True)
+            print(f"{clock()} {name}: infrastructure failure {why}, retry {attempt + 1}/{MAX_INFRA_RETRIES}", flush=True)
         return t, rc, name
 
     if not dry_run:
@@ -778,35 +778,35 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
         t = next(pending, None)
         if t is not None and not dry_run and codex_pause["until"] > time.time():
             w = codex_pause["until"] - time.time()
-            print(f"{msk_now()} pace: plan 5-hour window full enough, waiting {w/60:.0f} min", flush=True)
+            print(f"{clock()} pace: plan 5-hour window full enough, waiting {w/60:.0f} min", flush=True)
             time.sleep(w)
         if t is not None and (pace_units_5h or pace_usd_5h) and not dry_run:
             while (w := max(pace_wait_seconds(harness.name, pace_units_5h) if pace_units_5h else 0.0,
                             pace_wait_seconds(harness.name, pace_usd_5h, field_name="cost_est_usd") if pace_usd_5h else 0.0)) > 0:
-                print(f"{msk_now()} pace: 5-hour window full, waiting {w/60:.0f} min")
+                print(f"{clock()} pace: 5-hour window full, waiting {w/60:.0f} min")
                 time.sleep(min(w, 600))
         paused = False
         while t is not None and not dry_run and (jobs_dir / "PAUSE").exists():
             if not paused:  # an operator or a watchdog paused this batch; remove the file to go on
-                print(f"{msk_now()} pause: {jobs_dir / 'PAUSE'} exists: {(jobs_dir / 'PAUSE').read_text().strip()[:200]}", flush=True)
+                print(f"{clock()} pause: {jobs_dir / 'PAUSE'} exists: {(jobs_dir / 'PAUSE').read_text().strip()[:200]}", flush=True)
                 paused = True
             time.sleep(60)
         if paused:
-            print(f"{msk_now()} resume: PAUSE removed", flush=True)
+            print(f"{clock()} resume: PAUSE removed", flush=True)
         announced = False
         while t is not None and not dry_run and (disk_pause_gib or disk_stop_gib):
             free = host_free_gib()
             ds = disk_state(free, disk_pause_gib, disk_stop_gib)
             if ds == "stop":
                 state.stopped = f"host disk free {free:.1f} GiB < {disk_stop_gib:g} GiB"
-                print(f"{msk_now()} disk stop: {state.stopped}", flush=True)
+                print(f"{clock()} disk stop: {state.stopped}", flush=True)
                 return None
             if ds == "go":
                 if announced:
-                    print(f"{msk_now()} disk resume: host disk free {free:.1f} GiB", flush=True)
+                    print(f"{clock()} disk resume: host disk free {free:.1f} GiB", flush=True)
                 break
             if not announced:
-                print(f"{msk_now()} disk pause: host disk free {free:.1f} GiB < {disk_pause_gib:g} GiB", flush=True)
+                print(f"{clock()} disk pause: host disk free {free:.1f} GiB < {disk_pause_gib:g} GiB", flush=True)
                 announced = True
             time.sleep(disk_check_s)
         return t
@@ -825,7 +825,7 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
         n = max(1, min(top, n))
         if n != last_wanted["n"]:
             if last_wanted["n"] is not None:
-                print(f"{msk_now()} concurrency {last_wanted['n']} -> {n}", flush=True)
+                print(f"{clock()} concurrency {last_wanted['n']} -> {n}", flush=True)
             last_wanted["n"] = n
         return n
 
@@ -858,7 +858,7 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
                         reset = float(cw.get("seven_day_resets") or 0)
                         until = min(reset, time.time() + week_pause_probe_s) if reset > time.time() else time.time() + week_pause_probe_s
                         codex_pause["until"] = max(codex_pause["until"], until)
-                        print(f"{msk_now()} pause: account 7-day window {cw['seven_day']:.0%} >= {claude_week_cap:.0%}", flush=True)
+                        print(f"{clock()} pause: account 7-day window {cw['seven_day']:.0%} >= {claude_week_cap:.0%}", flush=True)
                 if rolling_week and cw.get("seven_day_resets"):
                     window_start = utc_iso(float(cw["seven_day_resets"]) - 7 * 86400)
                 if rl.get("five_hour") is not None and rl["five_hour"] >= codex_pace_pct:
@@ -870,7 +870,7 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
                     if codex_week_cap_action == "pause" and wk >= codex_weekly_cap:
                         until = rl.get("weekly_resets_at") or time.time() + week_pause_probe_s
                         codex_pause["until"] = max(codex_pause["until"], float(until))
-                        print(f"{msk_now()} pause: Codex week {wk}% >= {codex_weekly_cap}% until "
+                        print(f"{clock()} pause: Codex week {wk}% >= {codex_weekly_cap}% until "
                               f"{utc_iso(codex_pause['until'])}", flush=True)
                 state.done.append(t.job_name)
                 for prev in sorted(jobs_dir.glob(f"{t.job_name}__r*")) + [jobs_dir / t.job_name]:
@@ -881,7 +881,7 @@ def run_batch(trials: list[Trial], harness: Harness, arms: dict[str, Arm],
                 state.usd_spent_window = ledger_spent(harness.name, window_start)
                 dollars = ledger_spent(harness.name, window_start, "cost_est_usd")
                 completed_here += 1
-                print(f"{msk_now()} {t.job_name} rc={rc} week={state.usd_spent_window/1e6:.1f}M units ${dollars:.2f}"
+                print(f"{clock()} {t.job_name} rc={rc} week={state.usd_spent_window/1e6:.1f}M units ${dollars:.2f}"
                       + (f" codex-weekly={wk}%" if wk is not None else ""), flush=True)
                 pin = pin_mismatch(tdir, harness)
                 if hits:

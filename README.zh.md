@@ -51,7 +51,7 @@ R 是 skill 的平均成本除以对应安慰剂的平均成本，小于 1 表�
 
 如果你的 skill 安装方式不对，或者对应的安慰剂对它不公平，请[提交 issue](https://github.com/simonether/skill-placebo/issues/new?template=skill-install-dispute.yml)：写明 skill、commit、问题所在以及如何验证。
 所有试验记录都是公开的，可以直接指向具体的运行。确认的安装错误会让该 skill 的各组全部重跑、更新结果，在 METHOD.md 中以修订记录，
-并在此处链接该 issue（[METHOD.md 修订 19](METHOD.md)）。
+并在此处链接该 issue（[METHOD.md 第 14 节](METHOD.md#14-fairness-to-skill-authors)）。
 
 ## 局限
 

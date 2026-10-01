@@ -24,7 +24,7 @@ from skill_placebo.runner import plan, run_batch  # noqa: E402
 
 SEED = 20260930  # amendment 9
 N = 5
-UNITS_PER_POINT = 5.8e6  # calibration: 1% of the Claude week ~ 5.8 M units
+UNITS_PER_POINT = 5.8e6  # calibration (METHOD.md amendment 9): 1% of the Claude week ~ 5.8 M units
 CLAUDE_GUARDS = dict(
     units_budget=25 * UNITS_PER_POINT,     # the benchmark's own ledger, per limit week: 25 points
     usd_budget=370.0,                      # second guard from amendment 3, per limit week

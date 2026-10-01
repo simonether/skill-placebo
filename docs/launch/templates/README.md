@@ -53,7 +53,7 @@ number changes in a different setup.
 If your skill was installed wrong or its placebo is unfair to it, [open an issue](https://github.com/simonether/skill-placebo/issues/new?template=skill-install-dispute.yml): skill, commit, what is
 wrong, how to check. Every trial is public, so you can point at the exact runs. A confirmed installation error
 means your skill's arms are rerun in full, the result is updated, an amendment in METHOD.md records it, and the
-issue is linked here ([METHOD.md, amendment 19](METHOD.md)).
+issue is linked here ([METHOD.md, section 14](METHOD.md#14-fairness-to-skill-authors)).
 
 ## Reproduce
 

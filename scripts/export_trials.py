@@ -122,7 +122,7 @@ def main():
             "archive": archive.name, "sha256": digest, "bytes": archive.stat().st_size,
             "contents": "each trial's agent/claude-code.txt (raw stream) or Codex rollout, and agent/trajectory.json "
                         "(ATIF), under the same <where>/<arm>/<job>/<trial>/ paths as this folder; scrubbed",
-            "published_as": "GitHub release asset (the owner attaches it at launch)"}, indent=1) + "\n")
+            "published_as": "GitHub release asset (release v0.1.0)"}, indent=1) + "\n")
         print(f"{archive.relative_to(ROOT)}: {archive.stat().st_size / 1e6:.0f} MB, sha256 {digest[:12]}")
     shutil.rmtree(staging, ignore_errors=True)
 

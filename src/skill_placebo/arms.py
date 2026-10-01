@@ -15,7 +15,7 @@ VENDOR = ROOT / "vendor"
 PLACEBO_DIR = ROOT / "arms" / "placebo"
 MOUNT_ROOT = "/opt/plugins"
 
-# Priority order by stars, loud repos protected (METHOD.md section 3).
+# Priority order by stars (METHOD.md section 3).
 # Reduced designs drop from the end.
 PRIORITY = [
     "superpowers", "mattpocock", "karpathy", "ponytail", "caveman",
