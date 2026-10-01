@@ -30,6 +30,12 @@ R 是 skill 的平均成本除以对应安慰剂的平均成本，小于 1 表�
 
 这是 Codex 试点阶段的 kill 测试：{{codex.n_skills}} 个 skill、{{codex.n_tasks}} 个任务、每组 {{codex.n_per_arm}} 次试验。v1 没有进行 Codex 主实验。
 
+## 致 skill 作者
+
+如果你的 skill 安装方式不对，或者对应的安慰剂对它不公平，请[提交 issue](https://github.com/simonether/skill-placebo/issues/new?template=skill-install-dispute.yml)：写明 skill、commit、问题所在以及如何验证。
+所有试验记录都是公开的，可以直接指向具体的运行。确认的安装错误会让该 skill 的各组全部重跑、更新结果，在 METHOD.md 中以修订记录，
+并在此处链接该 issue（[METHOD.md 修订 19](METHOD.md)）。
+
 ## 局限
 
 - 两个模型，均为 medium 推理强度（各自的默认值）；任务是公开的，可能出现在训练数据中。

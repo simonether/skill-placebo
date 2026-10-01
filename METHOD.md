@@ -415,6 +415,8 @@ cost estimate.
 - Results go to the authors of the tested skills 48 hours before publication. Replies are linked
   from the results page. Installation errors found by authors are fixed and the affected skill's
   arms are rerun in full before publication (an amendment records it).
+  *[Replaced by amendment 19 (2026-10-01): no notice to authors before publication; disputes come as
+  issues after it.]*
 - Neutral wording. The results say what was measured, on which tasks and models, and nothing about
   intent.
 
@@ -905,3 +907,21 @@ large (about 560 MB for the Claude Code run: documents that the tasks give the a
   assets of GitHub release v0.1.0, one archive per harness, under the same paths; their sha256 are committed in
   `results/*/*/AGENT_LOGS.json`.
 Everything passed `scripts/scrub.py` (keys, the runner's home path, e-mail) before export.
+
+### Amendment 19 (2026-10-01, after the analysis, before publication): no notice to authors before publication
+
+**Decision.** The owner, 2026-10-01 (via the hub): results are revised only if the authors themselves write;
+nothing is sent to them in advance. This replaces the second point of section 14 ("Results go to the authors
+of the tested skills 48 hours before publication ..."), which stays in place, marked as replaced.
+
+**Change.**
+1. No skill author receives results before publication.
+2. After publication, an author or anyone else can open an issue about how a skill was installed or about its
+   placebo (template: `.github/ISSUE_TEMPLATE/skill-install-dispute.yml`). Every trial's records are public
+   (amendment 18), so a dispute can point at the exact trials.
+3. A confirmed installation error means that skill's arms are rerun in full; the result is updated, an
+   amendment records the error and the rerun, and the issue is linked from the results page. A dispute that is
+   not confirmed stays linked with the reason.
+4. Neutral wording (section 14, third point) is unchanged.
+
+**Runs affected:** none; it changes how results are published and corrected.

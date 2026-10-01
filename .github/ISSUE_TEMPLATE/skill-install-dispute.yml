@@ -1,0 +1,48 @@
+name: Skill install or placebo dispute
+description: A tested skill was installed wrong, or its placebo is unfair to it (METHOD.md, amendment 19)
+title: "[dispute] <skill>: "
+labels: ["dispute"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Every trial is public: per-trial records under `results/`, full agent logs in the release.
+        A confirmed installation error means the skill's arms are rerun in full, the result is updated,
+        an amendment in METHOD.md records it, and this issue is linked from the results page.
+  - type: dropdown
+    id: skill
+    attributes:
+      label: Skill
+      options:
+        - addyosmani/agent-skills
+        - mattpocock/skills
+        - ayghri/i-have-adhd
+        - OthmanAdi/planning-with-files
+        - EveryInc/compound-engineering-plugin
+        - multica-ai/andrej-karpathy-skills
+        - obra/superpowers
+        - DietrichGebert/ponytail
+        - JuliusBrussee/caveman
+    validations:
+      required: true
+  - type: input
+    id: commit
+    attributes:
+      label: Commit
+      description: The commit we tested is in skills.lock.json. Name it, or the commit you think we should have used and why.
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What is wrong with the install or the placebo
+      description: For example, a hook that did not run, a missing agent or command, a mode that your README documents differently, or a placebo that is not comparable.
+    validations:
+      required: true
+  - type: textarea
+    id: check
+    attributes:
+      label: How to check it
+      description: Point at trials (paths under results/) or describe a test that would show the problem.
+    validations:
+      required: true
