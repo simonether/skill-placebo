@@ -8,7 +8,10 @@ Usage:
 Detects: exact values of every KEY=VALUE in .secrets/api.env and of every token in
 .secrets/codex-home/auth.json (the most reliable check),
 Anthropic / OpenRouter / OpenAI / GitHub key shapes, bearer tokens, the runner's own home directory
-(not other people's paths quoted in public task texts) and the owner's e-mail. Binary files are reported, not rewritten.
+(not other people's paths quoted in public task texts) and personal strings such as the runner's e-mail. Those are
+not in the code: one regular expression per line in .secrets/scrub-patterns.txt (gitignored, '#' starts a comment)
+or in SCRUB_EXTRA_PATTERNS (newline-separated), both matched case-insensitively. Binary files are reported, not
+rewritten.
 """
 import argparse
 import os
@@ -18,6 +21,19 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRETS_ENV = os.path.join(ROOT, ".secrets", "api.env")
 CODEX_AUTH = os.path.join(ROOT, ".secrets", "codex-home", "auth.json")
+PERSONAL_PATTERNS = os.path.join(ROOT, ".secrets", "scrub-patterns.txt")
+
+
+def personal_patterns():
+    lines = os.environ.get("SCRUB_EXTRA_PATTERNS", "").splitlines()
+    try:
+        with open(PERSONAL_PATTERNS, encoding="utf-8") as f:
+            lines += f.read().splitlines()
+    except FileNotFoundError:
+        pass
+    lines = [l.strip() for l in lines]
+    return [("personal", re.compile(l, re.I)) for l in lines if l and not l.startswith("#")]
+
 
 PATTERNS = [
     ("anthropic-key", re.compile(r"sk-ant-[A-Za-z0-9_\-]{20,}")),
@@ -26,8 +42,7 @@ PATTERNS = [
     ("github-token", re.compile(r"\b(?:ghp|gho|ghu|ghs|ghr)_[A-Za-z0-9]{30,}\b|github_pat_[A-Za-z0-9_]{40,}")),
     ("bearer", re.compile(r"(?i)bearer\s+[A-Za-z0-9._\-]{24,}")),
     ("home-path", re.compile(re.escape(os.path.expanduser("~")) + r"(?![A-Za-z0-9._\-])")),
-    ("email", re.compile(r"owner@example\.invalid", re.I)),
-]
+] + personal_patterns()
 
 
 def secret_values():
@@ -93,6 +108,8 @@ def main():
     ap.add_argument("paths", nargs="+")
     args = ap.parse_args()
     values = secret_values()
+    if not any(kind == "personal" for kind, _ in PATTERNS):
+        print("scrub: no personal patterns (.secrets/scrub-patterns.txt or SCRUB_EXTRA_PATTERNS)", file=sys.stderr)
     found = 0
     for path in iter_files(args.paths):
         try:
@@ -104,7 +121,7 @@ def main():
         except UnicodeDecodeError:
             hits = [k for k, v in values if v.encode() in raw]
             # Not UTF-8 (a binary, or text with a few stray bytes such as a git history dump): the secret
-            # values are checked on the bytes, the patterns (keys, home path, e-mail) on a lossy decoding.
+            # values are checked on the bytes, the patterns (keys, home path, personal strings) on a lossy decoding.
             lossy = raw.decode("utf-8", errors="replace")
             kinds = sorted({k for k, _, _ in scan_text(lossy, [])})
             if hits or kinds:

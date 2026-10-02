@@ -10,7 +10,7 @@ Layout:
   results/pilot/codex/trials/<arm>/<job>/             the Codex pilot kill test (secondary result)
 Per trial: result.json, the agent's session log and ATIF trajectory, approval turns, the verifier's output
 and reward, and the amendment 9/12/14 records (diff.json, snapshot.json, verifier_rerun.json). Then every
-exported file is scrubbed in place (keys, the runner's home path, e-mail) and checked again.
+exported file is scrubbed in place (keys, the runner's home path, personal strings) and checked again.
 """
 import json
 import shutil
