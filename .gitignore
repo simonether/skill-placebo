@@ -46,3 +46,7 @@ docs/launch/pilot/
 docs/launch/manual-*.json
 docs/launch/templates/channels/
 docs/launch/templates/authors/
+
+# Project canon for the agent (kept locally)
+CLAUDE.md
+.claude/
