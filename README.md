@@ -117,7 +117,7 @@ MIT, see [LICENSE](https://github.com/simonether/skill-placebo/blob/main/LICENSE
 
 ## Badge for tested skills
 
-`[![placebo-tested](https://raw.githubusercontent.com/simonether/skill-placebo/main/docs/badges/<skill>-cc.svg)](https://github.com/simonether/skill-placebo#results-claude-code)`
+`[![placebo-tested](https://raw.githubusercontent.com/simonether/skill-placebo/main/docs/badges/<skill>-cc.svg)](https://github.com/simonether/skill-placebo#results-claude-code-claude-opus-5-5)`
 
 ---
 <sub>Made by Simon (@simonether) · I take AI-built apps from demo to production at Keelfast.</sub>
