@@ -1,6 +1,6 @@
 # Pilot summary (2026-09-29 .. 2026-09-30)
 
-Method: METHOD.md v1.0 (a16b180) with amendments 1-8. Pilot data are not reused in the main run.
+Method: METHOD.md v1.0 (720c192) with amendments 1-8. Pilot data are not reused in the main run.
 Costs are estimates from tokens at public API list prices; the runs used subscriptions.
 
 ## Claude Code (claude-opus-5-5, effort medium, Claude Code 2.1.282)
