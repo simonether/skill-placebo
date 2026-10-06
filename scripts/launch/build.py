@@ -33,10 +33,11 @@ SCOPES = {
     "main": {"cc": ROOT / "results/main/claude-code.json", "codex": ROOT / "results/main/codex.json",
              "out": ROOT / "docs/launch/final", "readme": ROOT / "README.md", "chart": "forest", "date": None},
 }
-# The one-command run works through PyPI only once the package is published. Until then
-# the texts use the clone-and-run form. Flip PYPI to True when the package is on PyPI.
-PYPI = False
+# The one-command run works through PyPI only once the package is published. False gives the
+# clone-and-run form; True (since the launch, when the package goes to PyPI) gives `uvx skill-placebo run`.
+PYPI = True
 REPO_URL = "https://github.com/simonether/skill-placebo"
+RAW_URL = "https://raw.githubusercontent.com/simonether/skill-placebo/main"
 RUN = ({"run_cmd": "uvx skill-placebo run <owner/repo>", "run_cmd_example": "uvx skill-placebo run DietrichGebert/ponytail"}
        if PYPI else
        {"run_cmd": f"git clone {REPO_URL} && cd skill-placebo && uv run skill-placebo run <owner/repo>",
@@ -189,6 +190,7 @@ def harness_context(key: str, d: dict | None) -> dict:
         p_txt = f", both at Holm-adjusted p = {beat_p[0]}"
     ctx[f"{key}.headline"] = (f"{counts['beats placebo']} of {len(comps)} skills beat a same-length placebo{p_txt} "
                               f"({', '.join(rest)})")
+    ctx[f"{key}.headline_short"] = f"{counts['beats placebo']} of {len(comps)} beat it{p_txt} ({', '.join(rest)})"
     ctx[f"{key}.beat_p_zh"] = (f"（Holm 校正后 p = {'、'.join(beat_p)}）" if beat_p else "")
     ctx[f"{key}.headline_zh"] = (f"{len(comps)} 个 skill 中 {counts['beats placebo']} 个优于安慰剂{ctx[f'{key}.beat_p_zh']}，"
                                  f"{counts['worse than placebo']} 个更差，{counts['no better than placebo']} 个没有差别"
@@ -253,6 +255,17 @@ def chart_block(prefix: str, rel: str) -> str:
     return (f'<picture>\n  <source media="(prefers-color-scheme: dark)" srcset="{rel}/{prefix}-dark.svg">\n'
             f'  <img src="{rel}/{prefix}-light.svg" width="820" alt="Forest plot: cost ratio of each skill vs its '
             f'same-length placebo with 95% confidence intervals">\n</picture>')
+
+
+def absolute_links(body: str) -> str:
+    """Repository-relative links and images as absolute URLs to main, so the README also renders on PyPI."""
+    def link(rel: str) -> str:
+        path = rel.split("#", 1)[0]
+        kind = "tree" if path.endswith("/") or (ROOT / path).is_dir() else "blob"
+        return f"{REPO_URL}/{kind}/main/{rel}"
+    body = re.sub(r'\b(src|srcset)="(?!https?:|#)([^"]+)"', lambda m: f'{m.group(1)}="{RAW_URL}/{m.group(2)}"', body)
+    body = re.sub(r"!\[([^\]]*)\]\((?!https?:)([^)\s]+)\)", lambda m: f"![{m.group(1)}]({RAW_URL}/{m.group(2)})", body)
+    return re.sub(r"\]\((?!https?:|#|mailto:)([^)\s]+)\)", lambda m: f"]({link(m.group(1))})", body)
 
 
 def badge_svg(label: str, message: str, color: str) -> str:
@@ -363,6 +376,8 @@ def main():
             body = re.sub(r"^(\d+\. )(Show HN: .*)$",
                           lambda m: f"{m.group(1)}{m.group(2)}  `{len(m.group(2))} chars{' - TOO LONG' if len(m.group(2)) > 80 else ''}`",
                           body, flags=re.M)
+        if rel.name.startswith("README"):
+            body = absolute_links(body)
         if a.scope == "pilot" and not rel.name.startswith("README"):
             body = PILOT_BANNER + "\n" + body
         dest.write_text(body)

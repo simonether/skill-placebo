@@ -1,14 +1,14 @@
 
 <p align="center">
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/img/forest-dark.svg">
-  <img src="docs/img/forest-light.svg" width="820" alt="Forest plot: cost ratio of each skill vs its same-length placebo with 95% confidence intervals">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/simonether/skill-placebo/main/docs/img/forest-dark.svg">
+  <img src="https://raw.githubusercontent.com/simonether/skill-placebo/main/docs/img/forest-light.svg" width="820" alt="Forest plot: cost ratio of each skill vs its same-length placebo with 95% confidence intervals">
 </picture>
 </p>
 
 # skill-placebo
 
-[English](README.md) · 中文
+[English](https://github.com/simonether/skill-placebo/blob/main/README.md) · 中文
 
 **给最热门的 coding agent skill 做安慰剂对照：一个 skill 是否比同样长度的中性文字更好？**
 
@@ -16,7 +16,7 @@
 
 **9 个 skill 中 2 个优于安慰剂（Holm 校正后 p = 0.049），0 个更差，7 个没有差别。** 对照组：同样长度、同样安装方式的中性安慰剂。<br>
 次要结果（与不装 skill 相比）：没有一个 skill 的成本明显低于不装 skill；同样长度的安慰剂本身使成本变化 +2% to +16%。<br>
-<sub>测量日期 2026-09-30：15 个公开任务（SWE-bench Verified、Terminal-Bench 2.1、OpenThoughts-TBLite），Claude Code + claude-opus-5-5，每组 30 次试验，共 450 次。方法在第一次运行前登记：[METHOD.md](METHOD.md)。原始轨迹：[`results/`](results/)。复现一行：`git clone https://github.com/simonether/skill-placebo && cd skill-placebo && uv run skill-placebo run <owner/repo>`。</sub>
+<sub>测量日期 2026-09-30：15 个公开任务（SWE-bench Verified、Terminal-Bench 2.1、OpenThoughts-TBLite），Claude Code + claude-opus-5-5，每组 30 次试验，共 450 次。方法在第一次运行前登记：[METHOD.md](https://github.com/simonether/skill-placebo/blob/main/METHOD.md)。原始轨迹：[`results/`](https://github.com/simonether/skill-placebo/tree/main/results/)。复现一行：`uvx skill-placebo run <owner/repo>`。</sub>
 
 ## 结果：Claude Code（claude-opus-5-5）
 
@@ -35,7 +35,7 @@
 置信区间未经校正；判定使用 9 个 skill 的 Holm 校正 p 值（i-have-adhd：成本的未校正置信区间不含 1，Holm 校正后 p = 0.095；planning-with-files：通过率的未校正置信区间不含 0，Holm 校正后 p = 0.178）。
 
 R 是 skill 的平均成本除以对应安慰剂的平均成本，小于 1 表示 skill 更省。D 是通过率差（百分点）。判定规则见
-[METHOD.md 9.1](METHOD.md#91-verdict-per-skill-and-harness)，对 9 个 skill 做 Holm 校正。
+[METHOD.md 9.1](https://github.com/simonether/skill-placebo/blob/main/METHOD.md#91-verdict-per-skill-and-harness)，对 9 个 skill 做 Holm 校正。
 
 ## Codex（gpt-6-sol，仅试点，次要结果）
 
@@ -51,11 +51,11 @@ R 是 skill 的平均成本除以对应安慰剂的平均成本，小于 1 表�
 
 如果你的 skill 安装方式不对，或者对应的安慰剂对它不公平，请[提交 issue](https://github.com/simonether/skill-placebo/issues/new?template=skill-install-dispute.yml)：写明 skill、commit、问题所在以及如何验证。
 所有试验记录都是公开的，可以直接指向具体的运行。确认的安装错误会让该 skill 的各组全部重跑、更新结果，在 METHOD.md 中以修订记录，
-并在此处链接该 issue（[METHOD.md 第 14 节](METHOD.md#14-fairness-to-skill-authors)）。
+并在此处链接该 issue（[METHOD.md 第 14 节](https://github.com/simonether/skill-placebo/blob/main/METHOD.md#14-fairness-to-skill-authors)）。
 
 ## 局限
 
-- 两个模型，均为 medium 推理强度（各自的默认值）；任务是公开的，可能出现在训练数据中。
+- 主实验只有一个模型：Claude Code 中的 claude-opus-5-5，medium 推理强度（默认值）；Codex 只做了小规模试点；任务是公开的，可能出现在训练数据中。
 - 多数任务对 claude-opus-5-5 来说已接近满分，因此通过率信息有限，结论以成本为主。
 - 成本按 token 数乘以公开价格估算。
 

@@ -63,8 +63,8 @@ issue is linked here ([METHOD.md, section 14](METHOD.md#14-fairness-to-skill-aut
 
 ## Limits
 
-- Two models at medium effort, each harness's default: {{cc.model}} (Claude Code) and {{codex.model}} (Codex). Other models
-  can behave differently.
+- One model in the main run: {{cc.model}} in Claude Code at medium effort, the harness default. Codex ({{codex.model}})
+  ran only in a small pilot. Other models can behave differently.
 - The tasks are public and probably in the models' training data. That affects every arm equally, but
   absolute pass rates say little about new work.
 - Most tasks sat at the ceiling for {{cc.model}}, so the pass rate carries little information here and
