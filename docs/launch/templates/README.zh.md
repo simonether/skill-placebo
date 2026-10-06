@@ -13,13 +13,15 @@
 
 **{{cc.headline_zh}}。** 对照组：同样长度、同样安装方式的中性安慰剂。<br>
 {{cc.secondary_line_zh}}<br>
-<sub>测量日期 {{date}}：{{cc.n_tasks}} 个公开任务（SWE-bench Verified、Terminal-Bench 2.1、OpenThoughts-TBLite），Claude Code + {{cc.model}}，每组 {{cc.n_per_arm}} 次试验，共 {{cc.n_trials}} 次。方法在第一次运行前登记：[METHOD.md](METHOD.md)。原始轨迹：[`results/`](results/)。复现一行：`{{run_cmd}}`。</sub>
+<sub>测量日期 {{date}}：{{cc.n_tasks}} 个公开任务（SWE-bench Verified、Terminal-Bench 2.1、OpenThoughts-TBLite），Claude Code + {{cc.model}}，每组 {{cc.n_per_arm}} 次试验，共 {{cc.n_trials}} 次。方法在第一次运行前登记：[METHOD.md](METHOD.md)。逐次试验记录：[`results/`](results/)；智能体完整日志：[release v0.1.0](https://github.com/simonether/skill-placebo/releases/tag/v0.1.0)（sha256 见 `results/*/*/AGENT_LOGS.json`）。复现一行：`{{run_cmd}}`。</sub>
 
 ## 结果：Claude Code（{{cc.model}}）
 
 {{cc.results_table}}
 
-{{cc.ci_note_zh}}
+{{cc.ci_note_zh}}<br>
+{{cc.approval_note_zh}}<br>
+2026-10-06 更正（[METHOD.md 修订 19](METHOD.md#16-amendments)）：两次代理超时、但之后测试通过的试验，按第 5、7 节改记为失败；planning-with-files 由“没有差别”改为“比安慰剂差”。成本不变。
 
 R 是 skill 的平均成本除以对应安慰剂的平均成本，小于 1 表示 skill 更省。D 是通过率差（百分点）。判定规则见
 [METHOD.md 9.1](METHOD.md#91-verdict-per-skill-and-harness)，对 {{cc.n_skills}} 个 skill 做 Holm 校正。

@@ -224,7 +224,10 @@ def trial_row(res: Path) -> dict | None:
         "reward": reward,
         # No reward: an infrastructure failure is not a trial (excluded, rerun); anything else - agent
         # timeout, verifier timeout on the agent's code, crash - is a failed trial (METHOD.md section 7).
-        "passed": (None if _is_infra(exc) else 0) if reward is None else int(float(reward) >= 1.0),
+        # An agent timeout is a failed trial even when the verifier, run on its final state, passes
+        # (METHOD.md sections 5 and 7; amendment 19).
+        "passed": (0 if exc.get("exception_type") == "AgentTimeoutError" else
+                   (None if _is_infra(exc) else 0) if reward is None else int(float(reward) >= 1.0)),
         "exception": exc.get("exception_type"),
         "attempt": attempt,
         "infra_failure": int(_is_infra(exc)),

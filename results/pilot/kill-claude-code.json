@@ -9,21 +9,21 @@
    "cost_treat": 0.23070416,
    "cost_control": 0.22605611999999997,
    "pass_treat": 1.0,
-   "pass_control": 1.0,
+   "pass_control": 0.9,
    "ratio": 1.020561442884183,
    "ratio_ci": [
     0.8322610200365124,
     1.261991147486191
    ],
    "ratio_p": 0.9029097090290971,
-   "diff_pp": 0.0,
+   "diff_pp": 9.999999999999998,
    "diff_ci_pp": [
     0.0,
-    0.0
+    30.000000000000004
    ],
-   "diff_p": 1.0,
+   "diff_p": 0.6557344265573443,
    "cost_per_solved_treat": 0.23070416,
-   "cost_per_solved_control": 0.22605611999999997,
+   "cost_per_solved_control": 0.2511734666666666,
    "mean_output_tokens_skill": 5187.0,
    "mean_output_tokens_placebo": 5518.8
   },

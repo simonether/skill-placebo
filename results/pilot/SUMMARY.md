@@ -9,8 +9,11 @@ Costs are estimates from tokens at public API list prices; the runs used subscri
   4 infrastructure retries, 22 calibration runs.
 - Per task trial: median 0.053 M units ($0.17), mean 0.060 M units ($0.20). All task trials:
   9.6 M units, $31.9.
-- Baseline selection: 41 of 47 tasks passed every trial, 3 passed some (application-debug,
-  django-13512, sympy-17630), 3 passed none (django-11141, django-11734, video-processing).
+- Baseline selection: 40 of 47 tasks passed every trial, 3 passed some (application-debug,
+  django-13512, sympy-17630), 4 passed none (django-11141, django-11734, django-13401, video-processing).
+  Corrected on 2026-10-06 (METHOD.md amendment 19): both django-13401 trials were agent timeouts whose
+  verifier passed afterwards and had been counted as passes; a timeout is a failed trial (sections 5, 7).
+  The selected set does not change: django-13401 was not selected either way.
   Opus 5.5 at medium effort sits at the ceiling of this pool.
 - Selected set for the main run: 3 qualified + 12 ceiling-flagged (`tasks/selected.json`).
 - Plan windows (account-wide, from Claude Code's own `rate_limit_event`): 7-day 4% → 13%;
@@ -20,11 +23,13 @@ Costs are estimates from tokens at public API list prices; the runs used subscri
 
 | Skill | Placebo | Cost ratio R [95% CI] | Pass skill / placebo | Output tokens skill / placebo |
 |---|---|---|---|---:|
-| caveman | cc-5 | 1.02 [0.83, 1.26] | 100% / 100% | 5,187 / 5,519 |
+| caveman | cc-5 | 1.02 [0.83, 1.26] | 100% / 90% | 5,187 / 5,519 |
 | ponytail | cc-4 | 0.75 [0.63, 0.88] | 100% / 100% (90% before the verifier rerun) | 3,004 / 4,749 |
 | i-have-adhd | cc-3 | 0.72 [0.60, 0.92] | 100% / 100% | 4,602 / 6,620 |
 
 Kill rule (section 11.3): not killed; ponytail and i-have-adhd show non-trivial cost differences.
+One placebo-cc-5 trial (django-11265) was an agent timeout whose verifier passed afterwards; it is a failed
+trial (amendment 19), so that placebo's pass rate is 90%. The kill rule uses cost only and does not change.
 One kill-test trial (placebo-cc-5 x django-15957) ran without its placebo (directory rebuilt during
 the run) and was repeated; see the log of 29.09.
 One kill-test trial (placebo-cc-4 x fix_async_worker_queue) had a verifier timeout. Under amendment 9

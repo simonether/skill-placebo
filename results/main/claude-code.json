@@ -209,21 +209,21 @@
    "cost_treat": 0.21180906666666663,
    "cost_control": 0.21485523333333337,
    "pass_treat": 0.9,
-   "pass_control": 0.8666666666666667,
+   "pass_control": 0.8333333333333334,
    "ratio": 0.9858222365850366,
    "ratio_ci": [
     0.9129467183537535,
     1.0558862704881067
    ],
    "ratio_p": 0.7105289471052895,
-   "diff_pp": 3.3333333333333326,
+   "diff_pp": 6.666666666666665,
    "diff_ci_pp": [
     0.0,
-    9.999999999999998
+    16.666666666666664
    ],
-   "diff_p": 0.7409259074092591,
+   "diff_p": 0.25137486251374863,
    "cost_per_solved_treat": 0.23534340740740736,
-   "cost_per_solved_control": 0.24790988461538463,
+   "cost_per_solved_control": 0.25782628,
    "placebo": "placebo-cc-5",
    "output_tokens_vs_placebo": {
     "ratio": 0.9473241827291867,
@@ -245,21 +245,21 @@
    "cost_treat": 0.20338538,
    "cost_control": 0.21485523333333337,
    "pass_treat": 0.8333333333333334,
-   "pass_control": 0.8666666666666667,
+   "pass_control": 0.8333333333333334,
    "ratio": 0.946615899667016,
    "ratio_ci": [
     0.8955883790902164,
     0.9873904139990752
    ],
    "ratio_p": 0.0059994000599940004,
-   "diff_pp": -3.3333333333333326,
+   "diff_pp": 0.0,
    "diff_ci_pp": [
-    -10.000000000000009,
-    0.0
+    -9.999999999999998,
+    9.999999999999998
    ],
-   "diff_p": 0.7219278072192781,
+   "diff_p": 1.0,
    "cost_per_solved_treat": 0.244062456,
-   "cost_per_solved_control": 0.24790988461538463,
+   "cost_per_solved_control": 0.25782628,
    "placebo": "placebo-cc-5",
    "output_tokens_vs_placebo": {
     "ratio": 0.9182892396076447,
@@ -308,15 +308,15 @@
    "mean_output_tokens_placebo": 3902.1666666666665
   },
   "planning-with-files": {
-   "verdict": "no better than placebo",
+   "verdict": "worse than placebo",
    "ratio_p_adj": 1.0,
-   "diff_p_adj": 0.17818218178182182,
+   "diff_p_adj": 0.043195680431956804,
    "n_tasks": 15,
    "n_treat": 30,
    "n_control": 30,
    "cost_treat": 0.2140317266666667,
    "cost_control": 0.20466953999999998,
-   "pass_treat": 0.8333333333333334,
+   "pass_treat": 0.8,
    "pass_control": 1.0,
    "ratio": 1.0457429408727197,
    "ratio_ci": [
@@ -324,13 +324,13 @@
     1.1880020618071445
    ],
    "ratio_p": 0.5391460853914608,
-   "diff_pp": -16.666666666666664,
+   "diff_pp": -19.999999999999996,
    "diff_ci_pp": [
-    -33.333333333333336,
-    -3.3333333333333326
+    -36.66666666666667,
+    -6.666666666666665
    ],
-   "diff_p": 0.0197980201979802,
-   "cost_per_solved_treat": 0.25683807200000003,
+   "diff_p": 0.0047995200479952005,
+   "cost_per_solved_treat": 0.2675396583333334,
    "cost_per_solved_control": 0.20466953999999998,
    "placebo": "placebo-cc-1",
    "output_tokens_vs_placebo": {
@@ -862,13 +862,13 @@
     "n_control": 30
    },
    "pass_vs_baseline": {
-    "diff_pp": -3.3333333333333326,
+    "diff_pp": -6.666666666666665,
     "diff_ci_pp": [
-     -13.333333333333341,
-     6.666666666666677
+     -20.000000000000007,
+     6.666666666666665
     ],
-    "diff_p": 0.7669233076692331,
-    "pass_arm": 0.8333333333333334,
+    "diff_p": 0.42715728427157285,
+    "pass_arm": 0.8,
     "pass_baseline": 0.8666666666666667
    },
    "tokens_vs_baseline": {
@@ -1410,13 +1410,13 @@
     "n_control": 30
    },
    "pass_vs_baseline": {
-    "diff_pp": 0.0,
+    "diff_pp": -3.3333333333333326,
     "diff_ci_pp": [
-     0.0,
+     -10.000000000000009,
      0.0
     ],
-    "diff_p": 1.0,
-    "pass_arm": 0.8666666666666667,
+    "diff_p": 0.718928107189281,
+    "pass_arm": 0.8333333333333334,
     "pass_baseline": 0.8666666666666667
    },
    "tokens_vs_baseline": {

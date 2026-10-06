@@ -905,3 +905,37 @@ large (about 560 MB for the Claude Code run: documents that the tasks give the a
   assets of GitHub release v0.1.0, one archive per harness, under the same paths; their sha256 are committed in
   `results/*/*/AGENT_LOGS.json`.
 Everything passed `scripts/scrub.py` (keys, the runner's home path, e-mail) before export.
+
+### Amendment 19 (2026-10-06, after the repository was made public, before the launch posts): agent timeouts count as failed trials; the approval-turn mark
+
+**What was wrong.** Sections 5 and 7 say that an agent timeout is a failed trial. The analysis code counted a
+trial as passed whenever the verifier returned a reward of 1, and Harbor runs the verifier on the agent's final
+state even after a timeout. Two main-run trials were agent timeouts (1,200 s) whose verifier passed afterwards:
+placebo-cc-5 on django__django-11265 and planning-with-files on django__django-15957, both in block 1. Both had
+been counted as passes. Found on 2026-10-06 while checking the approval-turn records for section 5.1 (neither
+trial has one: the timeout ended the run before it was written). No other published trial is affected; the
+Codex pilot had no timeouts.
+
+**Change.** `src/skill_placebo/collect.py` counts an agent timeout as a failed trial whatever the reward (with a
+test), and the analysis was rerun with nothing else changed (`results/main/claude-code.json`). The effect is on
+pass rates only; costs and every R are unchanged:
+- planning-with-files vs its placebo: D −17 → −20 pp [−37, −7], Holm-adjusted p 0.178 → 0.043, so its verdict
+  changes from "no better than placebo" to **"worse than placebo"**;
+- caveman D +3 → +7 pp and agent-skills D −3 → 0 pp (their placebo cc-5 now passes 83%); verdicts unchanged.
+The headline becomes "2 of 9 skills beat a same-length placebo, both at Holm-adjusted p = 0.049 (1 worse, 6 no
+better)".
+
+**Pilot.** The same rule applies to the Claude Code pilot. One kill-test trial (placebo-cc-5 on django-11265)
+and both selection trials of django-13401 were such timeouts. The kill rule uses cost only and does not change;
+the caveman placebo's kill-test pass rate becomes 90% (`results/pilot/kill-claude-code.json`,
+`results/pilot/SUMMARY.md`). `tasks/selected.json` records django-13401 as 2 of 2 passes, which is 0 of 2 under
+this rule; it was not selected either way, so the selected set does not change.
+
+**Section 5.1 mark.** Section 5.1 requires the results table to mark superpowers and every skill whose trials
+used the scripted approval turn; the table as first published did not. It now marks superpowers, ponytail and
+i-have-adhd, with the counts from the trial records under the table.
+
+**Versions.** Release v0.1.0 (its tag is on commit 29c7426) and the README in PyPI package 0.1.0 show the earlier
+numbers; the main branch and the next package version carry the corrected ones.
+
+**Runs affected:** none is rerun; the main-run analysis and the pilot summary are recomputed.

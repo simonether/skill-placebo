@@ -17,7 +17,9 @@
 
 {{cc.results_table}}
 
-{{cc.ci_note}}
+{{cc.ci_note}}<br>
+{{cc.approval_note}}<br>
+Corrected on 2026-10-06 ([METHOD.md, amendment 19](METHOD.md#16-amendments)): two agent timeouts whose tests passed afterwards now count as failed trials, as sections 5 and 7 require; planning-with-files moves from "no better" to "worse than placebo". Costs are unchanged.
 
 R is the skill's mean cost divided by its placebo's; below 1 the skill is cheaper. D is the pass-rate
 difference. Verdicts follow [METHOD.md 9.1](METHOD.md#91-verdict-per-skill-and-harness), with Holm

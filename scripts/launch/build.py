@@ -86,7 +86,7 @@ def with_verdicts(d: dict) -> dict:
     return d
 
 
-def harness_context(key: str, d: dict | None) -> dict:
+def harness_context(key: str, d: dict | None, trials_dir: Path | None = None) -> dict:
     ctx: dict[str, str] = {}
     if d is None:
         return ctx
@@ -136,7 +136,8 @@ def harness_context(key: str, d: dict | None) -> dict:
         ctx[f"{key}.{tag}.pct"] = pct(comps[k]["ratio"])
         ctx[f"{key}.{tag}.R"] = f"{comps[k]['ratio']:.2f}"
         ctx[f"{key}.{tag}.R_ci"] = fmt_ci(comps[k]["ratio_ci"])
-    ctx[f"{key}.results_table"] = results_table(comps)
+    marked, ctx[f"{key}.approval_note"], ctx[f"{key}.approval_note_zh"] = approval_marks(comps, approval_counts(trials_dir))
+    ctx[f"{key}.results_table"] = results_table(comps, marked)
     # Unadjusted CIs vs Holm-adjusted verdicts: name every case where they seem to disagree.
     odd, odd_zh = [], []
     for s_, c_ in comps.items():
@@ -198,13 +199,44 @@ def harness_context(key: str, d: dict | None) -> dict:
     return ctx
 
 
-def results_table(comps: dict) -> str:
+def approval_counts(trials_dir: Path | None) -> dict[str, tuple[int, int]]:
+    """Per arm: (trials where the scripted approval turn fired, trials with an approval record); METHOD.md 5.1."""
+    out: dict[str, tuple[int, int]] = {}
+    for f in sorted(trials_dir.glob("*/*/*/agent/approval_turns.txt")) if trials_dir and trials_dir.is_dir() else []:
+        arm = f.relative_to(trials_dir).parts[0]
+        fired, n = out.get(arm, (0, 0))
+        out[arm] = (fired + (int(f.read_text().split()[0]) > 0), n + 1)
+    return out
+
+
+def approval_marks(comps: dict, counts: dict) -> tuple[set, str, str]:
+    """METHOD.md 5.1: the table marks superpowers and every skill whose trials used the scripted approval turn."""
+    marked = {s for s in comps if s == "superpowers" or counts.get(f"skill-{s}", (0, 0))[0] > 0}
+    if not marked:
+        return marked, "", ""
+    fired = [(a, f) for a, (f, _) in counts.items() if f]
+    fired.sort(key=lambda x: (not x[0].startswith("skill-"), PRIORITY.index(x[0][6:]) if x[0][6:] in PRIORITY else 99, x[0]))
+    names = [(a[6:] if a.startswith("skill-") else a.replace("placebo-", "placebo "), f) for a, f in fired]
+    total, records = sum(f for _, f in fired), sum(n for _, n in counts.values())
+    never = [s for s in sorted(marked) if counts.get(f"skill-{s}", (0, 0))[0] == 0]
+    link = "[METHOD.md 5.1](METHOD.md#51-scripted-approval-turn)"
+    en = (f"† Scripted approval, not an author-documented mode ({link}): the scripted turn fired in {total} of "
+          f"{records} recorded trials ({', '.join(f'{n} {f}' for n, f in names)})"
+          + (f", never for {' or '.join(never)}" if never else "") + ".")
+    names_zh = "、".join(f"{n.replace('placebo ', '安慰剂 ')} {f}" for n, f in names)
+    zh = (f"† 脚本化批准，不是作者文档中的模式（{link}）：在 {records} 次有记录的试验中触发 {total} 次（{names_zh}）"
+          + (f"，{'、'.join(never)} 从未触发" if never else "") + "。")
+    return marked, en, zh
+
+
+def results_table(comps: dict, marked: set = frozenset()) -> str:
     rows = ["| Skill | Cost vs placebo R [95% CI] | Change | Pass skill / placebo | D, pp [95% CI] | Verdict | n |",
             "|---|---|---:|---|---|---|---|"]
     for skill in sorted(comps, key=lambda k: (PRIORITY.index(k) if k in PRIORITY else 99)):
         c = comps[skill]
         d = f"{c['diff_pp']:+.0f}".replace("-", "−")
-        rows.append(f"| {skill} | {c['ratio']:.2f} {fmt_ci(c['ratio_ci'])} | {pct(c['ratio'])} | "
+        name = f"{skill} †" if skill in marked else skill
+        rows.append(f"| {name} | {c['ratio']:.2f} {fmt_ci(c['ratio_ci'])} | {pct(c['ratio'])} | "
                     f"{c['pass_treat']:.0%} / {c['pass_control']:.0%} | {d} {fmt_pp_ci(c['diff_ci_pp'])} | {c['verdict']} | "
                     f"{c['n_treat']}/{c['n_control']} |")
     return "\n".join(rows)
@@ -318,8 +350,8 @@ def build_context(scope: str, cc_path: str | None = None, codex_path: str | None
     ctx = {**RUN, "scope_banner": PILOT_BANNER if scope == "pilot" else "",
            "date": sc["date"] or ((cc or {}).get("meta") or {}).get("date", ""),
            "claims_table": claims_table(claims, cc)}
-    ctx.update(harness_context("cc", cc))
-    ctx.update(harness_context("codex", cx))
+    ctx.update(harness_context("cc", cc, ROOT / "results" / scope / "claude-code" / "trials"))
+    ctx.update(harness_context("codex", cx, ROOT / "results" / CODEX_SCOPE / "codex" / "trials"))
     manual = ROOT / "docs" / "launch" / f"manual-{scope}.json"
     if manual.exists():  # e.g. {"surprise": "..."}: sentences chosen on final data, may hold placeholders
         for k, v in json.loads(manual.read_text()).items():

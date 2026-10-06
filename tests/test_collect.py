@@ -51,6 +51,20 @@ def test_verifier_timeout_is_a_failed_trial(tmp_path):
     assert r["passed"] == 0 and r["infra_failure"] == 0
 
 
+def test_agent_timeout_is_a_failed_trial_even_with_a_passing_reward(tmp_path):
+    # METHOD.md sections 5 and 7: a timeout is a failed trial, even when the verifier, run on the agent's final
+    # state after the timeout, passes (amendment 19).
+    job = tmp_path / "b01-0445__claude-code__skill-planning-with-files__django__django-15957"
+    t = job / "django__django-15957__x"
+    (t / "agent").mkdir(parents=True)
+    (t / "result.json").write_text(json.dumps({"task_name": "django__django-15957", "trial_name": "x",
+        "agent_info": {"model_info": {"name": "claude-opus-5-5"}}, "agent_result": {"n_input_tokens": 10},
+        "verifier_result": {"rewards": {"reward": 1.0}},
+        "exception_info": {"exception_type": "AgentTimeoutError"}}))
+    (r,) = list(rows(tmp_path))
+    assert r["passed"] == 0 and r["reward"] == 1.0 and r["infra_failure"] == 0 and r["cost_est_usd"] is not None
+
+
 def _timeout_trial(tmp_path):
     job = tmp_path / "b00-0001__claude-code__placebo-cc-4__fix_async_worker_queue"
     t = job / "fix_async_worker_queue__x"
